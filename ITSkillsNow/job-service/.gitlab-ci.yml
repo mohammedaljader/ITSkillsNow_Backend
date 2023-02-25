@@ -1,0 +1,9 @@
+maven-jobservice:build:
+  image: maven:latest
+  stage: build
+  script: "mvn -f ITSkillsNow/job-service/pom.xml compile"
+
+maven-jobservice:test:   
+  image: maven:latest
+  stage: test    
+  script: "mvn -f ITSkillsNow/job-service/pom.xml test"

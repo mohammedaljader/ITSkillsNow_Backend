@@ -1,0 +1,7 @@
+stages:
+  - build
+  - test
+
+include:
+  - local: 'ITSkillsNow/job-service/.gitlab-ci.yml'
+  - local: 'ITSkillsNow/course-service/.gitlab-ci.yml'
