@@ -3,10 +3,6 @@ stages:
   - test
   - sonarqube
 
-include:
-  - local: 'ITSkillsNow/job-service/.gitlab-ci.yml'
-  - local: 'ITSkillsNow/course-service/.gitlab-ci.yml'
-
 
 sonarqube:
   stage: sonarqube
@@ -24,3 +20,8 @@ sonarqube:
   allow_failure: true
   only:
     - master # or the name of your main branch
+
+
+include:
+  - local: 'ITSkillsNow/job-service/.gitlab-ci.yml'
+  - local: 'ITSkillsNow/course-service/.gitlab-ci.yml'
