@@ -1,11 +1,15 @@
 maven-courseservice:build:
   image: maven:latest
   stage: build
-  script: 
-    - echo "is building"
-    - "mvn -f ITSkillsNow/course-service/pom.xml compile"
+  script: "mvn -f ITSkillsNow/course-service/pom.xml compile"
+  only:
+    changes:
+      - ITSkillsNow/course-service/**/*
 
 maven-courseservice:test:   
   image: maven:latest
   stage: test    
   script: "mvn -f ITSkillsNow/course-service/pom.xml test"
+  only:
+    changes:
+      - ITSkillsNow/course-service/**/*
