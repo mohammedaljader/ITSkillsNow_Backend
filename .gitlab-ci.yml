@@ -1,7 +1,8 @@
 stages:
+  - sonarqube
   - build
   - test
-  - sonarqube
+
 
 
 include:
