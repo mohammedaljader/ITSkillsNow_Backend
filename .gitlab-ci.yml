@@ -25,4 +25,4 @@ sonarqube:
     - mvn -f ITSkillsNow/pom.xml sonar:sonar -Dsonar.login=4a0e0a09b0ba481ef458ffac9d6d4215e7454802
   allow_failure: true
   only:
-    - master # or the name of your main branch
+    - main # or the name of your main branch
