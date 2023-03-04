@@ -21,7 +21,7 @@ sonarqube:
     paths:
       - .sonar/cache
   script:
-    - mvn -f ITSkillsNow verify sonar:sonar -Dsonar.qualitygate.wait=true
+    - mvn -f ITSkillsNow/pom.xml verify sonar:sonar -Dsonar.qualitygate.wait=true
 
   allow_failure: true
   only:
