@@ -1,0 +1,51 @@
+version: '3.9'
+
+services:
+  discovery-server:
+    image: discovery-server
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+    build:
+      context: ./discovery-server
+      dockerfile: "Dockerfile"
+
+
+  gateway:
+    image: gateway
+    container_name: gateway
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://discovery-server:8761/eureka
+    ports:
+      - "8080:8080"
+    build:
+      context: ./api-gateway
+      dockerfile: "Dockerfile"
+    depends_on:
+      - discovery-server
+
+  course-service:
+    image: course-service
+    container_name: course-service
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://discovery-server:8761/eureka
+    ports:
+      - "8081:8081"
+    build:
+      context: ./course-service
+      dockerfile: "Dockerfile"
+    depends_on:
+      - discovery-server
+
+  job-service:
+    image: job-service
+    container_name: job-service
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://discovery-server:8761/eureka
+    ports:
+      - "8082:8082"
+    build:
+      context: ./job-service
+      dockerfile: "Dockerfile"
+    depends_on:
+      - discovery-server
