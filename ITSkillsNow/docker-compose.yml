@@ -76,3 +76,8 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+
+  sonarqube:
+    image: sonarqube:9.9.0-community
+    ports:
+      - '9000:9000'
