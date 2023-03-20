@@ -21,7 +21,7 @@ sonarqube:
     paths:
       - .sonar/cache
   script:
-    - mvn verify sonar:sonar -Dsonar.projectKey=ITSkillsNow
+    - mvn -f ITSkillsNow/pom.xml verify sonar:sonar -Dsonar.projectKey=ITSkillsNow
 
   allow_failure: true
   only:
