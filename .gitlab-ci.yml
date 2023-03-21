@@ -21,8 +21,7 @@ sonarqube:
     paths:
       - .sonar/cache
   script:
-    - mvn -f ITSkillsNow/pom.xml clean install
-    - mvn -f ITSkillsNow/pom.xml "-Dsonar.qualitygate=true" sonar:sonar
+    - mvn -f ITSkillsNow/pom.xml verify sonar:sonar -Dsonar.projectKey=ITSkillsNow
 
   allow_failure: true
   only:
