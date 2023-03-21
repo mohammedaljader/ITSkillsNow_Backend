@@ -21,7 +21,8 @@ sonarqube:
     paths:
       - .sonar/cache
   script:
-    - mvn -f ITSkillsNow/pom.xml clean verify sonar:sonar -Dsonar.projectKey=ITSkillsNow -Dsonar.host.url=http://localhost:9000 -Dsonar.login=sqp_9a95ec75e4120ee660f97f95ca3cd14380b3c9e8
+    - mvn -f ITSkillsNow/pom.xml clean install
+    - mvn -f ITSkillsNow/pom.xml "-Dsonar.qualitygate=true" sonar:sonar
 
   allow_failure: true
   only:
