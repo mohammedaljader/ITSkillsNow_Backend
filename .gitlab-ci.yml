@@ -22,9 +22,9 @@ sonarqube:
       - .sonar/cache
   script:
     - mvn -f ITSkillsNow/course-service clean verify 
-    - mvn -f ITSkillsNow/course-service sonar:sonar
+    - mvn -f ITSkillsNow/course-service "-Dsonar.qualitygate=true" sonar:sonar
     - mvn -f ITSkillsNow/job-service clean verify 
-    - mvn -f ITSkillsNow/job-service sonar:sonar
+    - mvn -f ITSkillsNow/job-service "-Dsonar.qualitygate=true" sonar:sonar
 
   allow_failure: true
   only:
