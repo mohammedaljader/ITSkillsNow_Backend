@@ -5,8 +5,6 @@
 dITSkillsNow/course-service/src/main/java/com/itskillsnow/courseservice/dto/request/AddCourseDto.java,d\0\d006b2779873656933bd1a5af712cf1f8ca0b1b0
 ‹
 [ITSkillsNow/job-service/src/main/java/com/itskillsnow/jobservice/JobServiceApplication.java,2\6\26b866bc21eedcad5a64e490603a41bd81a97532
-F
-ITSkillsNow/.gitignore,0\5\05759cd1490816df8bd4cc69f223953a630fd1ee
 U
 %ITSkillsNow/course-service/Dockerfile,b\c\bc199cfffa82e2e74537416123f27ae38f598f69
 W
