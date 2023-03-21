@@ -21,8 +21,10 @@ sonarqube:
     paths:
       - .sonar/cache
   script:
-    - mvn -f ITSkillsNow/pom.xml clean install
-    - mvn -f ITSkillsNow/pom.xml "-Dsonar.qualitygate=true" sonar:sonar
+    - mvn -f ITSkillsNow/course-service/pom.xml clean verify
+    - mvn -f ITSkillsNow/course-service/pom.xml sonar:sonar -Pcoverage -Dsonar.projectKey=Course-service -Dsonar.host.url=http://localhost:9000 -Dsonar.login=sqp_0340bf45d977aea574f714b7aef6d859f7fb5c22
+    - mvn -f ITSkillsNow/job-service/pom.xml clean verify
+    - mvn -f ITSkillsNow/job-service/pom.xml sonar:sonar -Pcoverage -Dsonar.projectKey=Job-service -Dsonar.host.url=http://localhost:9000 -Dsonar.login=sqp_ef699fa7a3c717adde689b66293133965baf2965
 
   allow_failure: true
   only:
