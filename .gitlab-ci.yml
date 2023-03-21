@@ -22,9 +22,9 @@ sonarqube:
       - .sonar/cache
   script:
     - mvn -f ITSkillsNow/course-service clean verify 
-    - mvn -f ITSkillsNow/course-service sonar:sonar -Dsonar.login=sqp_be6e4a72a5ca5b2cdaec1a69b459cc7dd12967d5
+    - mvn -f ITSkillsNow/course-service sonar:sonar
     - mvn -f ITSkillsNow/job-service clean verify 
-    - mvn -f ITSkillsNow/job-service sonar:sonar -Dsonar.login=sqp_ef699fa7a3c717adde689b66293133965baf2965
+    - mvn -f ITSkillsNow/job-service sonar:sonar
 
   allow_failure: true
   only:
