@@ -28,10 +28,10 @@ sonarqube:
     paths:
       - .sonar/cache
   script:
-    - mvn -f ITSkillsNow/course-service clean install 
-    - mvn -f ITSkillsNow/course-service/pom.xml sonar:sonar -Pcoverage -Dsonar.projectKey="$SONAR_PROJECTKEY_COURSE" -Dsonar.host.url="$SONAR_HOST_URL" -Dsonar.login="$SONAR_TOKEN_COURSE"
-    - mvn -f ITSkillsNow/job-service clean install 
-    - mvn -f ITSkillsNow/job-service/pom.xml sonar:sonar -Pcoverage -Dsonar.projectKey="$SONAR_PROJECTKEY_JOB" -Dsonar.host.url="$SONAR_HOST_URL" -Dsonar.login="$SONAR_TOKEN_JOB"
+    - mvn -f ITSkillsNow/course-service clean verify 
+    - mvn -f ITSkillsNow/course-service/pom.xml sonar:sonar -Pcoverage -Dsonar.projectKey="$SONAR_PROJECTKEY_COURSE"
+    - mvn -f ITSkillsNow/job-service clean verify 
+    - mvn -f ITSkillsNow/job-service/pom.xml sonar:sonar -Dsonar.projectKey="$SONAR_PROJECTKEY_JOB" 
 
   allow_failure: true
   only:
