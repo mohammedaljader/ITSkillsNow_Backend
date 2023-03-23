@@ -29,9 +29,9 @@ sonarqube:
       - .sonar/cache
   script:
     - mvn -f ITSkillsNow/course-service clean verify 
-    - mvn -f ITSkillsNow/course-service/pom.xml sonar:sonar -Dsonar.projectKey=$SONAR_PROJECTKEY_COURSE
+    - mvn -f ITSkillsNow/course-service/pom.xml "-Dsonar.qualitygate=true" sonar:sonar -Dsonar.projectKey=$SONAR_PROJECTKEY_COURSE
     - mvn -f ITSkillsNow/job-service clean verify 
-    - mvn -f ITSkillsNow/job-service/pom.xml sonar:sonar -Dsonar.projectKey=$SONAR_PROJECTKEY_JOB
+    - mvn -f ITSkillsNow/job-service/pom.xml "-Dsonar.qualitygate=true" sonar:sonar -Dsonar.projectKey=$SONAR_PROJECTKEY_JOB
 
   allow_failure: true
   only:
