@@ -19,7 +19,7 @@ include:
 
 sonarqube:
   stage: sonarqube
-  image: maven:latest
+  image: maven:3.6.3-jdk-11
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar" 
     GIT_DEPTH: "0" 
@@ -28,10 +28,12 @@ sonarqube:
     paths:
       - .sonar/cache
   script:
-    - mvn -f ITSkillsNow/course-service clean verify 
-    - mvn -f ITSkillsNow/course-service/pom.xml sonar:sonar -Pcoverage -Dsonar.projectKey="$SONAR_PROJECTKEY_COURSE" -Dsonar.host.url="$SONAR_HOST_URL" -Dsonar.login="$SONAR_TOKEN_COURSE"
-    - mvn -f ITSkillsNow/job-service clean verify 
-    - mvn -f ITSkillsNow/job-service/pom.xml sonar:sonar -Pcoverage -Dsonar.projectKey="$SONAR_PROJECTKEY_JOB" -Dsonar.host.url="$SONAR_HOST_URL" -Dsonar.login="$SONAR_TOKEN_JOB"
+    - cd ITSkillsNow/course-service
+    - mvn clean install 
+    - mvn sonar:sonar -Pcoverage -Dsonar.host.url="$SONAR_HOST_URL" -Dsonar.projectKey="$SONAR_PROJECTKEY_COURSE" -Dsonar.login="$SONAR_TOKEN_COURSE"
+    - cd ITSkillsNow/job-service
+    - mvn clean install 
+    - mvn sonar:sonar -Pcoverage -Dsonar.host.url="$SONAR_HOST_URL" -Dsonar.projectKey="$SONAR_PROJECTKEY_JOB" -Dsonar.login="$SONAR_TOKEN_JOB"
 
   allow_failure: true
   only:
