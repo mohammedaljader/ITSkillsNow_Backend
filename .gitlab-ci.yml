@@ -4,6 +4,13 @@ stages:
   - sonarqube
 
 
+variables:
+  SONAR_HOST_URL: "http://localhost:9000"
+  SONAR_PROJECTKEY_COURSE: "Course-service"
+  SONAR_TOKEN_COURSE: "sqp_be6e4a72a5ca5b2cdaec1a69b459cc7dd12967d5"
+  SONAR_PROJECTKEY_JOB: "Job-service"
+  SONAR_TOKEN_JOB: "sqp_ef699fa7a3c717adde689b66293133965baf2965"
+
 
 include:
   - local: 'ITSkillsNow/job-service/.gitlab-ci.yml'
@@ -22,9 +29,9 @@ sonarqube:
       - .sonar/cache
   script:
     - mvn -f ITSkillsNow/course-service clean verify 
-    - mvn -f ITSkillsNow/course-service sonar:sonar -Pcoverage -Dsonar.projectKey=Course-service -Dsonar.host.url=http://localhost:9000 -Dsonar.login=sqp_be6e4a72a5ca5b2cdaec1a69b459cc7dd12967d5
+    - mvn -f ITSkillsNow/course-service/pom.xml sonar:sonar -Pcoverage -Dsonar.projectKey="$SONAR_PROJECTKEY_COURSE" -Dsonar.host.url="$SONAR_HOST_URL" -Dsonar.login="$SONAR_TOKEN_COURSE"
     - mvn -f ITSkillsNow/job-service clean verify 
-    - mvn -f ITSkillsNow/job-service sonar:sonar -Pcoverage -Dsonar.projectKey=Job-service -Dsonar.host.url=http://localhost:9000 -Dsonar.login=sqp_ef699fa7a3c717adde689b66293133965baf2965
+    - mvn -f ITSkillsNow/job-service/pom.xml sonar:sonar -Pcoverage -Dsonar.projectKey="$SONAR_PROJECTKEY_JOB" -Dsonar.host.url="$SONAR_HOST_URL" -Dsonar.login="$SONAR_TOKEN_JOB"
 
   allow_failure: true
   only:
