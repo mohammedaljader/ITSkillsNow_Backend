@@ -21,10 +21,8 @@ sonarqube:
     paths:
       - .sonar/cache
   script:
-    - mvn -f ITSkillsNow/course-service clean verify 
-    - mvn -f ITSkillsNow/course-service/pom.xml sonar:sonar -Pcoverage
-    - mvn -f ITSkillsNow/job-service clean verify 
-    - mvn -f ITSkillsNow/job-service/pom.xml sonar:sonar -Pcoverage
+    - mvn -f ITSkillsNow/course-service/pom.xml clean verify sonar:sonar -Pcoverage
+    - mvn -f ITSkillsNow/job-service/pom.xml clean verify sonar:sonar -Pcoverage
 
   allow_failure: true
   only:
