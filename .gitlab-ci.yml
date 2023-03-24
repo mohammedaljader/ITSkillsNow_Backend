@@ -22,9 +22,9 @@ sonarqube:
       - .sonar/cache
   script:
     - mvn -f ITSkillsNow/course-service clean install 
-    - mvn -f ITSkillsNow/course-service/pom.xml "-Dsonar.qualitygate=true" sonar:sonar
+    - mvn -f ITSkillsNow/course-service/pom.xml "-Dsonar.qualitygate=true" sonar:sonar -Pcoverage
     - mvn -f ITSkillsNow/job-service clean install 
-    - mvn -f ITSkillsNow/job-service/pom.xml "-Dsonar.qualitygate=true" sonar:sonar
+    - mvn -f ITSkillsNow/job-service/pom.xml "-Dsonar.qualitygate=true" sonar:sonar -Pcoverage
 
   allow_failure: true
   only:
