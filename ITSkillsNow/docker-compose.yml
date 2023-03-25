@@ -47,6 +47,22 @@ services:
       - rabbitmq
       - zipkin
 
+  auth-service:
+    image: auth-service
+    container_name: auth-service
+    environment:
+        - eureka.client.serviceUrl.defaultZone=http://discovery-server:8761/eureka
+        - management.zipkin.tracing.endpoint=http://zipkin:9411/api/v2/spans
+    ports:
+        - "9898:9898"
+    build:
+        context: ./auth-service
+        dockerfile: "Dockerfile"
+    depends_on:
+        - discovery-server
+        - mysql
+        - zipkin
+
   job-service:
     image: job-service
     container_name: job-service
@@ -79,5 +95,18 @@ services:
 
   sonarqube:
     image: sonarqube:9.9.0-community
+    container_name: sonarqube
     ports:
       - '9000:9000'
+
+
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=00000000
+      - MYSQL_DATABASE=user
+      - MYSQL_PASSWORD=00000000
+
+    ports:
+      - "3306:3306"

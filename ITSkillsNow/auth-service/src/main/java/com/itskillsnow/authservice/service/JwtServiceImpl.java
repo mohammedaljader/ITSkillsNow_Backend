@@ -1,5 +1,6 @@
 package com.itskillsnow.authservice.service;
 
+import com.itskillsnow.authservice.service.ServiceInterfaces.JwtService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -12,17 +13,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class JwtService {
+public class JwtServiceImpl implements JwtService {
 
 
-    public static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
+    private static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
 
 
+    @Override
     public void validateToken(final String token) {
         Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token);
     }
 
-
+    @Override
     public String generateToken(String userName) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, userName);

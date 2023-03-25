@@ -2,7 +2,7 @@ package com.itskillsnow.authservice.config;
 
 
 import com.itskillsnow.authservice.entity.Role;
-import com.itskillsnow.authservice.entity.UserCredential;
+import com.itskillsnow.authservice.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,10 +16,10 @@ public class CustomUserDetails implements UserDetails {
     private final String password;
     private final Role role;
 
-    public CustomUserDetails(UserCredential userCredential) {
-        this.username = userCredential.getName();
-        this.password = userCredential.getPassword();
-        this.role = userCredential.getRole();
+    public CustomUserDetails(User user) {
+        this.username = user.getUsername();
+        this.password = user.getPassword();
+        this.role = user.getRole();
     }
 
     @Override

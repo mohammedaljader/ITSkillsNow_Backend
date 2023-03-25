@@ -1,12 +1,12 @@
 package com.itskillsnow.authservice.controller;
 
 
+import com.itskillsnow.authservice.dto.AddUserDto;
 import com.itskillsnow.authservice.dto.AuthRequest;
 import com.itskillsnow.authservice.dto.AuthResponse;
-import com.itskillsnow.authservice.entity.UserCredential;
-import com.itskillsnow.authservice.service.AuthService;
+import com.itskillsnow.authservice.entity.User;
+import com.itskillsnow.authservice.service.ServiceInterfaces.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,20 +17,20 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService service;
+    private final AuthService authService;
 
     private final AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
-    public String addNewUser(@RequestBody UserCredential user) {
-        return service.saveUser(user);
+    public String addNewUser(@RequestBody AddUserDto user) {
+        return authService.saveUser(new User(user.getFullName(), user.getUsername(), user.getEmail(), user.getPassword()));
     }
 
-    @PostMapping("/token")
-    public AuthResponse getToken(@RequestBody AuthRequest authRequest) {
+    @PostMapping("/login")
+    public AuthResponse login(@RequestBody AuthRequest authRequest) {
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
         if (authenticate.isAuthenticated()) {
-            return service.generateToken(authRequest.getUsername());
+            return authService.generateToken(authRequest.getUsername());
         } else {
             throw new RuntimeException("invalid access");
         }
@@ -38,7 +38,7 @@ public class AuthController {
 
     @GetMapping("/validate")
     public String validateToken(@RequestParam("token") String token) {
-        service.validateToken(token);
+        authService.validateToken(token);
         return "Token is valid";
     }
 
