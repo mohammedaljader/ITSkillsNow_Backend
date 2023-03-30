@@ -6,14 +6,14 @@ eureka:
     register-with-eureka: true
     enabled: true
 
-server:
-  port: 9898
 spring:
   application:
-    name: AUTH-SERVICE
+    name: job-service
+  rabbitmq:
+    addresses: localhost:5672
   datasource:
     password: password
-    url: jdbc:postgresql://localhost:5433/userDB
+    url: jdbc:postgresql://localhost:5433/jobDB
     username: itskillsnow
   jpa:
     hibernate:
@@ -26,10 +26,14 @@ spring:
   profiles:
     active: default
 
+server:
+  port: 8082
+
 management:
-  tracing:
-    sampling:
-      probability: 1.0
   zipkin:
     tracing:
       endpoint: http://localhost:9411/api/v2/spans
+  tracing:
+    sampling:
+      probability: 1.0
+
