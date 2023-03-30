@@ -1,6 +1,35 @@
 version: '3.9'
 
 services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: itskillsnow
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5433:5432"
+    networks:
+      - postgres
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - postgres
+
+
   discovery-server:
     image: discovery-server
     container_name: discovery-server
@@ -11,9 +40,10 @@ services:
     build:
       context: ./discovery-server
       dockerfile: "Dockerfile"
+    networks:
+      - spring
     depends_on:
       - zipkin
-
 
   gateway:
     image: gateway
@@ -26,6 +56,8 @@ services:
     build:
       context: ./api-gateway
       dockerfile: "Dockerfile"
+    networks:
+      - spring
     depends_on:
       - discovery-server
       - zipkin
@@ -42,6 +74,8 @@ services:
     build:
       context: ./course-service
       dockerfile: "Dockerfile"
+    networks:
+      - spring
     depends_on:
       - discovery-server
       - rabbitmq
@@ -51,17 +85,19 @@ services:
     image: auth-service
     container_name: auth-service
     environment:
-        - eureka.client.serviceUrl.defaultZone=http://discovery-server:8761/eureka
-        - management.zipkin.tracing.endpoint=http://zipkin:9411/api/v2/spans
+      - SPRING_PROFILES_ACTIVE=docker
     ports:
         - "9898:9898"
     build:
         context: ./auth-service
         dockerfile: "Dockerfile"
+    networks:
+      - spring
+      - postgres
     depends_on:
-        - discovery-server
-        - mysql
-        - zipkin
+      - postgres
+      - discovery-server
+      - zipkin
 
   job-service:
     image: job-service
@@ -75,6 +111,8 @@ services:
     build:
       context: ./job-service
       dockerfile: "Dockerfile"
+    networks:
+      - spring
     depends_on:
       - discovery-server
       - rabbitmq
@@ -85,6 +123,8 @@ services:
     container_name: zipkin
     ports:
       - "9411:9411"
+    networks:
+      - spring
 
   rabbitmq:
     image: rabbitmq:3.9.11-management-alpine
@@ -92,21 +132,24 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    networks:
+      - spring
 
   sonarqube:
     image: sonarqube:9.9.0-community
     container_name: sonarqube
     ports:
       - '9000:9000'
+    networks:
+      - spring
 
 
-  mysql:
-    image: mysql:latest
-    container_name: mysql
-    environment:
-      - MYSQL_ROOT_PASSWORD=00000000
-      - MYSQL_DATABASE=user
-      - MYSQL_PASSWORD=00000000
+networks:
+  postgres:
+    driver: bridge
+  spring:
+    driver: bridge
 
-    ports:
-      - "3306:3306"
+volumes:
+  postgres:
+  pgadmin:
