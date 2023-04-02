@@ -14,7 +14,7 @@ sonarqube:
   stage: sonarqube
   image: maven:3.6.3-jdk-11
   script:
-    - mvn -f ITSkillsNow/course-service/pom.xml clean verify sonar:sonar -Dsonar.projectKey=Course-service -Dsonar.login=sqp_1ef478ab90636ed24520b9fcce20c620e9eb014b
+    - mvn -f ITSkillsNow/course-service/pom.xml clean verify sonar:sonar
 
   allow_failure: true
   only:
