@@ -1,5 +1,6 @@
 package com.itskillsnow.apigateway.util;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -18,6 +19,20 @@ public class JwtUtil {
         Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token);
     }
 
+    public Claims extractClaims(final String token) {
+        return Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token).getBody();
+    }
+
+    public String extractRoles(final String token) {
+        Claims claims = extractClaims(token);
+        return claims.get("roles", String.class);
+    }
+
+
+    public String extractUsername(final String token) {
+        Claims claims = extractClaims(token);
+        return claims.get("username", String.class);
+    }
 
 
     private Key getSignKey() {

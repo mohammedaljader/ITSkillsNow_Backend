@@ -15,6 +15,26 @@ public class RouteValidator {
             "/eureka"
     );
 
+    public static final List<String> adminEndpoints = List.of(
+            "/api/course",
+            "/api/job"
+    );
+
+    public static final List<String> userEndpoints = List.of(
+            "/api/job/messages"
+    );
+
+
+    public Predicate<ServerHttpRequest> isAdmin =
+            request -> adminEndpoints
+                    .stream()
+                    .anyMatch(uri -> request.getURI().getPath().contains(uri));
+
+    public Predicate<ServerHttpRequest> isUser =
+            request -> userEndpoints
+                    .stream()
+                    .anyMatch(uri -> request.getURI().getPath().contains(uri));
+
     public Predicate<ServerHttpRequest> isSecured =
             request -> openApiEndpoints
                     .stream()

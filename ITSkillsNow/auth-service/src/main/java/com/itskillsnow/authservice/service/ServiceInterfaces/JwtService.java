@@ -1,6 +1,12 @@
 package com.itskillsnow.authservice.service.ServiceInterfaces;
 
+import com.itskillsnow.authservice.entity.User;
+
+import java.util.Map;
+
 public interface JwtService {
-    String generateToken(String userName);
+    String generateToken(User user, String userName);
     void validateToken(final String token);
+
+    Map<String, String> generateTokens(User user, String userName);
 }

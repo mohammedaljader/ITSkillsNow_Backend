@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -37,7 +39,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse generateToken(String username) {
-        return new AuthResponse(jwtService.generateToken(username));
+        Optional<User> user = userRepository.findByUsername(username);
+        if(user.isEmpty()){
+            return null;
+        }
+        return new AuthResponse(jwtService.generateToken(user.get(),username));
     }
 
     @Override
