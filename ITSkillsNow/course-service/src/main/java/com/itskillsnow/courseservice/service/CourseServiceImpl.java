@@ -1,6 +1,6 @@
 package com.itskillsnow.courseservice.service;
 
-import com.itskillsnow.courseservice.config.CourseMQConfig;
+import com.itskillsnow.courseservice.config.RabbitMQConfig;
 import com.itskillsnow.courseservice.dto.request.AddCourseDto;
 import com.itskillsnow.courseservice.dto.request.CustomMessage;
 import com.itskillsnow.courseservice.dto.response.CourseView;
@@ -31,7 +31,7 @@ public class CourseServiceImpl implements CourseService {
         String newCourse = "course: " + course.getCourseName() + " added!";
         CustomMessage message = new CustomMessage(UUID.randomUUID().toString(), newCourse, new Date());
         try{
-            template.convertAndSend(CourseMQConfig.EXCHANGE, CourseMQConfig.ROUTING_KEY, message);
+            template.convertAndSend(RabbitMQConfig.EXCHANGE, RabbitMQConfig.ROUTING_KEY, message);
         }catch (Exception exception){
             log.info(exception.getMessage());
         }

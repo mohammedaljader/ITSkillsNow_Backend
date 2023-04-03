@@ -13,10 +13,13 @@ spring:
     addresses: localhost:5672
   data:
     mongodb:
-      uri : mongodb+srv://mohammedaljader18:xBQFCPOpUjdeYn4p@cluster0.cn6urrw.mongodb.net/?retryWrites=true&w=majority
-      database : User
+      database: User
+      authentication-database: admin
+      port: 27017
+      host: localhost
+      auto-index-creation: true
   profiles:
-    active: test
+    active: default
 
 server:
   port: 8085
@@ -29,3 +32,4 @@ management:
   tracing:
     sampling:
       probability: 1.0
+

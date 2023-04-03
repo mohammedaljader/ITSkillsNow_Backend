@@ -1,6 +1,6 @@
 package com.itskillsnow.jobservice.listener;
 
-import com.itskillsnow.jobservice.cofig.JobMQConfig;
+import com.itskillsnow.jobservice.cofig.RabbitMQConfig;
 import com.itskillsnow.jobservice.models.Message;
 import com.itskillsnow.jobservice.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ public class MessageListener {
     private final MessageRepository messageRepository;
 
 
-    @RabbitListener(queues = JobMQConfig.QUEUE)
+    @RabbitListener(queues = RabbitMQConfig.QUEUE)
     public void listener(CustomMessage message) {
         messageRepository.save(new Message(message.getMessageId(), message.getMessage(), message.getMessageDate()));
         log.info("Message received successfully!");

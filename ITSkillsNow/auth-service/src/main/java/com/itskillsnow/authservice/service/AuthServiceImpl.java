@@ -4,10 +4,13 @@ package com.itskillsnow.authservice.service;
 import com.itskillsnow.authservice.dto.AuthResponse;
 import com.itskillsnow.authservice.entity.Role;
 import com.itskillsnow.authservice.entity.User;
+import com.itskillsnow.authservice.event.AuthEvent;
+import com.itskillsnow.authservice.event.UserPayload;
 import com.itskillsnow.authservice.repository.UserRepository;
 import com.itskillsnow.authservice.service.ServiceInterfaces.AuthService;
 import com.itskillsnow.authservice.service.ServiceInterfaces.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +26,8 @@ public class AuthServiceImpl implements AuthService {
 
     private final JwtService jwtService;
 
+    private final RabbitTemplate rabbitTemplate;
+
 
     @Override
     public String saveUser(User user) {
@@ -32,7 +37,12 @@ public class AuthServiceImpl implements AuthService {
         }else {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             user.setRole(Role.USER);
-            userRepository.save(user);
+            User userSaved = userRepository.save(user);
+            // Send payload to User Service
+            UserPayload payload = new UserPayload(userSaved.getId().toString(), userSaved.getFullName(),
+                    userSaved.getUsername(), userSaved.getEmail());
+            AuthEvent event = new AuthEvent(payload, "create");
+            rabbitTemplate.convertAndSend("auth.exchange", "auth.create", event);
             return "user added to the system";
         }
     }

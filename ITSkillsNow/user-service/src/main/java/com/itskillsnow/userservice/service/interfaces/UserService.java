@@ -7,4 +7,6 @@ import java.util.List;
 public interface UserService {
     List<UserDto> getAllUsers();
     UserDto getUserByUsername(String username);
+
+    boolean deleteUser(String username);
 }

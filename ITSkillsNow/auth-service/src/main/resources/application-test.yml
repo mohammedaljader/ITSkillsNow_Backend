@@ -12,6 +12,8 @@ server:
 spring:
   application:
     name: AUTH-SERVICE
+  rabbitmq:
+    addresses: localhost:5672
   datasource:
     url: jdbc:h2:mem:userDB
     driverClassName: org.h2.Driver
