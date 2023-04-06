@@ -41,13 +41,13 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public boolean updateJob(UpdateJobDto jobDto) {
-        Optional<User> user = userRepository.findByUsername(jobDto.getUsername());
+        Optional<Job> job = jobRepository.findById(jobDto.getJobId());
 
-        if(user.isEmpty()){
+        if(job.isEmpty()){
             return false;
         }
-        Job job = mapUpdateJobDtoToModel(jobDto, user.get());
-        jobRepository.save(job);
+        Job updatedJob = mapUpdateJobDtoToModel(jobDto, job.get().getUser());
+        jobRepository.save(updatedJob);
         return true;
     }
 
@@ -82,7 +82,8 @@ public class JobServiceImpl implements JobService {
     public List<JobView> getAllJobsByUserId(String username) {
         Optional<User> user = userRepository.findByUsername(username);
         if(user.isEmpty()){
-            throw new UserNotFoundException("User Not Found");
+            //ToDO: add exceptions
+            return null;
         }
         List<Job> users = jobRepository.findAllByUser(user.get());
 

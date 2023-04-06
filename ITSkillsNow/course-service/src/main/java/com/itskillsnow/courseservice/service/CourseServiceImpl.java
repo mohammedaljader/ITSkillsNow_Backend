@@ -39,12 +39,12 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Boolean updateCourse(UpdateCourseDto courseDto) {
-        Optional<User> user = userRepository.findByUsername(courseDto.getUsername());
-        if(user.isEmpty()){
+        Optional<Course> course = courseRepository.findById(courseDto.getCourseId());
+        if(course.isEmpty()){
             return false;
         }
-        Course course = mapUpdateDtoToModel(courseDto,user.get());
-        courseRepository.save(course);
+        Course updatedCourse = mapUpdateDtoToModel(courseDto,course.get().getUser());
+        courseRepository.save(updatedCourse);
         return true;
     }
 
@@ -62,7 +62,8 @@ public class CourseServiceImpl implements CourseService {
     public CourseView getCourseById(UUID courseId) {
         Optional<Course> course = courseRepository.findById(courseId);
         if(course.isEmpty()){
-            throw new RuntimeException("Course not Found!");
+            //TODO: proper Exceptions
+            return null;
         }
         return mapModelToDto(course.get());
     }
@@ -71,7 +72,8 @@ public class CourseServiceImpl implements CourseService {
     public List<CourseView> getAllCoursesByUser(String username) {
         Optional<User> user = userRepository.findByUsername(username);
         if(user.isEmpty()){
-            throw new RuntimeException("User not found!");
+            //TODO: proper Exceptions
+            return null;
         }
         List<Course> courses = courseRepository.findAllByUser(user.get());
         return courses.stream()
