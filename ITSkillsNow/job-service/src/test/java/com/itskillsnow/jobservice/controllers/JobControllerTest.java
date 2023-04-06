@@ -42,7 +42,8 @@ class JobControllerTest {
     @Test
     void testAddAndGetJobs() {
         // Create a new job
-        AddJobDto jobDto = new AddJobDto("Test");
+        AddJobDto jobDto = new AddJobDto("Test", "", "", "",
+                "", "", 9, "");
 
         // Send a POST request to add the job
         restTemplate.postForObject(baseUrl, jobDto, AddJobDto.class);

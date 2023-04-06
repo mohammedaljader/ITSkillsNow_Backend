@@ -4,11 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddJobDto {
+public class UpdateJobDto {
+    private UUID jobId;
+
     private String jobName;
 
     private String jobDescription;

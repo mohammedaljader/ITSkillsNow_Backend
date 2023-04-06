@@ -49,7 +49,8 @@ public class JobControllerIntegrationTest {
 
     @Test
     public void testAddJob() throws Exception {
-        AddJobDto jobDto = new AddJobDto("Test");
+        AddJobDto jobDto = new AddJobDto("Test",
+                "", "", "", "", "", 9, "");
 
         doNothing().when(jobService).addJob(jobDto);
 
@@ -69,8 +70,14 @@ public class JobControllerIntegrationTest {
         UUID jobId1 = UUID.randomUUID();
         UUID jobId2 = UUID.randomUUID();
         List<JobView> jobViews = new ArrayList<>();
-        jobViews.add(new JobView(jobId1, "Job 1"));
-        jobViews.add(new JobView(jobId2, "Job 2"));
+        jobViews.add(JobView.builder()
+                        .jobName("Job 1")
+                        .jobId(jobId1)
+                .build());
+        jobViews.add(JobView.builder()
+                .jobName("Job 2")
+                .jobId(jobId2)
+                .build());
 
         // Mock the behavior of the JobService to return the sample JobViews
         when(jobService.getAllJobs()).thenReturn(jobViews);
