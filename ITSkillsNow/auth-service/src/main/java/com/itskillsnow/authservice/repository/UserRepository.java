@@ -1,7 +1,7 @@
 package com.itskillsnow.authservice.repository;
 
 
-import com.itskillsnow.authservice.entity.User;
+import com.itskillsnow.authservice.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

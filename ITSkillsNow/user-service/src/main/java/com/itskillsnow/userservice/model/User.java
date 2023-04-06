@@ -1,4 +1,4 @@
-package com.itskillsnow.userservice.models;
+package com.itskillsnow.userservice.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

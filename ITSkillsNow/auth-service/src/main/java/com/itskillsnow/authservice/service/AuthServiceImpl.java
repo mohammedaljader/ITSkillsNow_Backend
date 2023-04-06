@@ -2,8 +2,8 @@ package com.itskillsnow.authservice.service;
 
 
 import com.itskillsnow.authservice.dto.AuthResponse;
-import com.itskillsnow.authservice.entity.Role;
-import com.itskillsnow.authservice.entity.User;
+import com.itskillsnow.authservice.model.Role;
+import com.itskillsnow.authservice.model.User;
 import com.itskillsnow.authservice.event.AuthEvent;
 import com.itskillsnow.authservice.event.UserPayload;
 import com.itskillsnow.authservice.repository.UserRepository;

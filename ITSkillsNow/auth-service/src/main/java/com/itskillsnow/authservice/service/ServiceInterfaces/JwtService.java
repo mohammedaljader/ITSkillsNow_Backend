@@ -1,6 +1,6 @@
 package com.itskillsnow.authservice.service.ServiceInterfaces;
 
-import com.itskillsnow.authservice.entity.User;
+import com.itskillsnow.authservice.model.User;
 
 import java.util.Map;
 

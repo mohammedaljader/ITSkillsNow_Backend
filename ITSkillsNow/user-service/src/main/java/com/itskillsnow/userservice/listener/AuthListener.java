@@ -3,7 +3,7 @@ package com.itskillsnow.userservice.listener;
 import com.itskillsnow.userservice.event.AuthEvent;
 import com.itskillsnow.userservice.event.UserEvent;
 import com.itskillsnow.userservice.event.UserPayload;
-import com.itskillsnow.userservice.models.User;
+import com.itskillsnow.userservice.model.User;
 import com.itskillsnow.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +29,14 @@ public class AuthListener {
 
         User userSaved = userRepository.save(user);
         log.info("User sent successfully!");
-        UserEvent CreatedUserEvent = new UserEvent(userSaved.getUserId(), "create");
-        rabbitTemplate.convertAndSend("user.exchange", "user.create", CreatedUserEvent);
-        log.info("User info sent to all services.");
+        UserEvent CreatedUserEvent = new UserEvent(userSaved.getUsername(), "create");
+        try {
+            rabbitTemplate.convertAndSend("user.exchange",
+                    "user.create",
+                    CreatedUserEvent);
+            log.info("User info sent to all services.");
+        }catch (Exception exception){
+            log.info(exception.getMessage());
+        }
     }
 }

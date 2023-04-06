@@ -24,7 +24,7 @@ spring:
           format_sql: true
       show-sql: true
   profiles:
-      active: default
+      active: test
 
 server:
   port: 8081

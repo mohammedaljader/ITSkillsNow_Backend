@@ -1,6 +1,6 @@
 package com.itskillsnow.authservice.service;
 
-import com.itskillsnow.authservice.entity.User;
+import com.itskillsnow.authservice.model.User;
 import com.itskillsnow.authservice.service.ServiceInterfaces.JwtService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

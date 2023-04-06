@@ -1,6 +1,6 @@
 package com.itskillsnow.userservice.repository;
 
-import com.itskillsnow.userservice.models.User;
+import com.itskillsnow.userservice.model.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;

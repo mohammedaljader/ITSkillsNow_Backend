@@ -2,7 +2,7 @@ package com.itskillsnow.userservice.service;
 
 import com.itskillsnow.userservice.dto.UserDto;
 import com.itskillsnow.userservice.event.UserEvent;
-import com.itskillsnow.userservice.models.User;
+import com.itskillsnow.userservice.model.User;
 import com.itskillsnow.userservice.repository.UserRepository;
 import com.itskillsnow.userservice.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;

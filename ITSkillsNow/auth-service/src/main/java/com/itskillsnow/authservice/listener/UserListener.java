@@ -1,6 +1,6 @@
 package com.itskillsnow.authservice.listener;
 
-import com.itskillsnow.authservice.entity.User;
+import com.itskillsnow.authservice.model.User;
 import com.itskillsnow.authservice.event.UserEvent;
 import com.itskillsnow.authservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,13 +23,13 @@ public class UserListener {
     @RabbitListener(queues = "user.queue")
     public void deleteUser(UserEvent event){
         if(event.getEventType().equals("delete")){
-            handleUserDelete(event.getUserId());
+            handleUserDelete(event.getUsername());
         }
     }
 
 
-    private void handleUserDelete(String userId){
-        Optional<User> user = userRepository.findById(UUID.fromString(userId));
+    private void handleUserDelete(String username){
+        Optional<User> user = userRepository.findByUsername(username);
         user.ifPresent(userRepository::delete);
         log.info("User deleted successfully!");
     }

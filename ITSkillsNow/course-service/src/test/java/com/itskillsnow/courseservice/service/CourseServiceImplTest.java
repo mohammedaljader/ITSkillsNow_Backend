@@ -1,8 +1,9 @@
 package com.itskillsnow.courseservice.service;
 
 import com.itskillsnow.courseservice.dto.response.CourseView;
-import com.itskillsnow.courseservice.models.Course;
+import com.itskillsnow.courseservice.model.Course;
 import com.itskillsnow.courseservice.repository.CourseRepository;
+import com.itskillsnow.courseservice.repository.UserRepository;
 import com.itskillsnow.courseservice.service.interfaces.CourseService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,20 +26,23 @@ class CourseServiceImplTest {
     private CourseRepository courseRepository;
 
     @Mock
-    private RabbitTemplate rabbitTemplate;
+    private UserRepository userRepository;
 
     private CourseService courseService;
 
 
     @BeforeEach
     void setUp() {
-        courseService = new CourseServiceImpl(courseRepository, rabbitTemplate);
+        courseService = new CourseServiceImpl(courseRepository, userRepository);
     }
 
 
     @Test
     void TestGetAllCourses(){
-        Course course = new Course(UUID.randomUUID(), "Test");
+        Course course = Course.builder()
+                .courseId(UUID.randomUUID())
+                .courseName("Test")
+                .build();
         when(courseRepository.findAll()).thenReturn(List.of(course));
 
         List<CourseView> courses = courseService.getAllCourses();

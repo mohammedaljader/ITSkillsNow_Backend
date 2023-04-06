@@ -1,7 +1,7 @@
 package com.itskillsnow.authservice.config;
 
 
-import com.itskillsnow.authservice.entity.User;
+import com.itskillsnow.authservice.model.User;
 import com.itskillsnow.authservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

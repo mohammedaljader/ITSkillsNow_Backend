@@ -1,8 +1,8 @@
 package com.itskillsnow.authservice.config;
 
 
-import com.itskillsnow.authservice.entity.Role;
-import com.itskillsnow.authservice.entity.User;
+import com.itskillsnow.authservice.model.Role;
+import com.itskillsnow.authservice.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

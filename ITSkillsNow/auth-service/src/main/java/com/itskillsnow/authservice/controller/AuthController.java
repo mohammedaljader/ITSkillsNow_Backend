@@ -4,7 +4,7 @@ package com.itskillsnow.authservice.controller;
 import com.itskillsnow.authservice.dto.AddUserDto;
 import com.itskillsnow.authservice.dto.AuthRequest;
 import com.itskillsnow.authservice.dto.AuthResponse;
-import com.itskillsnow.authservice.entity.User;
+import com.itskillsnow.authservice.model.User;
 import com.itskillsnow.authservice.service.ServiceInterfaces.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
