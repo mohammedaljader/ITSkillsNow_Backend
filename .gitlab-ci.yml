@@ -23,8 +23,18 @@ sonarqube:
     paths:
       - .sonar/cache
   script:
-    - mvn -f ITSkillsNow/auth-service/pom.xml clean verify sonar:sonar -Dsonar.login=5c901e1da9cdb760528748ab4db6bf0f0fceeeec -Dsonar.organization=itskillsnow -Dsonar.projectKey=Auth-service
+    - mvn -f ITSkillsNow/course-service clean install 
+    - mvn -f ITSkillsNow/course-service/pom.xml sonar:sonar -Pcoverage
+    - mvn -f ITSkillsNow/job-service clean install 
+    - mvn -f ITSkillsNow/job-service/pom.xml sonar:sonar -Pcoverage
+    - mvn -f ITSkillsNow/user-service clean install 
+    - mvn -f ITSkillsNow/user-service/pom.xml sonar:sonar -Pcoverage
+    - mvn -f ITSkillsNow/auth-service clean install 
+    - mvn -f ITSkillsNow/auth-service/pom.xml sonar:sonar -Pcoverage
 
   allow_failure: true
   only:
     - main
+
+
+
