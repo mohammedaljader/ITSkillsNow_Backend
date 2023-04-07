@@ -23,8 +23,7 @@ sonarqube:
     paths:
       - .sonar/cache
   script:
-    - mvn -f ITSkillsNow/auth-service/pom.xml clean install 
-    - mvn -f ITSkillsNow/auth-service/pom.xml org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Auth-service -Dsonar.login=5c901e1da9cdb760528748ab4db6bf0f0fceeeec
+    - mvn -f ITSkillsNow/auth-service/pom.xml clean verify sonar:sonar -Dsonar.login=5c901e1da9cdb760528748ab4db6bf0f0fceeeec -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=itskillsnow -Dsonar.projectKey=Auth-service
 
   allow_failure: true
   only:
