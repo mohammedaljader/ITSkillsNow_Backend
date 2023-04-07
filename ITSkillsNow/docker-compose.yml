@@ -142,6 +142,8 @@ services:
     container_name: sonarqube
     ports:
       - '9000:9000'
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
     networks:
       - sonarQube
 
@@ -152,7 +154,7 @@ networks:
   spring:
     driver: bridge
   sonarQube:
-    driver: bridge
+    external: true
 
 volumes:
   postgres:
