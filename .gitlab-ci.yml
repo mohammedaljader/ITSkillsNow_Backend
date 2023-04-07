@@ -24,7 +24,7 @@ sonarqube:
       - .sonar/cache
   script:
     - mvn -f ITSkillsNow/auth-service/pom.xml clean install 
-    - mvn -f ITSkillsNow/auth-service/pom.xml sonar:sonar -Dsonar.projectKey=Auth-service -Dsonar.login=5c901e1da9cdb760528748ab4db6bf0f0fceeeec
+    - mvn -f ITSkillsNow/auth-service/pom.xml org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Auth-service -Dsonar.login=5c901e1da9cdb760528748ab4db6bf0f0fceeeec
 
   allow_failure: true
   only:
