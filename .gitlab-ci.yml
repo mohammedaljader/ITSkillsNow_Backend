@@ -8,6 +8,8 @@ stages:
 include:
   - local: 'ITSkillsNow/job-service/.gitlab-ci.yml'
   - local: 'ITSkillsNow/course-service/.gitlab-ci.yml'
+  - local: 'ITSkillsNow/auth-service/.gitlab-ci.yml'
+  - local: 'ITSkillsNow/user-service/.gitlab-ci.yml'
 
 
 sonarqube:

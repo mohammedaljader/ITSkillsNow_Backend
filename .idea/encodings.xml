@@ -2,10 +2,12 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/ITSkillsNow/api-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ITSkillsNow/auth-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ITSkillsNow/course-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ITSkillsNow/discovery-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ITSkillsNow/job-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ITSkillsNow/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ITSkillsNow/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ITSkillsNow/user-service/src/main/java" charset="UTF-8" />
   </component>
 </project>

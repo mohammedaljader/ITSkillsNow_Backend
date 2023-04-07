@@ -2,12 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ITSkillsNow/ITSkillsNow.iml" filepath="$PROJECT_DIR$/ITSkillsNow/ITSkillsNow.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ITSkillsNow/api-gateway/api-gateway.iml" filepath="$PROJECT_DIR$/ITSkillsNow/api-gateway/api-gateway.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/backend_itskillsnow.iml" filepath="$PROJECT_DIR$/.idea/backend_itskillsnow.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ITSkillsNow/course-service/course-service.iml" filepath="$PROJECT_DIR$/ITSkillsNow/course-service/course-service.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ITSkillsNow/discovery-server/discovery-server.iml" filepath="$PROJECT_DIR$/ITSkillsNow/discovery-server/discovery-server.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ITSkillsNow/job-service/job-service.iml" filepath="$PROJECT_DIR$/ITSkillsNow/job-service/job-service.iml" />
     </modules>
   </component>
 </project>

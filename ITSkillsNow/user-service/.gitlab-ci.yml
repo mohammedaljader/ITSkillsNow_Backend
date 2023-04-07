@@ -1,0 +1,15 @@
+maven-userservice:build:
+  image: maven:latest
+  stage: build
+  script: "mvn -f ITSkillsNow/user-service/pom.xml compile"
+  only:
+    changes:
+      - ITSkillsNow/user-service/**/*
+
+maven-userservice:test:
+  image: maven:latest
+  stage: test    
+  script: "mvn -f ITSkillsNow/user-service/pom.xml test"
+  only:
+    changes:
+      - ITSkillsNow/user-service/**/*
