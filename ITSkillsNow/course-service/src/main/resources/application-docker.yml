@@ -1,0 +1,38 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
+    enabled: true
+
+server:
+  port: 8081
+
+spring:
+  application:
+    name: course-service
+  rabbitmq:
+    addresses: rabbitmq:5672
+  datasource:
+    password: password
+    url: jdbc:postgresql://postgres:5432/courseDB
+    username: itskillsnow
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+
+
+management:
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
+  tracing:
+    sampling:
+      probability: 1.0
+

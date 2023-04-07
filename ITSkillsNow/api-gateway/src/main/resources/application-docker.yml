@@ -1,0 +1,40 @@
+eureka:
+  client:
+    service-url:
+      defaultZone : http://discovery-server:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: course-service
+          uri: lb://course-service
+          predicates:
+            - Path=/api/course/**
+          filters:
+            - AuthenticationFilter
+
+        - id: job-service
+          uri: lb://job-service
+          predicates:
+            - Path=/api/job/**
+          filters:
+            - AuthenticationFilter
+
+        - id: AUTH-SERVICE
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/auth/**
+
+  application:
+    name: api-gateway
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans

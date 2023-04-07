@@ -20,12 +20,15 @@
         <module>job-service</module>
         <module>discovery-server</module>
         <module>api-gateway</module>
+        <module>auth-service</module>
+        <module>user-service</module>
     </modules>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <spring-cloud.version>2022.0.1</spring-cloud.version>
+        <spring-cloud-azure.version>5.0.0</spring-cloud-azure.version>
     </properties>
 
     <dependencyManagement>
@@ -34,6 +37,13 @@
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
                 <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.azure.spring</groupId>
+                <artifactId>spring-cloud-azure-dependencies</artifactId>
+                <version>${spring-cloud-azure.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

@@ -1,0 +1,42 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: course-service
+          uri: lb://course-service
+          predicates:
+            - Path=/api/course/**
+          filters:
+            - AuthenticationFilter
+
+        - id: job-service
+          uri: lb://job-service
+          predicates:
+            - Path=/api/job/**
+          filters:
+            - AuthenticationFilter
+
+        - id: AUTH-SERVICE
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/auth/**
+
+  application:
+    name: api-gateway
+  profiles:
+    active: default
+
+eureka:
+  client:
+    service-url:
+      defaultZone : http://localhost:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
