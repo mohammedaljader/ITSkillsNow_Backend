@@ -75,7 +75,6 @@ services:
     networks:
       - spring
       - postgres
-      - sonarQube
     depends_on:
       - discovery-server
       - postgres
@@ -113,7 +112,6 @@ services:
     networks:
       - spring
       - postgres
-      - sonarQube
     depends_on:
       - discovery-server
       - postgres
@@ -154,7 +152,7 @@ networks:
   spring:
     driver: bridge
   sonarQube:
-    external: true
+    driver: bridge
 
 volumes:
   postgres:
