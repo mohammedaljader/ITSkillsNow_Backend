@@ -23,7 +23,7 @@ sonarqube:
     paths:
       - .sonar/cache
   script:
-    - mvn -f ITSkillsNow/course-service/pom.xml verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Course-service -Dsonar.login=c0601c12426c4756b514fd9ed1ea9ff3ecb2304c -Dsonar.qualitygate.wait=true
+    - mvn -f ITSkillsNow/course-service/pom.xml verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Course-service -Dsonar.qualitygate.wait=true
     - mvn -f ITSkillsNow/job-service/pom.xml verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Job-service -Dsonar.login=26678f78f20da2818d5114e4fd92c17ddce384b8
     - mvn -f ITSkillsNow/user-service/pom.xml verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=User-Service -Dsonar.login=9d4571e235b9344f2ede9fbac93160bff48d382b
     - mvn -f ITSkillsNow/user-service/pom.xml verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Auth-service -Dsonar.login=5c901e1da9cdb760528748ab4db6bf0f0fceeeec
