@@ -33,6 +33,6 @@ sonarqube:
   stage: sonarqube
   image: maven:3.6.3-jdk-11
   script:
-    - mvn -f ITSkillsNow/user-service/pom.xml sonar:sonar -Dsonar.projectKey=Auth-service -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=5c901e1da9cdb760528748ab4db6bf0f0fceeeec 
+    - mvn -f ITSkillsNow/user-service/pom.xml sonar:sonar -Dsonar.projectKey=Auth-service -Dsonar.login=5c901e1da9cdb760528748ab4db6bf0f0fceeeec 
   only:
     - main
