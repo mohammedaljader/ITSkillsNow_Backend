@@ -12,27 +12,29 @@ include:
   - local: 'ITSkillsNow/user-service/.gitlab-ci.yml'
 
 
-# sonarqube:
-#   stage: sonarqube
-#   image: maven:3.6.3-jdk-11
-#   variables:
-#     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar" 
-#     GIT_DEPTH: "0" 
-#   cache:
-#     key: "${CI_JOB_NAME}"
-#     paths:
-#       - .sonar/cache
-#   script:
-#     - mvn -f ITSkillsNow/auth-service/pom.xml clean verify sonar:sonar
-
-#   allow_failure: true
-#   only:
-#     - main
-
 sonarqube:
   stage: sonarqube
   image: maven:3.6.3-jdk-11
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar" 
+    GIT_DEPTH: "0" 
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
   script:
-    - mvn -f ITSkillsNow/user-service/pom.xml sonar:sonar -Dsonar.projectKey=Auth-service -Dsonar.login=5c901e1da9cdb760528748ab4db6bf0f0fceeeec 
+    - mvn -f ITSkillsNow/course-service clean install 
+    - mvn -f ITSkillsNow/course-service/pom.xml sonar:sonar -Pcoverage
+    - mvn -f ITSkillsNow/job-service clean install 
+    - mvn -f ITSkillsNow/job-service/pom.xml sonar:sonar -Pcoverage
+    - mvn -f ITSkillsNow/user-service clean install 
+    - mvn -f ITSkillsNow/user-service/pom.xml sonar:sonar -Pcoverage
+    - mvn -f ITSkillsNow/auth-service clean install 
+    - mvn -f ITSkillsNow/auth-service/pom.xml sonar:sonar -Pcoverage
+
+  allow_failure: true
   only:
     - main
+
+
+
