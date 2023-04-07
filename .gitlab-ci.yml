@@ -23,7 +23,7 @@ sonarqube:
     paths:
       - .sonar/cache
   script:
-    - mvn -f ITSkillsNow/auth-service/pom.xml clean verify sonar:sonar -Dsonar.organization=itskillsnow -Dsonar.projectKey=Auth-service
+    - mvn -f ITSkillsNow/auth-service/pom.xml clean verify sonar:sonar
 
   allow_failure: true
   only:
