@@ -14,9 +14,9 @@
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-<!--        <sonar.host.url>http://localhost:9000</sonar.host.url>-->
-<!--        <sonar.login>loginToken</sonar.login>-->
-<!--        <sonar.organization>default</sonar.organization>-->
+        <sonar.host.url>http://localhost:9000</sonar.host.url>
+        <sonar.login>sqp_2ab62db3ac5a4ed6cff195ba76be6320c058dbdb</sonar.login>
+        <sonar.organization>default</sonar.organization>
     </properties>
 
     <dependencies>
@@ -121,15 +121,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>sonar</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <sonar.host.url>http://localhost:9000</sonar.host.url>
-            </properties>
-        </profile>
         <profile>
             <id>coverage</id>
             <build>

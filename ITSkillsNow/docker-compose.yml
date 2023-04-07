@@ -81,6 +81,24 @@ services:
       - rabbitmq
       - zipkin
 
+  user-service:
+    image: user-service
+    container_name: user-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+      - "8085:8085"
+    build:
+      context: ./user-service
+      dockerfile: "Dockerfile"
+    networks:
+      - spring
+    depends_on:
+      - discovery-server
+      - rabbitmq
+      - zipkin
+
+
   auth-service:
     image: auth-service
     container_name: auth-service
