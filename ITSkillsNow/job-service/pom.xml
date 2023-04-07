@@ -14,9 +14,8 @@
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <sonar.host.url>http://localhost:9000</sonar.host.url>
-        <sonar.login>sqp_2ab62db3ac5a4ed6cff195ba76be6320c058dbdb</sonar.login>
-        <sonar.organization>default</sonar.organization>
+        <sonar.organization>itskillsnow</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
     <dependencies>
