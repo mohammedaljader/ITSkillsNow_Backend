@@ -28,6 +28,14 @@ spring:
       enabled: true
       path: /h2-ui
 
+  cloud:
+    azure:
+      storage:
+        blob:
+          account-name: itskillsnowcontainer
+          account-key: gsfqLw++o2GTcAkK7QiCh8yj6bMsfjg8aPYx0sEH3P4DwWifYHe52yaz1LvrGZ1adFMJM3zuwCYg+ASthnBpyw==
+          connection-string: BlobEndpoint=https://itskillsnowcontainer.blob.core.windows.net/;QueueEndpoint=https://itskillsnowcontainer.queue.core.windows.net/;FileEndpoint=https://itskillsnowcontainer.file.core.windows.net/;TableEndpoint=https://itskillsnowcontainer.table.core.windows.net/;SharedAccessSignature=sv=2021-12-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2023-04-07T19:54:26Z&st=2023-04-07T11:54:26Z&spr=https&sig=1iTbXykui2%2BjhV204YjRjgN2PakqzQGMeTfruuAJzfQ%3D
+
 server:
   port: 8082
 
@@ -38,4 +46,5 @@ management:
   tracing:
     sampling:
       probability: 1.0
+
 
