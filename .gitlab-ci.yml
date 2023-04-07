@@ -23,8 +23,8 @@ sonarqube:
     paths:
       - .sonar/cache
   script:
-    - mvn -f ITSkillsNow/course-service/pom.xml clean install 
-    - mvn -f ITSkillsNow/course-service/pom.xml sonar:sonar -Dsonar.qualitygate.wait=true
+    - mvn -f ITSkillsNow/auth-service/pom.xml clean install 
+    - mvn -f ITSkillsNow/auth-service/pom.xml sonar:sonar -Dsonar.qualitygate.wait=true
 
   allow_failure: true
   only:
