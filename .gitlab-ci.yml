@@ -21,8 +21,7 @@ sonarqube:
     paths:
       - .sonar/cache
   script:
-    - mvn -f ITSkillsNow/course-service/pom.xml clean verify sonar:sonar -Pcoverage
-    - mvn -f ITSkillsNow/job-service/pom.xml clean verify sonar:sonar -Pcoverage
+    - mvn -f ITSkillsNow/course-service/pom.xml clean verify -P sonar -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=itskillsnow -Dsonar.login=43804ac61ae83b6ace9759b677b0bde482d6283f
 
   allow_failure: true
   only:
