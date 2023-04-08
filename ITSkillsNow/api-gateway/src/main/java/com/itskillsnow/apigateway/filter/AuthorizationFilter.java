@@ -10,6 +10,8 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.NonNull;
 
+import java.util.List;
+
 
 @Component
 public class AuthorizationFilter implements WebFilter {
@@ -41,10 +43,15 @@ public class AuthorizationFilter implements WebFilter {
             }
 
             String token = authorizationHeader.substring(BEARER_PREFIX.length());
-            String roles = jwtUtil.extractRoles(token);
+            List<String> roles = jwtUtil.extractRoles(token);
 
-            if(validator.isUser.test(exchange.getRequest())){
-                if (!roles.equals("USER")) {
+            if(roles == null){
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return exchange.getResponse().setComplete();
+            }
+
+            if(validator.isAdmin.test(exchange.getRequest())){
+                if (!roles.contains("ADMIN")) {
                     exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
                     return exchange.getResponse().setComplete();
                 }else {
@@ -52,8 +59,8 @@ public class AuthorizationFilter implements WebFilter {
                 }
             }
 
-            if(validator.isAdmin.test(exchange.getRequest())){
-                if (!roles.equals("ADMIN")) {
+            if(validator.isUser.test(exchange.getRequest())){
+                if (!roles.contains("USER")) {
                     exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
                     return exchange.getResponse().setComplete();
                 }else {

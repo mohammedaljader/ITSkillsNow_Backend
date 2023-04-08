@@ -10,14 +10,18 @@ import com.itskillsnow.authservice.repository.UserRepository;
 import com.itskillsnow.authservice.service.ServiceInterfaces.AuthService;
 import com.itskillsnow.authservice.service.ServiceInterfaces.JwtService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
@@ -36,13 +40,21 @@ public class AuthServiceImpl implements AuthService {
             return "Email or username is already taken!";
         }else {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
-            user.setRole(Role.USER);
+            user.setRoles(List.of(Role.USER));
             User userSaved = userRepository.save(user);
+
             // Send payload to User Service
-            UserPayload payload = new UserPayload(userSaved.getId().toString(), userSaved.getFullName(),
-                    userSaved.getUsername(), userSaved.getEmail());
-            AuthEvent event = new AuthEvent(payload, "create");
-            rabbitTemplate.convertAndSend("auth.exchange", "auth.create", event);
+            try {
+                UserPayload payload = new UserPayload(userSaved.getId().toString(), userSaved.getFullName(),
+                        userSaved.getUsername(), userSaved.getEmail());
+
+                AuthEvent event = new AuthEvent(payload, "create");
+                rabbitTemplate.convertAndSend("auth.exchange", "auth.create", event);
+                log.info("User sent successfully!");
+            }catch (Exception ex){
+                log.error(ex.getMessage());
+                log.info("Error while sending user");
+            }
             return "user added to the system";
         }
     }
@@ -53,7 +65,14 @@ public class AuthServiceImpl implements AuthService {
         if(user.isEmpty()){
             return null;
         }
-        return new AuthResponse(jwtService.generateToken(user.get(),username));
+        Map<String, String> tokens = jwtService.generateTokens(user.get(), username);
+        return new AuthResponse(tokens.get("accessToken"), tokens.get("refreshToken"));
+    }
+
+    @Override
+    public AuthResponse refreshToken(String refreshToken) {
+        String username = jwtService.getUsernameFromToken(refreshToken);
+        return generateToken(username);
     }
 
     @Override

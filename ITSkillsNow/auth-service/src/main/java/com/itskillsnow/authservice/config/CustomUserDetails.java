@@ -9,22 +9,25 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CustomUserDetails implements UserDetails {
 
     private final String username;
     private final String password;
-    private final Role role;
+    private final List<Role> roles;
 
     public CustomUserDetails(User user) {
         this.username = user.getUsername();
         this.password = user.getPassword();
-        this.role = user.getRole();
+        this.roles = user.getRoles();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return roles.stream()
+                .map(x -> new SimpleGrantedAuthority(x.name()))
+                .collect(Collectors.toList());
     }
 
     @Override

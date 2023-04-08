@@ -7,4 +7,5 @@ public interface AuthService {
     String saveUser(User credential);
     AuthResponse generateToken(String username);
     void validateToken(String token);
+    AuthResponse refreshToken(String refreshToken);
 }

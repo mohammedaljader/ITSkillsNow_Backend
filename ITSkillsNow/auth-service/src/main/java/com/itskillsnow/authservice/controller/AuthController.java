@@ -42,4 +42,9 @@ public class AuthController {
         return "Token is valid";
     }
 
+    @PostMapping("/refresh/{refreshToken}")
+    public AuthResponse refreshToken(@PathVariable String refreshToken) {
+        return authService.refreshToken(refreshToken);
+    }
+
 }

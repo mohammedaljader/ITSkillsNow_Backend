@@ -3,6 +3,7 @@ package com.itskillsnow.authservice.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -26,9 +27,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
+    @ElementCollection(targetClass = Role.class)
+    private List<Role> roles;
 
 
     public User(String fullName, String username, String email, String password) {

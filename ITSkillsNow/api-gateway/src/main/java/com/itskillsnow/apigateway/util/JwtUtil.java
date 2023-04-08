@@ -1,5 +1,7 @@
 package com.itskillsnow.apigateway.util;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -7,6 +9,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.util.List;
 
 @Component
 public class JwtUtil {
@@ -23,11 +26,11 @@ public class JwtUtil {
         return Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token).getBody();
     }
 
-    public String extractRoles(final String token) {
+    public List<String> extractRoles(final String token) {
         Claims claims = extractClaims(token);
-        return claims.get("roles", String.class);
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.convertValue(claims.get("roles"), new TypeReference<>() {});
     }
-
 
     public String extractUsername(final String token) {
         Claims claims = extractClaims(token);

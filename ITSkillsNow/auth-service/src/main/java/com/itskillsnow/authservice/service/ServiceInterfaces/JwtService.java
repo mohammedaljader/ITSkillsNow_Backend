@@ -7,6 +7,6 @@ import java.util.Map;
 public interface JwtService {
     String generateToken(User user, String userName);
     void validateToken(final String token);
-
     Map<String, String> generateTokens(User user, String userName);
+    String getUsernameFromToken(String refreshToken);
 }
