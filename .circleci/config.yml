@@ -13,9 +13,7 @@ jobs:
              mvn -f ITSkillsNow/job-service -B -DskipTests clean package &&
              mvn -f ITSkillsNow/auth-service -B -DskipTests clean package &&
              mvn -f ITSkillsNow/user-service -B -DskipTests clean package 
-      - run:
-          name: Test
-          command: |mvn -f ITSkillsNow/course-service test
+
 
   test:
      docker:
