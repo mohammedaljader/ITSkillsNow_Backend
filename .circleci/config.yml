@@ -4,6 +4,7 @@ jobs:
   build:
     docker:
       - image: cimg/openjdk:17.0
+    parallelism: 4
     steps:
       - checkout
       - run:
@@ -26,6 +27,7 @@ jobs:
   test:
      docker:
        - image: cimg/openjdk:17.0
+     parallelism: 4
      steps:
        - checkout
        - run:
@@ -48,6 +50,7 @@ jobs:
   sonarcloud:
     docker:
       - image: cimg/openjdk:17.0
+    parallelism: 4
     steps:
       - checkout
       - run:
