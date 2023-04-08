@@ -45,7 +45,9 @@ workflows:
   sample:
     jobs:
       - build
-      - test
+      - test:
+          requires:
+            - build
       - sonarcloud:
           requires:
             - build
