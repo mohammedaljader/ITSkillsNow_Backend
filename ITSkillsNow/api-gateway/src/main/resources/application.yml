@@ -21,6 +21,13 @@ spring:
           predicates:
             - Path=/auth/**
 
+        - id: job-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/user/**
+          filters:
+            - AuthenticationFilter
+
   application:
     name: api-gateway
   profiles:
