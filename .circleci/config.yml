@@ -9,9 +9,9 @@ jobs:
       - run:
           name: Build
           command: |
-             mvn -f ITSkillsNow/course-service -B -DskipTests clean package &&
-             mvn -f ITSkillsNow/job-service -B -DskipTests clean package &&
-             mvn -f ITSkillsNow/auth-service -B -DskipTests clean package &&
+             mvn -f ITSkillsNow/course-service -B -DskipTests clean package 
+             mvn -f ITSkillsNow/job-service -B -DskipTests clean package 
+             mvn -f ITSkillsNow/auth-service -B -DskipTests clean package 
              mvn -f ITSkillsNow/user-service -B -DskipTests clean package 
 
 
@@ -23,9 +23,9 @@ jobs:
        - run:
          name: Test
          command: |
-            mvn -f ITSkillsNow/course-service test &&
-            mvn -f ITSkillsNow/job-service test &&
-            mvn -f ITSkillsNow/auth-service test &&
+            mvn -f ITSkillsNow/course-service test 
+            mvn -f ITSkillsNow/job-service test 
+            mvn -f ITSkillsNow/auth-service test 
             mvn -f ITSkillsNow/user-service test
 
   sonarcloud:
@@ -36,9 +36,9 @@ jobs:
       - run:
           name: SonarCloud Analysis
           command: |
-             mvn -f ITSkillsNow/course-service clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=Course-service -Dsonar.organization=itskillsnow -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=c0601c12426c4756b514fd9ed1ea9ff3ecb2304c &&
-             mvn -f ITSkillsNow/job-service clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=Job-service -Dsonar.organization=itskillsnow -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=26678f78f20da2818d5114e4fd92c17ddce384b8 &&
-             mvn -f ITSkillsNow/user-service clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=User-Service -Dsonar.organization=itskillsnow -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=9d4571e235b9344f2ede9fbac93160bff48d382b &&
+             mvn -f ITSkillsNow/course-service clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=Course-service -Dsonar.organization=itskillsnow -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=c0601c12426c4756b514fd9ed1ea9ff3ecb2304c 
+             mvn -f ITSkillsNow/job-service clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=Job-service -Dsonar.organization=itskillsnow -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=26678f78f20da2818d5114e4fd92c17ddce384b8 
+             mvn -f ITSkillsNow/user-service clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=User-Service -Dsonar.organization=itskillsnow -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=9d4571e235b9344f2ede9fbac93160bff48d382b 
              mvn -f ITSkillsNow/auth-service clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=Auth-service -Dsonar.organization=itskillsnow -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=5c901e1da9cdb760528748ab4db6bf0f0fceeeec 
 
 workflows:
