@@ -24,7 +24,7 @@ jobs:
           command: mvn -f ITSkillsNow/user-service -B -DskipTests clean package 
 
 
-  test:
+  unit_tests:
      docker:
        - image: cimg/openjdk:17.0
      parallelism: 4
@@ -45,7 +45,28 @@ jobs:
        - run:
            name: Test_UserService
            command: mvn -f ITSkillsNow/user-service test
-            
+   
+   integration_tests:
+     docker:
+       - image: cimg/openjdk:17.0
+     parallelism: 4
+     steps:
+       - checkout
+       - run:
+           name: Test_CourseService
+           command: echo "Test_CourseService" 
+         
+       - run:
+           name:  Test_JobService
+           command: echo "Test_JobService" 
+         
+       - run:
+           name: Test_AuthService
+           command:  echo "Test_AuthService" 
+         
+       - run:
+           name: Test_UserService
+           command: echo "Test_UserService" 
 
   sonarcloud:
     docker:
@@ -74,8 +95,15 @@ workflows:
   sample:
     jobs:
       - build
-      - test
+      - unit_tests:
+          requires:
+            - build
+      - integration_tests:
+          requires:
+            - build
+            - unit_tests
       - sonarcloud:
           requires:
             - build
-            - test
+            - unit_tests
+            - integration_tests
