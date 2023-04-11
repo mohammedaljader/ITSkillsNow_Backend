@@ -9,6 +9,10 @@ eureka:
   client:
     fetch-registry: false
     register-with-eureka: false
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka
+  instance:
+    prefer-ip-address: true
 
 
 management:

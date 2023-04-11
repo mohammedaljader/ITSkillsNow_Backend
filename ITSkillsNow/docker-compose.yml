@@ -59,8 +59,8 @@ services:
     networks:
       - spring
     depends_on:
-      - discovery-server
       - zipkin
+      - discovery-server
 
   course-service:
     image: course-service
@@ -115,6 +115,7 @@ services:
     depends_on:
       - discovery-server
       - postgres
+      - rabbitmq
       - zipkin
 
   job-service:
@@ -153,23 +154,11 @@ services:
     networks:
       - spring
 
-  sonarqube:
-    image: sonarqube:9.9.0-community
-    container_name: sonarqube
-    ports:
-      - '9000:9000'
-    environment:
-      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
-    networks:
-      - sonarQube
-
 
 networks:
   postgres:
     driver: bridge
   spring:
-    driver: bridge
-  sonarQube:
     driver: bridge
 
 volumes:

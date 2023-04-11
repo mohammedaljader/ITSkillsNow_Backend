@@ -156,16 +156,18 @@ class AuthServiceImplTest {
     public void given_RefreshToken_withCorrectRefreshToken_shouldReturnTokens() {
         String refreshToken = "some_refresh_token";
         String username = "some_username";
+        String fullName = "fullName";
 
 
         when(jwtService.getUsernameFromToken(refreshToken)).thenReturn(username);
 
         User user = new User(UUID.randomUUID().toString(),username, "some_password", "USER");
+        user.setFullName(fullName);
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
         String accessToken = "some_access_token";
         String newRefreshToken = "new_some_refresh_token";
-        AuthResponse expectedResponse = new AuthResponse(accessToken, newRefreshToken);
+        AuthResponse expectedResponse = new AuthResponse(accessToken, newRefreshToken, username, fullName);
         when(jwtService.generateTokens(user, username)).thenReturn(
                 Map.of("accessToken", accessToken, "refreshToken", newRefreshToken)
         );

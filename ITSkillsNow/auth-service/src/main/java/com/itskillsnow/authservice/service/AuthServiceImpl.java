@@ -66,7 +66,7 @@ public class AuthServiceImpl implements AuthService {
             return null;
         }
         Map<String, String> tokens = jwtService.generateTokens(user.get(), username);
-        return new AuthResponse(tokens.get("accessToken"), tokens.get("refreshToken"));
+        return new AuthResponse(tokens.get("accessToken"), tokens.get("refreshToken"), username, user.get().getFullName());
     }
 
     @Override

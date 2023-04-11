@@ -45,29 +45,31 @@ public class AuthorizationFilter implements WebFilter {
             String token = authorizationHeader.substring(BEARER_PREFIX.length());
             List<String> roles = jwtUtil.extractRoles(token);
 
-            if(roles == null){
-                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                return exchange.getResponse().setComplete();
-            }
+            Mono<Void> exchangeResult = routingUser(exchange, chain, roles);
 
-            if(validator.isAdmin.test(exchange.getRequest())){
-                if (!roles.contains("ADMIN")) {
-                    exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-                    return exchange.getResponse().setComplete();
-                }else {
-                    return chain.filter(exchange);
-                }
-            }
-
-            if(validator.isUser.test(exchange.getRequest())){
-                if (!roles.contains("USER")) {
-                    exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-                    return exchange.getResponse().setComplete();
-                }else {
-                    return chain.filter(exchange);
-                }
+            if (exchangeResult != null){
+                return exchangeResult;
             }
         }
         return chain.filter(exchange);
+    }
+
+    private Mono<Void> routingUser(ServerWebExchange exchange, WebFilterChain chain, List<String> roles) {
+        boolean valid;
+        if (roles.contains("ADMIN")) {
+            valid = validator.isAdmin.test(exchange.getRequest());
+        } else if (roles.contains("USER")) {
+            valid = validator.isUser.test(exchange.getRequest());
+        } else {
+            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+            return exchange.getResponse().setComplete();
+        }
+
+        if (valid) {
+            return chain.filter(exchange);
+        } else {
+            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+            return exchange.getResponse().setComplete();
+        }
     }
 }
