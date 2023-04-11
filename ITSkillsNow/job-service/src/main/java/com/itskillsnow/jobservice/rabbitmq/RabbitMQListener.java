@@ -13,7 +13,7 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class UserListener {
+public class RabbitMQListener {
 
 
     private final UserRepository userRepository;

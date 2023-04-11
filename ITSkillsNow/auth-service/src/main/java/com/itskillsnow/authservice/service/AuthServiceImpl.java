@@ -6,12 +6,12 @@ import com.itskillsnow.authservice.model.Role;
 import com.itskillsnow.authservice.model.User;
 import com.itskillsnow.authservice.event.AuthEvent;
 import com.itskillsnow.authservice.event.UserPayload;
+import com.itskillsnow.authservice.rabbitmq.RabbitMQSender;
 import com.itskillsnow.authservice.repository.UserRepository;
 import com.itskillsnow.authservice.service.ServiceInterfaces.AuthService;
 import com.itskillsnow.authservice.service.ServiceInterfaces.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +30,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final JwtService jwtService;
 
-    private final RabbitTemplate rabbitTemplate;
+    private final RabbitMQSender rabbitMQSender;
 
 
     @Override
@@ -49,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
                         userSaved.getUsername(), userSaved.getEmail());
 
                 AuthEvent event = new AuthEvent(payload, "create");
-                rabbitTemplate.convertAndSend("auth.exchange", "auth.create", event);
+                rabbitMQSender.sendMessage("auth.exchange", "auth.create", event);
                 log.info("User sent successfully!");
             }catch (Exception ex){
                 log.error(ex.getMessage());

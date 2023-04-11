@@ -4,6 +4,7 @@ import com.itskillsnow.authservice.dto.AuthResponse;
 import com.itskillsnow.authservice.event.AuthEvent;
 import com.itskillsnow.authservice.event.UserPayload;
 import com.itskillsnow.authservice.model.User;
+import com.itskillsnow.authservice.rabbitmq.RabbitMQSender;
 import com.itskillsnow.authservice.repository.UserRepository;
 import com.itskillsnow.authservice.service.AuthServiceImpl;
 import com.itskillsnow.authservice.service.ServiceInterfaces.JwtService;
@@ -15,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Map;
@@ -40,12 +40,12 @@ class AuthServiceImplTest {
     private JwtService jwtService;
 
     @Mock
-    private RabbitTemplate rabbitTemplate;
+    private RabbitMQSender rabbitMQSender;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        authService = new AuthServiceImpl(userRepository, passwordEncoder, jwtService, rabbitTemplate);
+        authService = new AuthServiceImpl(userRepository, passwordEncoder, jwtService, rabbitMQSender);
     }
 
     @Test
@@ -99,8 +99,8 @@ class AuthServiceImplTest {
 
         UserPayload expectedPayload = new UserPayload(userId.toString(), "John Doe", "johnDoe", "johndoe@example.com");
         AuthEvent expectedEvent = new AuthEvent(expectedPayload, "create");
-        verify(rabbitTemplate, times(1))
-                .convertAndSend("auth.exchange", "auth.create", expectedEvent);
+        verify(rabbitMQSender, times(1))
+                .sendMessage("auth.exchange", "auth.create", expectedEvent);
     }
 
 

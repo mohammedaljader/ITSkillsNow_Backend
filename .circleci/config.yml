@@ -9,64 +9,67 @@ jobs:
       - checkout
       - run:
           name: Build_CourseService
-          command:  mvn -f ITSkillsNow/course-service -B -DskipTests clean package 
-            
+          command: mvn -f ITSkillsNow/course-service -B -DskipTests clean package
+
       - run:
           name: Build_JobService
-          command: mvn -f ITSkillsNow/job-service -B -DskipTests clean package 
-      
+          command: mvn -f ITSkillsNow/job-service -B -DskipTests clean package
+
       - run:
           name: Build_AuthService
           command: mvn -f ITSkillsNow/auth-service -B -DskipTests clean package
-          
+
       - run:
           name: Build_UserService
-          command: mvn -f ITSkillsNow/user-service -B -DskipTests clean package 
+          command: mvn -f ITSkillsNow/user-service -B -DskipTests clean package
 
+      - run:
+          name: Build_APIGateway
+          command: mvn -f ITSkillsNow/api-gateway -B -DskipTests clean package
 
   unit_tests:
-     docker:
-       - image: cimg/openjdk:17.0
-     parallelism: 4
-     steps:
-       - checkout
-       - run:
-           name: Test_CourseService
-           command: mvn -f ITSkillsNow/course-service test
-         
-       - run:
-           name:  Test_JobService
-           command: mvn -f ITSkillsNow/job-service test 
-         
-       - run:
-           name: Test_AuthService
-           command:  mvn -f ITSkillsNow/auth-service test 
-         
-       - run:
-           name: Test_UserService
-           command: mvn -f ITSkillsNow/user-service test
-   
+    docker:
+      - image: cimg/openjdk:17.0
+    parallelism: 4
+    steps:
+      - checkout
+      - run:
+          name: Test_CourseService
+          command: mvn -f ITSkillsNow/course-service test
+
+      - run:
+          name: Test_JobService
+          command: mvn -f ITSkillsNow/job-service test
+
+      - run:
+          name: Test_AuthService
+          command: mvn -f ITSkillsNow/auth-service test
+
+      - run:
+          name: Test_UserService
+          command: mvn -f ITSkillsNow/user-service test
+
   integration_tests:
-     docker:
-       - image: cimg/openjdk:17.0
-     parallelism: 4
-     steps:
-       - checkout
-       - run:
-           name: Test_CourseService
-           command: mvn -f ITSkillsNow/course-service failsafe:integration-test
-         
-       - run:
-           name:  Test_JobService
-           command: mvn -f ITSkillsNow/job-service failsafe:integration-test
-         
-       - run:
-           name: Test_AuthService
-           command: mvn -f ITSkillsNow/auth-service failsafe:integration-test
-         
-       - run:
-           name: Test_UserService
-           command: mvn -f ITSkillsNow/user-service failsafe:integration-test
+    docker:
+      - image: cimg/openjdk:17.0
+    parallelism: 4
+    steps:
+      - checkout
+      - run:
+          name: Test_CourseService
+          command: mvn -f ITSkillsNow/course-service failsafe:integration-test
+
+      - run:
+          name: Test_JobService
+          command: mvn -f ITSkillsNow/job-service failsafe:integration-test
+
+      - run:
+          name: Test_AuthService
+          command: mvn -f ITSkillsNow/auth-service failsafe:integration-test
+
+      - run:
+          name: Test_UserService
+          command: mvn -f ITSkillsNow/user-service failsafe:integration-test
 
   sonarcloud:
     docker:
@@ -77,19 +80,18 @@ jobs:
       - run:
           name: SonarCloud Analysis CourseService
           command: mvn -f ITSkillsNow/course-service clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=Course-service -Dsonar.organization=itskillsnow -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=c0601c12426c4756b514fd9ed1ea9ff3ecb2304c
-              
+
       - run:
           name: SonarCloud Analysis JobService
           command: mvn -f ITSkillsNow/job-service clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=Job-service -Dsonar.organization=itskillsnow -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=26678f78f20da2818d5114e4fd92c17ddce384b8
-          
+
       - run:
           name: SonarCloud Analysis UserService
-          command: mvn -f ITSkillsNow/user-service clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=User-Service -Dsonar.organization=itskillsnow -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=9d4571e235b9344f2ede9fbac93160bff48d382b 
-          
+          command: mvn -f ITSkillsNow/user-service clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=User-Service -Dsonar.organization=itskillsnow -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=9d4571e235b9344f2ede9fbac93160bff48d382b
+
       - run:
           name: SonarCloud Analysis AuthService
-          command: mvn -f ITSkillsNow/auth-service clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=Auth-service -Dsonar.organization=itskillsnow -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=5c901e1da9cdb760528748ab4db6bf0f0fceeeec 
-
+          command: mvn -f ITSkillsNow/auth-service clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=Auth-service -Dsonar.organization=itskillsnow -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=5c901e1da9cdb760528748ab4db6bf0f0fceeeec
 
 workflows:
   ITSkillsNow_Backend:

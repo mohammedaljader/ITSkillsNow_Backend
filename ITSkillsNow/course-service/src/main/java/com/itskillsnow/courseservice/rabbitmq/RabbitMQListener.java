@@ -1,4 +1,4 @@
-package com.itskillsnow.courseservice.listener;
+package com.itskillsnow.courseservice.rabbitmq;
 
 import com.itskillsnow.courseservice.event.UserEvent;
 import com.itskillsnow.courseservice.model.User;
@@ -14,7 +14,7 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class UserListener {
+public class RabbitMQListener {
 
 
     private final UserRepository userRepository;

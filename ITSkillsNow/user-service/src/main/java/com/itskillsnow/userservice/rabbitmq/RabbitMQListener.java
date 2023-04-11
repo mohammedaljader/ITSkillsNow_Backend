@@ -14,10 +14,10 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class AuthListener {
+public class RabbitMQListener {
 
     private final UserRepository userRepository;
-    private final RabbitTemplate rabbitTemplate;
+    private final RabbitMQSender rabbitMQSender;
 
     @RabbitListener(queues = "auth.queue")
     public void createUser(AuthEvent event){
@@ -31,10 +31,9 @@ public class AuthListener {
         log.info("User sent successfully!");
         UserEvent CreatedUserEvent = new UserEvent(userSaved.getUsername(), "create");
         try {
-            rabbitTemplate.convertAndSend("user.exchange",
+            rabbitMQSender.sendMessage("user.exchange",
                     "user.create",
                     CreatedUserEvent);
-            log.info("User info sent to all services.");
         }catch (Exception exception){
             log.info(exception.getMessage());
         }

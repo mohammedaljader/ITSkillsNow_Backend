@@ -1,4 +1,4 @@
-package com.itskillsnow.authservice.listener;
+package com.itskillsnow.authservice.rabbitmq;
 
 import com.itskillsnow.authservice.model.User;
 import com.itskillsnow.authservice.event.UserEvent;
@@ -9,18 +9,17 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class UserListener {
+public class RabbitMQListener {
 
 
     private final UserRepository userRepository;
 
 
-    @RabbitListener(queues = "user.queue")
+    @RabbitListener(queues = "auth_user.queue")
     public void deleteUser(UserEvent event){
         if(event.getEventType().equals("delete")){
             handleUserDelete(event.getUsername());

@@ -17,7 +17,11 @@ public class RabbitMQConfig {
 
     private final ConnectionFactory connectionFactory;
 
-    public static final String QUEUE = "user.queue";
+    public static final String AUTH_QUEUE = "auth_user.queue";
+
+    public static final String COURSE_USER_QUEUE = "course_user.queue";
+
+    public static final String JOB_USER_QUEUE = "job_user.queue";
     public static final String EXCHANGE = "user.exchange";
     public static final String ROUTING_KEY = "user.*";
 
@@ -27,13 +31,33 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Queue userQueue() {
-        return new Queue(QUEUE);
+    public Queue authUserQueue() {
+        return new Queue(AUTH_QUEUE);
     }
 
     @Bean
-    public Binding userBinding(TopicExchange userExchange, Queue userQueue) {
-        return BindingBuilder.bind(userQueue).to(userExchange).with(ROUTING_KEY);
+    public Queue courseUserQueue() {
+        return new Queue(COURSE_USER_QUEUE);
+    }
+
+    @Bean
+    public Queue jobUserQueue() {
+        return new Queue(JOB_USER_QUEUE);
+    }
+
+    @Bean
+    public Binding userBinding() {
+        return BindingBuilder.bind(authUserQueue()).to(userExchange()).with(ROUTING_KEY);
+    }
+
+    @Bean
+    public Binding CourseUserBinding() {
+        return BindingBuilder.bind(courseUserQueue()).to(userExchange()).with(ROUTING_KEY);
+    }
+
+    @Bean
+    public Binding JobUserBinding() {
+        return BindingBuilder.bind(jobUserQueue()).to(userExchange()).with(ROUTING_KEY);
     }
 
 
