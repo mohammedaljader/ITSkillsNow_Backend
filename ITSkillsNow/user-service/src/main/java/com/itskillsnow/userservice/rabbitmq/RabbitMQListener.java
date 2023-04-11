@@ -1,4 +1,4 @@
-package com.itskillsnow.userservice.listener;
+package com.itskillsnow.userservice.rabbitmq;
 
 import com.itskillsnow.userservice.event.AuthEvent;
 import com.itskillsnow.userservice.event.UserEvent;
