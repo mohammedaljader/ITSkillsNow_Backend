@@ -15,7 +15,7 @@ public class CorsConfig extends CorsConfiguration {
     {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials( true );
-        config.setAllowedOrigins( List.of( "http://localhost:3000" ) );
+        config.setAllowedOrigins( List.of( "http://localhost:3000", "https://itskillsnow.vercel.app" ) );
         config.setAllowedMethods( List.of( "GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD" ) );
         config.setAllowedHeaders( List.of( "origin", "content-type", "accept", "authorization", "cookie" ) );
 
