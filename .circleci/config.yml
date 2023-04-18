@@ -27,6 +27,23 @@ jobs:
           name: Build_APIGateway
           command: mvn -f ITSkillsNow/api-gateway -B -DskipTests clean package
 
+  build-and-push-microservice-1:
+    docker:
+      - image: circleci/openjdk:17-jdk
+    steps:
+      - checkout
+      - run:
+          name: Build Docker image for microservice-1
+          command: |
+            cd ITSkillsNow/course-service
+            docker build -t mohammedaljader2000/course-service .
+      - deploy:
+          name: Push Docker image for microservice-1 to registry
+          command: |
+            docker login -u mohammedaljader2000 -p M321aljader@
+            docker push mohammedaljader2000/course-service
+  
+  
   unit_tests:
     docker:
       - image: cimg/openjdk:17.0
