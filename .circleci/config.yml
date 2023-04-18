@@ -49,7 +49,7 @@ jobs:
             docker login -u "${DOCKERHUB_USERNAME}" -p "${DOCKERHUB_PASSWORD}"
             docker push mohammedaljader2000/course-service
   
-   build-and-push-job-service:
+  build-and-push-job-service:
     docker:
       - image: cimg/openjdk:17.0
     steps:
@@ -71,7 +71,7 @@ jobs:
             docker login -u "${DOCKERHUB_USERNAME}" -p "${DOCKERHUB_PASSWORD}"
             docker push mohammedaljader2000/job-service
    
-   build-and-push-auth-service:
+  build-and-push-auth-service:
     docker:
       - image: cimg/openjdk:17.0
     steps:
@@ -93,7 +93,7 @@ jobs:
             docker login -u "${DOCKERHUB_USERNAME}" -p "${DOCKERHUB_PASSWORD}"
             docker push mohammedaljader2000/auth-service
    
-   build-and-push-user-service:
+  build-and-push-user-service:
     docker:
       - image: cimg/openjdk:17.0
     steps:
@@ -115,7 +115,7 @@ jobs:
             docker login -u "${DOCKERHUB_USERNAME}" -p "${DOCKERHUB_PASSWORD}"
             docker push mohammedaljader2000/user-service
   
-   build-and-push-apigateway:
+  build-and-push-apigateway:
     docker:
       - image: cimg/openjdk:17.0
     steps:
@@ -137,7 +137,7 @@ jobs:
             docker login -u "${DOCKERHUB_USERNAME}" -p "${DOCKERHUB_PASSWORD}"
             docker push mohammedaljader2000/gateway
   
-   build-and-push-discovery-server:
+  build-and-push-discovery-server:
     docker:
       - image: cimg/openjdk:17.0
     steps:
