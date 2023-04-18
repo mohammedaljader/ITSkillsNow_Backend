@@ -114,7 +114,7 @@ workflows:
   ITSkillsNow_Backend:
     jobs:
       - build
-      - build-and-push-microservice-1
+      - build-and-push-microservice-1:
           requires:
             - build
       - unit_tests:
