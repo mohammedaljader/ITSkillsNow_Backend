@@ -203,7 +203,7 @@ jobs:
           name: Test_UserService
           command: mvn -f ITSkillsNow/user-service failsafe:integration-test
 
-  sonarcloud:
+  sonarcloud-course-service:
     docker:
       - image: cimg/openjdk:17.0
     parallelism: 4
@@ -212,15 +212,35 @@ jobs:
       - run:
           name: SonarCloud Analysis CourseService
           command: mvn -f ITSkillsNow/course-service clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=Course-service -Dsonar.organization=itskillsnow -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=c0601c12426c4756b514fd9ed1ea9ff3ecb2304c
-
+  
+  
+  sonarcloud-job-service:
+    docker:
+      - image: cimg/openjdk:17.0
+    parallelism: 4
+    steps:
+      - checkout
       - run:
           name: SonarCloud Analysis JobService
           command: mvn -f ITSkillsNow/job-service clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=Job-service -Dsonar.organization=itskillsnow -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=26678f78f20da2818d5114e4fd92c17ddce384b8
 
+  sonarcloud-user-service:
+    docker:
+      - image: cimg/openjdk:17.0
+    parallelism: 4
+    steps:
+      - checkout
       - run:
           name: SonarCloud Analysis UserService
           command: mvn -f ITSkillsNow/user-service clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=User-Service -Dsonar.organization=itskillsnow -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=9d4571e235b9344f2ede9fbac93160bff48d382b
 
+  
+  sonarcloud-auth-service:
+    docker:
+      - image: cimg/openjdk:17.0
+    parallelism: 4
+    steps:
+      - checkout
       - run:
           name: SonarCloud Analysis AuthService
           command: mvn -f ITSkillsNow/auth-service clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=Auth-service -Dsonar.organization=itskillsnow -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=5c901e1da9cdb760528748ab4db6bf0f0fceeeec
@@ -253,11 +273,15 @@ workflows:
       - build-and-push-apigateway:
           requires:
             - integration_tests
-      - sonarcloud:
+      - sonarcloud-course-service:
           requires:
             - build-and-push-course-service
-            - build-and-push-job-service
-            - build-and-push-user-service
+      - sonarcloud-job-service:
+          requires:
+            - build-and-push-course-service
+      - sonarcloud-auth-service:
+          requires:
             - build-and-push-auth-service
-            - build-and-push-discovery-server
-            - build-and-push-apigateway
+      - sonarcloud-user-service:
+          requires:
+            - build-and-push-user-service
