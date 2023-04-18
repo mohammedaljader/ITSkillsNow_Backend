@@ -29,7 +29,7 @@ jobs:
 
   build-and-push-microservice-1:
     docker:
-      - image: docker:17.05.0-ce-git
+      - image: cimg/openjdk:17.0
     steps:
       - checkout
       - setup_remote_docker
