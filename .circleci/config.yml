@@ -278,7 +278,7 @@ workflows:
             - build-and-push-course-service
       - sonarcloud-job-service:
           requires:
-            - build-and-push-course-service
+            - build-and-push-job-service
       - sonarcloud-auth-service:
           requires:
             - build-and-push-auth-service
