@@ -32,6 +32,7 @@ jobs:
       - image: docker:17.05.0-ce-git
     steps:
       - checkout
+      - setup_remote_docker
       - run:
           name: Build Docker image for microservice-1
           command: |
@@ -113,10 +114,10 @@ jobs:
 workflows:
   ITSkillsNow_Backend:
     jobs:
-      - build
-      - build-and-push-microservice-1:
+      - build-and-push-microservice-1
+      - build:
           requires:
-            - build
+            - build-and-push-microservice-1
       - unit_tests:
           requires:
             - build
