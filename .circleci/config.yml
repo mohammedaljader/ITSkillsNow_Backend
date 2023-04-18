@@ -34,6 +34,11 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
+          name: Build Java Maven project
+          command: |
+            cd ITSkillsNow/course-service
+            mvn clean package -DskipTests
+      - run:
           name: Build Docker image for microservice-1
           command: |
             cd ITSkillsNow/course-service
