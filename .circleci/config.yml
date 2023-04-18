@@ -27,7 +27,7 @@ jobs:
           name: Build_APIGateway
           command: mvn -f ITSkillsNow/api-gateway -B -DskipTests clean package
 
-  build-and-push-microservice-1:
+  build-and-push-course-service:
     docker:
       - image: cimg/openjdk:17.0
     steps:
@@ -39,16 +39,125 @@ jobs:
             cd ITSkillsNow/course-service
             mvn clean package -DskipTests
       - run:
-          name: Build Docker image for microservice-1
+          name: Build Docker image for course-service
           command: |
             cd ITSkillsNow/course-service
             docker build -f Dockerfile . -t mohammedaljader2000/course-service
       - deploy:
-          name: Push Docker image for microservice-1 to registry
+          name: Push Docker image for course-service to registry
           command: |
-            docker login -u mohammedaljader2000 -p M321aljader@
+            docker login -u "${DOCKERHUB_USERNAME}" -p "${DOCKERHUB_PASSWORD}"
             docker push mohammedaljader2000/course-service
   
+   build-and-push-job-service:
+    docker:
+      - image: cimg/openjdk:17.0
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Java Maven project
+          command: |
+            cd ITSkillsNow/job-service
+            mvn clean package -DskipTests
+      - run:
+          name: Build Docker image for job-service
+          command: |
+            cd ITSkillsNow/job-service
+            docker build -f Dockerfile . -t mohammedaljader2000/job-service
+      - deploy:
+          name: Push Docker image for job-service to registry
+          command: |
+            docker login -u "${DOCKERHUB_USERNAME}" -p "${DOCKERHUB_PASSWORD}"
+            docker push mohammedaljader2000/job-service
+   
+   build-and-push-auth-service:
+    docker:
+      - image: cimg/openjdk:17.0
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Java Maven project
+          command: |
+            cd ITSkillsNow/auth-service
+            mvn clean package -DskipTests
+      - run:
+          name: Build Docker image for auth-service
+          command: |
+            cd ITSkillsNow/auth-service
+            docker build -f Dockerfile . -t mohammedaljader2000/auth-service
+      - deploy:
+          name: Push Docker image for auth-service to registry
+          command: |
+            docker login -u "${DOCKERHUB_USERNAME}" -p "${DOCKERHUB_PASSWORD}"
+            docker push mohammedaljader2000/auth-service
+   
+   build-and-push-user-service:
+    docker:
+      - image: cimg/openjdk:17.0
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Java Maven project
+          command: |
+            cd ITSkillsNow/user-service
+            mvn clean package -DskipTests
+      - run:
+          name: Build Docker image for user-service
+          command: |
+            cd ITSkillsNow/user-service
+            docker build -f Dockerfile . -t mohammedaljader2000/user-service
+      - deploy:
+          name: Push Docker image for user-service to registry
+          command: |
+            docker login -u "${DOCKERHUB_USERNAME}" -p "${DOCKERHUB_PASSWORD}"
+            docker push mohammedaljader2000/user-service
+  
+   build-and-push-apigateway:
+    docker:
+      - image: cimg/openjdk:17.0
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Java Maven project
+          command: |
+            cd ITSkillsNow/api-gateway
+            mvn clean package -DskipTests
+      - run:
+          name: Build Docker image for apigateway
+          command: |
+            cd ITSkillsNow/api-gateway
+            docker build -f Dockerfile . -t mohammedaljader2000/gateway
+      - deploy:
+          name: Push Docker image for apigateway to registry
+          command: |
+            docker login -u "${DOCKERHUB_USERNAME}" -p "${DOCKERHUB_PASSWORD}"
+            docker push mohammedaljader2000/gateway
+  
+   build-and-push-discovery-server:
+    docker:
+      - image: cimg/openjdk:17.0
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Java Maven project
+          command: |
+            cd ITSkillsNow/discovery-server
+            mvn clean package -DskipTests
+      - run:
+          name: Build Docker image for discovery-server
+          command: |
+            cd ITSkillsNow/discovery-server
+            docker build -f Dockerfile . -t mohammedaljader2000/discovery-server
+      - deploy:
+          name: Push Docker image for discovery-server to registry
+          command: |
+            docker login -u "${DOCKERHUB_USERNAME}" -p "${DOCKERHUB_PASSWORD}"
+            docker push mohammedaljader2000/discovery-server
   
   unit_tests:
     docker:
@@ -119,16 +228,36 @@ jobs:
 workflows:
   ITSkillsNow_Backend:
     jobs:
-      - build-and-push-microservice-1
-      - build:
-          requires:
-            - build-and-push-microservice-1
+      - build
       - unit_tests:
           requires:
             - build
       - integration_tests:
           requires:
             - unit_tests
-      - sonarcloud:
+      - build-and-push-course-service:
           requires:
             - integration_tests
+      - build-and-push-job-service:
+          requires:
+            - integration_tests
+      - build-and-push-user-service:
+          requires:
+            - integration_tests
+      - build-and-push-auth-service:
+          requires:
+            - integration_tests
+      - build-and-push-discovery-server:
+          requires:
+            - integration_tests
+      - build-and-push-apigateway:
+          requires:
+            - integration_tests
+      - sonarcloud:
+          requires:
+            - build-and-push-course-service
+            - build-and-push-job-service
+            - build-and-push-user-service
+            - build-and-push-auth-service
+            - build-and-push-discovery-server
+            - build-and-push-apigateway
