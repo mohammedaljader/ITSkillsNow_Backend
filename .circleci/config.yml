@@ -37,6 +37,7 @@ jobs:
           name: Build Docker image for microservice-1
           command: |
             cd ITSkillsNow/course-service
+            mvn clean install
             docker build -t mohammedaljader2000/course-service .
       - deploy:
           name: Push Docker image for microservice-1 to registry
