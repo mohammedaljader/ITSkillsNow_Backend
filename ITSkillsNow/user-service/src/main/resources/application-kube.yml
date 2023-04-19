@@ -1,0 +1,25 @@
+eureka:
+  client:
+    enabled: false
+
+spring:
+  application:
+    name: user-service
+  rabbitmq:
+    addresses: rabbitmq:5672
+  data:
+    mongodb:
+      uri : mongodb+srv://mohammedaljader18:xBQFCPOpUjdeYn4p@cluster0.cn6urrw.mongodb.net/?retryWrites=true&w=majority
+      database : User
+
+server:
+  port: 8085
+
+
+management:
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
+  tracing:
+    sampling:
+      probability: 1.0

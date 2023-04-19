@@ -1,21 +1,18 @@
 eureka:
   client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-    fetch-registry: true
-    register-with-eureka: true
-    enabled: true
+    enabled: false
 
 server:
-  port: 9898
+  port: 8081
+
 spring:
   application:
-    name: auth-service
+    name: course-service
   rabbitmq:
-    addresses: localhost:5672
+    addresses: rabbitmq:5672
   datasource:
     password: password
-    url: jdbc:postgresql://localhost:5433/authDB
+    url: jdbc:postgresql://postgres:5432/courseDB
     username: itskillsnow
   jpa:
     hibernate:
@@ -25,13 +22,13 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: true
-  profiles:
-    active: default
+
 
 management:
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
   tracing:
     sampling:
       probability: 1.0
-  zipkin:
-    tracing:
-      endpoint: http://localhost:9411/api/v2/spans
+

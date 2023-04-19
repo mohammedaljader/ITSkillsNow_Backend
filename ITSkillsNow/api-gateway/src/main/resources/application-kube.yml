@@ -1,39 +1,34 @@
 eureka:
   client:
-    service-url:
-      defaultZone : http://discovery-server:8761/eureka
-    fetch-registry: true
-    register-with-eureka: true
-  instance:
-    prefer-ip-address: true
+    enabled: false
 
 spring:
   cloud:
     gateway:
       routes:
         - id: course-service
-          uri: lb://course-service
+          uri: http://course-service
           predicates:
             - Path=/api/course/**
           filters:
             - AuthenticationFilter
 
         - id: job-service
-          uri: lb://job-service
+          uri: http://job-service
           predicates:
             - Path=/api/job/**
           filters:
             - AuthenticationFilter
 
         - id: auth-service
-          uri: lb://auth-service
+          uri: http://auth-service
           predicates:
             - Path=/auth/**
 
         - id: user-service
-          uri: lb://user-service
+          uri: http://user-service
           predicates:
-            - Path=/api/user/**
+            - Path=/auth/**
           filters:
             - AuthenticationFilter
 

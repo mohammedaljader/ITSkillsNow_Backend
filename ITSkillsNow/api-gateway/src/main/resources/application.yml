@@ -16,12 +16,12 @@ spring:
           filters:
             - AuthenticationFilter
 
-        - id: AUTH-SERVICE
-          uri: lb://AUTH-SERVICE
+        - id: auth-service
+          uri: lb://auth-service
           predicates:
             - Path=/auth/**
 
-        - id: job-service
+        - id: user-service
           uri: lb://user-service
           predicates:
             - Path=/api/user/**

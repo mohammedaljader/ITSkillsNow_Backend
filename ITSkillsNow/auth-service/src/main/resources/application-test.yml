@@ -11,7 +11,7 @@ server:
 
 spring:
   application:
-    name: AUTH-SERVICE
+    name: auth-service
   rabbitmq:
     addresses: localhost:5672
   datasource:
