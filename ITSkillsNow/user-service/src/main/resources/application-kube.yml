@@ -6,7 +6,7 @@ spring:
   application:
     name: user-service
   rabbitmq:
-    addresses: rabbitmq:5672
+    addresses: http://rabbitmq:5672
   data:
     mongodb:
       uri : mongodb+srv://mohammedaljader18:xBQFCPOpUjdeYn4p@cluster0.cn6urrw.mongodb.net/?retryWrites=true&w=majority
