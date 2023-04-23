@@ -16,19 +16,23 @@ public class RabbitMQConfig {
 
     private final ConnectionFactory connectionFactory;
 
+    public static final String QUEUE = "auth.queue";
+    public static final String EXCHANGE = "auth.exchange";
+    public static final String ROUTING_KEY = "auth.*";
+
     @Bean
     public TopicExchange authExchange() {
-        return new TopicExchange("auth.exchange");
+        return new TopicExchange(EXCHANGE);
     }
 
     @Bean
     public Queue authQueue() {
-        return new Queue("auth.queue");
+        return new Queue(QUEUE);
     }
 
     @Bean
     public Binding authBinding(TopicExchange userExchange, Queue userQueue) {
-        return BindingBuilder.bind(userQueue).to(userExchange).with("auth.*");
+        return BindingBuilder.bind(userQueue).to(userExchange).with(ROUTING_KEY);
     }
 
     @Bean
