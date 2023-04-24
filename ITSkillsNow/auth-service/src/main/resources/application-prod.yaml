@@ -3,16 +3,16 @@ eureka:
     enabled: false
 
 server:
-  port: 8081
+  port: 9898
 
 spring:
   application:
-    name: course-service
+    name: auth-service
   rabbitmq:
     addresses: rabbitmq:5672
   datasource:
-    password: password
-    url: jdbc:postgresql://postgres:5432/courseDB
+    password: M0618678213@
+    url: jdbc:postgresql://itskillsnow.postgres.database.azure.com:5432/authDB
     username: itskillsnow
   jpa:
     hibernate:
@@ -24,11 +24,11 @@ spring:
     show-sql: true
 
 
+
 management:
-  zipkin:
-    tracing:
-      endpoint: http://zipkin:9411/api/v2/spans
   tracing:
     sampling:
       probability: 1.0
-
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans

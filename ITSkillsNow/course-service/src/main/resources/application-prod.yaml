@@ -11,8 +11,8 @@ spring:
   rabbitmq:
     addresses: rabbitmq:5672
   datasource:
-    password: password
-    url: jdbc:postgresql://postgres:5432/courseDB
+    password: M0618678213@
+    url: jdbc:postgresql://itskillsnow.postgres.database.azure.com:5432/courseDB
     username: itskillsnow
   jpa:
     hibernate:
@@ -31,4 +31,3 @@ management:
   tracing:
     sampling:
       probability: 1.0
-
