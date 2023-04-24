@@ -8,4 +8,5 @@ public interface AuthService {
     AuthResponse generateToken(String username);
     void validateToken(String token);
     AuthResponse refreshToken(String refreshToken);
+    boolean deleteMe(String username, String password);
 }

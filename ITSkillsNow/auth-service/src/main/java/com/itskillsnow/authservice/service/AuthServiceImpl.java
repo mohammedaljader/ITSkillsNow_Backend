@@ -76,6 +76,32 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public boolean deleteMe(String username, String password) {
+        Optional<User> user = userRepository.findByUsername(username);
+        if(user.isEmpty()){
+            return false;
+        }
+
+        if(passwordEncoder.matches(password, user.get().getPassword())){
+            userRepository.delete(user.get());
+            try {
+                UserPayload payload = new UserPayload();
+                payload.setUsername(user.get().getUsername());
+
+                AuthEvent event = new AuthEvent(payload, "delete");
+                rabbitMQSender.sendMessage("auth.exchange", "auth.delete", event);
+                log.info("User sent successfully!");
+            }catch (Exception ex){
+                log.error(ex.getMessage());
+                log.info("Error while sending user");
+            }
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    @Override
     public void validateToken(String token) {
         jwtService.validateToken(token);
     }

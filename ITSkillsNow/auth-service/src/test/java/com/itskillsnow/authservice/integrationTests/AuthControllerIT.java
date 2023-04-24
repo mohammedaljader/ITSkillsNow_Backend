@@ -3,6 +3,7 @@ package com.itskillsnow.authservice.integrationTests;
 import com.itskillsnow.authservice.dto.AddUserDto;
 import com.itskillsnow.authservice.dto.AuthRequest;
 import com.itskillsnow.authservice.dto.AuthResponse;
+import com.itskillsnow.authservice.dto.request.DeleteUserDto;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -269,6 +270,45 @@ class AuthControllerIT {
             // assert that the response status code is 403 Forbidden
             assertEquals(HttpStatus.FORBIDDEN, ex.getStatusCode());
         }
+    }
+
+    @Test
+    void testDeleteMe() {
+        // create a new user to test the login endpoint
+        AddUserDto user = new AddUserDto();
+        user.setFullName("John Doe3");
+        user.setUsername("johnDoe3");
+        user.setEmail("johndoe3@example.com");
+        user.setPassword("password3");
+
+        // register the user
+        restTemplate.postForObject(baseUrl + "/register", user, String.class);
+
+        // create the authentication request
+        AuthRequest authRequest = new AuthRequest();
+        authRequest.setUsername("johnDoe3");
+        authRequest.setPassword("password3");
+
+        restTemplate.postForObject(baseUrl + "/login", authRequest, AuthResponse.class);
+
+
+        // make the request
+        DeleteUserDto deleteUserDto = new DeleteUserDto(authRequest.getUsername(), authRequest.getPassword());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<DeleteUserDto> requestEntity = new HttpEntity<>(deleteUserDto, headers);
+
+        ResponseEntity<Boolean> responseEntity = restTemplate.exchange(baseUrl.concat("/").concat("deleteMe"),
+                HttpMethod.DELETE, requestEntity, Boolean.class);
+
+
+        // assert that the response status code is 200 OK
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+        // assert that the response body is true
+        assertEquals(Boolean.TRUE, responseEntity.getBody());
+
     }
 
 }

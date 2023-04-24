@@ -4,9 +4,11 @@ package com.itskillsnow.authservice.controller;
 import com.itskillsnow.authservice.dto.AddUserDto;
 import com.itskillsnow.authservice.dto.AuthRequest;
 import com.itskillsnow.authservice.dto.AuthResponse;
+import com.itskillsnow.authservice.dto.request.DeleteUserDto;
 import com.itskillsnow.authservice.model.User;
 import com.itskillsnow.authservice.service.ServiceInterfaces.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -47,4 +49,9 @@ public class AuthController {
         return authService.refreshToken(refreshToken);
     }
 
+    @DeleteMapping("/deleteMe")
+    @ResponseStatus(HttpStatus.OK)
+    public boolean deleteMe(@RequestBody DeleteUserDto userDto){
+        return authService.deleteMe(userDto.getUsername(), userDto.getPassword());
+    }
 }

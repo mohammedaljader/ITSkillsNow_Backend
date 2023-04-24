@@ -9,6 +9,7 @@ import com.itskillsnow.authservice.repository.UserRepository;
 import com.itskillsnow.authservice.service.AuthServiceImpl;
 import com.itskillsnow.authservice.service.ServiceInterfaces.JwtService;
 import io.jsonwebtoken.JwtException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -201,5 +202,59 @@ class AuthServiceImplTest {
         AuthResponse actualResponse = authService.refreshToken(refreshToken);
 
         assertNull(actualResponse);
+    }
+
+    @Test
+    public void given_DeleteMeWithCorrectUser_shouldReturnTrue() {
+        User user = new User();
+        user.setUsername("testUser");
+        user.setPassword("encoded_password");
+        UserPayload userPayload = new UserPayload();
+        userPayload.setUsername("testUser");
+
+        when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("password", "encoded_password")).thenReturn(true);
+        Mockito.doNothing().when(userRepository).delete(any());
+        Mockito.doNothing().when(rabbitMQSender).sendMessage(any(), any(), any());
+
+
+        boolean result = authService.deleteMe("testUser", "password");
+
+
+        Assertions.assertTrue(result);
+        verify(userRepository).delete(user);
+        verify(rabbitMQSender).sendMessage("auth.exchange", "auth.delete",
+                new AuthEvent(userPayload, "delete"));
+    }
+
+    @Test
+    public void given_DeleteMeWithIncorrectPassword_shouldReturnFalse() {
+        User user = new User();
+        user.setUsername("testUser");
+        user.setPassword("encoded_password");
+
+        when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("wrong_password", user.getPassword())).thenReturn(false);
+
+
+        boolean result = authService.deleteMe("testUser", "wrong_password");
+
+
+        Assertions.assertFalse(result);
+        verify(userRepository, never()).delete(user);
+        verify(rabbitMQSender, never()).sendMessage(any(), any(), any());
+    }
+
+    @Test
+    public void given_DeleteMeUserNotFound_shouldReturnFalse() {
+        when(userRepository.findByUsername("testUser")).thenReturn(Optional.empty());
+
+
+        boolean result = authService.deleteMe("testUser", "password");
+
+
+        Assertions.assertFalse(result);
+        verify(userRepository, never()).delete(any());
+        verify(rabbitMQSender, never()).sendMessage(any(), any(), any());
     }
 }
