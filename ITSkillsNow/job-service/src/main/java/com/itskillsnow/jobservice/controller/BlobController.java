@@ -1,10 +1,11 @@
 package com.itskillsnow.jobservice.controller;
 
+import com.itskillsnow.jobservice.dto.request.AddFileDto;
 import com.itskillsnow.jobservice.service.interfaces.BlobService;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,7 +25,6 @@ public class BlobController {
         return service.getAllFiles();
     }
 
-
     @GetMapping("/download/{filename}")
     public String download(@PathVariable String filename) {
         return service.downloadFile(filename);
@@ -36,15 +36,16 @@ public class BlobController {
     }
 
     @PostMapping("/upload")
-    public String uploadFile(MultipartFile file) throws IOException {
-        log.info("Filename :" + file.getOriginalFilename());
-        log.info("Size:" + file.getSize());
-        log.info("ContentType:" + file.getContentType());
-        Boolean storeFile = service.storeFile(file.getOriginalFilename(), file.getInputStream(), file.getSize());
+    public String uploadFile(@RequestBody AddFileDto addFileDto) throws IOException {
+        log.info("Filename :" + addFileDto.getFile().getOriginalFilename());
+        log.info("Size:" +  addFileDto.getFile().getSize());
+        log.info("ContentType:" +  addFileDto.getFile().getContentType());
+        Boolean storeFile = service.storeFile(addFileDto.getFile().getOriginalFilename(),
+                addFileDto.getFile().getInputStream(), addFileDto.getFile().getSize());
         if(storeFile){
-            return file.getOriginalFilename() + " Has been saved as a blob-item!!!";
+            return addFileDto.getFile().getOriginalFilename() + " Has been saved as a blob-item!!!";
         }else{
-            return "The file " + file.getOriginalFilename() + " already exists in Azure Blob Storage";
+            return "The file " + addFileDto.getFile().getOriginalFilename() + " already exists in Azure Blob Storage";
         }
     }
 }

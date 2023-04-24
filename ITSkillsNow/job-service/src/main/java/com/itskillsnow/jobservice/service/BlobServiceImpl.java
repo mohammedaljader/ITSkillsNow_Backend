@@ -54,17 +54,12 @@ public class BlobServiceImpl implements BlobService {
                 .concat(getFileExtension(filename));
 
         BlobClient blobClient = containerClient.getBlobClient(newFilename);
-        if (blobClient.exists()) {
-            log.warn("The file {} already exists in Azure Blob Storage", newFilename);
-            return false;
-        } else {
-            try (content) {
-                blobClient.upload(content, length);
-                log.info(blobClient.getBlobUrl());
-                return true;
-            } catch (Exception e) {
-                throw new RuntimeException("Error uploading file to Azure Blob Storage", e);
-            }
+        try (content) {
+            blobClient.upload(content, length);
+            log.info(blobClient.getBlobUrl());
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException("Error uploading file to Azure Blob Storage", e);
         }
     }
 
