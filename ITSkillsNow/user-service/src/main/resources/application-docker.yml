@@ -13,7 +13,7 @@ spring:
     addresses: rabbitmq:5672
   data:
     mongodb:
-      uri : mongodb+srv://mohammedaljader18:xBQFCPOpUjdeYn4p@cluster0.cn6urrw.mongodb.net/?retryWrites=true&w=majority
+      uri : mongodb+srv://mohammedaljader18:RMRQJxoqQu97q7B6@itskillsnow.ec6ojeh.mongodb.net/?retryWrites=true&w=majority
       database : User
 
 server:
