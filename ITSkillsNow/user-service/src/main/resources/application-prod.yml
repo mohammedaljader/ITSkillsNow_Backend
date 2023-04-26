@@ -1,10 +1,6 @@
 eureka:
   client:
-    service-url:
-      defaultZone: http://discovery-server:8761/eureka
-    fetch-registry: true
-    register-with-eureka: true
-    enabled: true
+    enabled: false
 
 spring:
   application:
@@ -12,8 +8,8 @@ spring:
   rabbitmq:
     addresses: rabbitmq:5672
   datasource:
-    password: password
-    url: jdbc:postgresql://postgres:5433/userDB
+    password: M0618678213@
+    url: jdbc:postgresql://itskillsnow.postgres.database.azure.com:5432/userDB
     username: itskillsnow
   jpa:
     hibernate:

@@ -11,15 +11,20 @@ spring:
     name: user-service
   rabbitmq:
     addresses: localhost:5672
-  data:
-    mongodb:
-      database: User
-      authentication-database: admin
-      port: 27017
-      host: localhost
-      auto-index-creation: true
+  datasource:
+    password: password
+    url: jdbc:postgresql://localhost:5433/userDB
+    username: itskillsnow
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
   profiles:
-    active: default
+    active: test
 
 server:
   port: 8085

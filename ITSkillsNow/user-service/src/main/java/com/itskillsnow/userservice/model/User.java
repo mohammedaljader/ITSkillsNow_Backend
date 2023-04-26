@@ -1,19 +1,22 @@
 package com.itskillsnow.userservice.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.UUID;
 
 
-@Document(collection = "users")
-@Data
+@Entity
+@Getter
+@Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "users")
 public class User {
     @Id
-    private String userId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID userId;
 
     private String username;
 

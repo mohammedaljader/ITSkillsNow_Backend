@@ -7,10 +7,18 @@ spring:
     name: user-service
   rabbitmq:
     addresses: rabbitmq:5672
-  data:
-    mongodb:
-      uri : mongodb+srv://mohammedaljader18:RMRQJxoqQu97q7B6@itskillsnow.ec6ojeh.mongodb.net/?retryWrites=true&w=majority
-      database : User
+  datasource:
+    password: password
+    url: jdbc:postgresql://postgres:5433/userDB
+    username: itskillsnow
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
 
 server:
   port: 8085

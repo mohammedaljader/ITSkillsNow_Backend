@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
         }
         userRepository.delete(user.get());
         //Delete User from all services database
-        UserEvent event = new UserEvent(user.get().getUserId(), "delete");
+        UserEvent event = new UserEvent(user.get().getUserId().toString(), "delete");
         rabbitTemplate.convertAndSend("user.exchange", "user.delete", event);
         return true;
     }

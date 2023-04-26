@@ -11,13 +11,22 @@ spring:
     name: user-service
   rabbitmq:
     addresses: localhost:5672
-  data:
-    mongodb:
-      database : User
-      authentication-database: admin
-      port: 27017
-      host: localhost
-      auto-index-creation: true
+  datasource:
+    url: jdbc:h2:mem:userDB
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+  h2:
+    console:
+      enabled: true
+      path: /h2-ui
 
 server:
   port: 8085

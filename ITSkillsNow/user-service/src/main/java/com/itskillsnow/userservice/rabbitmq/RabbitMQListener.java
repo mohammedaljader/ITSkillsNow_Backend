@@ -11,6 +11,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -23,7 +24,7 @@ public class RabbitMQListener {
     @RabbitListener(queues = "auth.queue")
     public void createUser(AuthEvent event){
         UserPayload payload = event.getUserPayload();
-        User user = new User(payload.getUserId(), payload.getUsername(),
+        User user = new User(UUID.fromString(payload.getUserId()), payload.getUsername(),
                 payload.getFullName(), payload.getEmail(), null);
 
         if(event.getEventType().equals("create")){
