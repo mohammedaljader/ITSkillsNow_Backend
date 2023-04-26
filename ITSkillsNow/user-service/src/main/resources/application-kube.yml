@@ -9,7 +9,7 @@ spring:
     addresses: rabbitmq:5672
   datasource:
     password: password
-    url: jdbc:postgresql://postgres:5433/userDB
+    url: jdbc:postgresql://postgres:5432/userDB
     username: itskillsnow
   jpa:
     hibernate:
