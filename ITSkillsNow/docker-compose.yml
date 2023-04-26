@@ -93,8 +93,10 @@ services:
       dockerfile: "Dockerfile"
     networks:
       - spring
+      - postgres
     depends_on:
       - discovery-server
+      - postgres
       - rabbitmq
       - zipkin
 
