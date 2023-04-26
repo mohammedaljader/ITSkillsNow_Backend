@@ -1,0 +1,44 @@
+eureka:
+  client:
+    enabled: false
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: course-service
+          uri: http://course-service
+          predicates:
+            - Path=/api/course/**
+          filters:
+            - AuthenticationFilter
+
+        - id: job-service
+          uri: http://job-service
+          predicates:
+            - Path=/api/job/**
+          filters:
+            - AuthenticationFilter
+
+        - id: auth-service
+          uri: https://auth-service--k4y9kys.internal.delightfulbay-c237bc12.westus2.azurecontainerapps.io
+          predicates:
+            - Path=/auth/**
+
+        - id: user-service
+          uri: http://user-service
+          predicates:
+            - Path=/api/user/**
+          filters:
+            - AuthenticationFilter
+
+  application:
+    name: api-gateway
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
