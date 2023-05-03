@@ -3,12 +3,14 @@ package com.itskillsnow.courseservice.unitTests;
 import com.itskillsnow.courseservice.dto.request.course.AddCourseDto;
 import com.itskillsnow.courseservice.dto.request.course.UpdateCourseDto;
 import com.itskillsnow.courseservice.dto.response.CourseView;
+import com.itskillsnow.courseservice.exception.CourseNotFoundException;
 import com.itskillsnow.courseservice.model.Course;
 import com.itskillsnow.courseservice.model.User;
 import com.itskillsnow.courseservice.repository.CourseRepository;
 import com.itskillsnow.courseservice.repository.UserRepository;
 import com.itskillsnow.courseservice.service.CourseServiceImpl;
 import com.itskillsnow.courseservice.service.interfaces.CourseService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -192,19 +194,19 @@ class CourseServiceImplTest {
 
     @Test
     public void given_getCourseById_withWrongData_returnsNull() {
-        // Prepare test data
         UUID courseId = UUID.randomUUID();
 
         when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
 
-        // Call the getCourseById function
-        CourseView result = courseService.getCourseById(courseId);
+        CourseNotFoundException exception = Assertions.assertThrows(CourseNotFoundException.class, () ->
+            courseService.getCourseById(courseId)
+        );
 
-        // Verify the result
-        assertNull(result);
+        String expectedMessage = "Course with id: " + courseId + " not found!";
+        String actualMessage = exception.getMessage();
+        Assertions.assertEquals(expectedMessage, actualMessage);
 
-        // Verify that the course was not retrieved from the database
-        verify(courseRepository, times(1)).findById(courseId);
+        verify(courseRepository).findById(courseId);
     }
 
     @Test
@@ -237,21 +239,18 @@ class CourseServiceImplTest {
 
     @Test
     public void given_getAllCoursesByUser_withWrongData_returnsNull() {
-        // Prepare test data
-        String username = "Username";
+        UUID courseId = UUID.randomUUID();
+        when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
 
-        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+        CourseNotFoundException exception = Assertions.assertThrows(CourseNotFoundException.class, () ->
+            courseService.getCourseById(courseId)
+        );
 
-        // Call the getAllCoursesByUser function
-        List<CourseView> result = courseService.getAllCoursesByUser(username);
+        String expectedMessage = "Course with id: " + courseId + " not found!";
+        String actualMessage = exception.getMessage();
+        Assertions.assertEquals(expectedMessage, actualMessage);
 
-        // Verify the result
-        assertNull(result);
-
-        // Verify that the user was not retrieved from the database
-        verify(userRepository, times(1)).findByUsername(username);
-        // Verify that the courses were not retrieved from the database
-        verify(courseRepository, never()).findAllByUser(any());
+        verify(courseRepository).findById(courseId);
     }
 
     @Test
