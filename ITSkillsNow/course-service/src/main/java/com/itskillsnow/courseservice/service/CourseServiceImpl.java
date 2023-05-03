@@ -1,8 +1,10 @@
 package com.itskillsnow.courseservice.service;
 
-import com.itskillsnow.courseservice.dto.request.AddCourseDto;
-import com.itskillsnow.courseservice.dto.request.UpdateCourseDto;
+import com.itskillsnow.courseservice.dto.request.course.AddCourseDto;
+import com.itskillsnow.courseservice.dto.request.course.UpdateCourseDto;
 import com.itskillsnow.courseservice.dto.response.CourseView;
+import com.itskillsnow.courseservice.exception.CourseNotFoundException;
+import com.itskillsnow.courseservice.exception.UserNotFoundException;
 import com.itskillsnow.courseservice.model.Course;
 import com.itskillsnow.courseservice.model.User;
 import com.itskillsnow.courseservice.repository.CourseRepository;
@@ -62,8 +64,7 @@ public class CourseServiceImpl implements CourseService {
     public CourseView getCourseById(UUID courseId) {
         Optional<Course> course = courseRepository.findById(courseId);
         if(course.isEmpty()){
-            //TODO: proper Exceptions
-            return null;
+            throw new CourseNotFoundException("Course with id: ".concat(courseId.toString()).concat(" not found!"));
         }
         return mapModelToDto(course.get());
     }
@@ -72,8 +73,7 @@ public class CourseServiceImpl implements CourseService {
     public List<CourseView> getAllCoursesByUser(String username) {
         Optional<User> user = userRepository.findByUsername(username);
         if(user.isEmpty()){
-            //TODO: proper Exceptions
-            return null;
+            throw new UserNotFoundException("User with username: ".concat(username).concat(" not found!"));
         }
         List<Course> courses = courseRepository.findAllByUser(user.get());
         return courses.stream()

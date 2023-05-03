@@ -1,7 +1,7 @@
 package com.itskillsnow.courseservice.integrationTests;
 
-import com.itskillsnow.courseservice.dto.request.AddCourseDto;
-import com.itskillsnow.courseservice.dto.request.UpdateCourseDto;
+import com.itskillsnow.courseservice.dto.request.course.AddCourseDto;
+import com.itskillsnow.courseservice.dto.request.course.UpdateCourseDto;
 import com.itskillsnow.courseservice.dto.response.CourseView;
 import com.itskillsnow.courseservice.model.User;
 import com.itskillsnow.courseservice.repository.UserRepository;

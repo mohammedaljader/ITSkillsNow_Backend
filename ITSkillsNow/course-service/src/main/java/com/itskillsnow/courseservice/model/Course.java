@@ -31,7 +31,7 @@ public class Course {
 
     private String courseLanguage;
 
-//    private Boolean courseIsPublished = false;
+    private Boolean courseIsPublished = false;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "username", nullable = false)
@@ -46,4 +46,17 @@ public class Course {
             cascade= {CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.PERSIST})
     @JsonIgnore
     private List<FavoriteCourse> favorites;
+
+    @OneToMany(mappedBy = "course",
+            cascade = CascadeType.ALL, orphanRemoval = true
+    )
+    @JsonIgnore
+    private List<Lesson> lessons;
+
+    @OneToMany(mappedBy = "course",
+            cascade = CascadeType.ALL, orphanRemoval = true
+    )
+    @JsonIgnore
+    private List<Quiz> quizzes;
+
 }

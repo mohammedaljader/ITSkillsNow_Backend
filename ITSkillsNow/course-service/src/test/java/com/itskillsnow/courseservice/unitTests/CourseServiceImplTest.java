@@ -1,7 +1,7 @@
 package com.itskillsnow.courseservice.unitTests;
 
-import com.itskillsnow.courseservice.dto.request.AddCourseDto;
-import com.itskillsnow.courseservice.dto.request.UpdateCourseDto;
+import com.itskillsnow.courseservice.dto.request.course.AddCourseDto;
+import com.itskillsnow.courseservice.dto.request.course.UpdateCourseDto;
 import com.itskillsnow.courseservice.dto.response.CourseView;
 import com.itskillsnow.courseservice.model.Course;
 import com.itskillsnow.courseservice.model.User;
@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.util.ArrayList;
 import java.util.List;

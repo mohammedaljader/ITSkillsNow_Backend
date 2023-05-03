@@ -1,4 +1,4 @@
-package com.itskillsnow.courseservice.dto.request;
+package com.itskillsnow.courseservice.dto.request.course;
 
 
 import lombok.AllArgsConstructor;

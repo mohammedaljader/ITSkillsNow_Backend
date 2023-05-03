@@ -37,6 +37,12 @@ public class User {
     @JsonIgnore
     private List<FavoriteCourse> favoriteCourses;
 
+    @OneToMany(mappedBy = "user",
+            cascade = CascadeType.ALL, orphanRemoval = true
+    )
+    @JsonIgnore
+    List<QuizUser> myQuizzes;
+
     public User(String username) {
         this.username = username;
     }
