@@ -20,6 +20,8 @@ public interface QuestionService {
 
     boolean deleteQuestion(UUID questionId);
 
+    boolean addOption(AddOptionDto addOptionDto);
+
     boolean updateOption(UpdateOptionDto updateOptionDto);
 
     boolean deleteOption(UUID optionId);

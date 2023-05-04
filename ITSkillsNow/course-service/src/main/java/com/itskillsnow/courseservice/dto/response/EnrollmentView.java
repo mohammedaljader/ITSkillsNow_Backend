@@ -7,15 +7,13 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FavoriteCourseView {
-    private UUID favoriteId;
-    LocalDate favoriteDate;
-    LocalTime favoriteTime;
-    private CourseView courseView;
+public class EnrollmentView {
+    LocalDate enrollmentDate;
+    LocalTime enrollmentTime;
+    CourseView courseView;
 }
