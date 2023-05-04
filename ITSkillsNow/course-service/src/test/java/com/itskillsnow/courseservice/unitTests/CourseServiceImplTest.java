@@ -1,7 +1,9 @@
 package com.itskillsnow.courseservice.unitTests;
 
 import com.itskillsnow.courseservice.dto.request.course.AddCourseDto;
+import com.itskillsnow.courseservice.dto.request.course.AddCourseWithFileDto;
 import com.itskillsnow.courseservice.dto.request.course.UpdateCourseDto;
+import com.itskillsnow.courseservice.dto.request.course.UpdateCourseWithFileDto;
 import com.itskillsnow.courseservice.dto.response.CourseView;
 import com.itskillsnow.courseservice.exception.CourseNotFoundException;
 import com.itskillsnow.courseservice.model.Course;
@@ -9,6 +11,7 @@ import com.itskillsnow.courseservice.model.User;
 import com.itskillsnow.courseservice.repository.CourseRepository;
 import com.itskillsnow.courseservice.repository.UserRepository;
 import com.itskillsnow.courseservice.service.CourseServiceImpl;
+import com.itskillsnow.courseservice.service.interfaces.BlobService;
 import com.itskillsnow.courseservice.service.interfaces.CourseService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +19,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,12 +43,15 @@ class CourseServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private BlobService blobService;
+
     private CourseService courseService;
 
 
     @BeforeEach
     void setUp() {
-        courseService = new CourseServiceImpl(courseRepository, userRepository);
+        courseService = new CourseServiceImpl(courseRepository, userRepository, blobService);
     }
 
     @Test
@@ -68,6 +78,68 @@ class CourseServiceImplTest {
     }
 
     @Test
+    public void given_addCourseWithImage_returnsTrue() throws IOException {
+        // Arrange
+        User user = new User();
+        user.setUsername("testUser");
+        MockMultipartFile mockMultipartFile = getFile();
+        when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
+        when(blobService.storeFile(anyString(),
+                any(InputStream.class),
+                anyLong())
+        ).thenReturn("Course_image");
+
+
+        AddCourseWithFileDto dto = new AddCourseWithFileDto();
+        dto.setCourseImage(mockMultipartFile);
+        dto.setUsername("testUser");
+
+        // Act
+        boolean result = courseService.addCourse(dto);
+
+        // Assert
+        verify(userRepository).findByUsername("testUser");
+        verify(blobService).storeFile(anyString(), any(InputStream.class), anyLong());
+        verify(courseRepository).save(any(Course.class));
+        assertTrue(result);
+    }
+
+    @Test
+    public void given_addCourse_withNoUser_returnsFalse() throws IOException {
+        // Arrange
+        when(userRepository.findByUsername("testUser")).thenReturn(Optional.empty());
+
+        AddCourseWithFileDto dto = new AddCourseWithFileDto();
+        dto.setCourseImage(new MockMultipartFile("test-image", new byte[] {1, 2, 3}));
+        dto.setUsername("testUser");
+
+        // Act
+        boolean result = courseService.addCourse(dto);
+
+        // Assert
+        verify(userRepository).findByUsername("testUser");
+        verify(courseRepository, times(0)).save(any(Course.class));
+        verify(blobService, times(0)).storeFile(any(String.class), any(InputStream.class), any(Long.class));
+        assertFalse(result);
+    }
+
+    @Test
+    public void testAddCourse_noImage() throws IOException {
+        // Arrange
+        AddCourseWithFileDto dto = new AddCourseWithFileDto();
+        dto.setUsername("testUser");
+
+        // Act
+        boolean result = courseService.addCourse(dto);
+
+        // Assert
+        verify(userRepository).findByUsername("testUser");
+        verify(courseRepository, times(0)).save(any(Course.class));
+        verify(blobService, times(0)).storeFile(any(String.class), any(InputStream.class), any(Long.class));
+        assertFalse(result);
+    }
+
+    @Test
     public void given_addCourse_withWrongData_returnsFalse() {
         // Prepare test data
         AddCourseDto courseDto = new AddCourseDto();
@@ -85,6 +157,83 @@ class CourseServiceImplTest {
 
         // Verify that the course was not saved
         verify(courseRepository, never()).save(any(Course.class));
+    }
+
+
+    @Test
+    public void given_updateCourse_withNewImage_returnsTrue() throws IOException {
+        // Arrange
+        UpdateCourseWithFileDto dto = new UpdateCourseWithFileDto();
+        UUID courseId = UUID.randomUUID();
+        dto.setCourseId(courseId);
+        MockMultipartFile mockMultipartFile = getFile();
+        dto.setCourseImage(mockMultipartFile);
+
+        Course course = new Course();
+        course.setUser(new User());
+        course.setCourseImage("oldImage.jpg");
+        Optional<Course> optionalCourse = Optional.of(course);
+
+        when(courseRepository.findById(courseId)).thenReturn(optionalCourse);
+        when(blobService.storeFile(anyString(),
+                any(InputStream.class),
+                anyLong())
+        ).thenReturn("newImage.jpg");
+
+
+        // Act
+        boolean result = courseService.updateCourse(dto);
+
+        // Assert
+        verify(courseRepository).findById(courseId);
+        verify(blobService).storeFile(anyString(), any(InputStream.class), anyLong());
+        verify(courseRepository, times(1)).save(any(Course.class));
+        assertTrue(result);
+    }
+
+
+
+    @Test
+    public void given_updateCourse_withNoNewImage_keepTheOldImageAndReturnsTrue() throws IOException {
+        // Arrange
+        UpdateCourseWithFileDto dto = new UpdateCourseWithFileDto();
+        UUID courseId = UUID.randomUUID();
+        dto.setCourseId(courseId);
+
+        Course course = new Course();
+        course.setUser(new User());
+        course.setCourseImage("oldImage.jpg");
+        Optional<Course> optionalCourse = Optional.of(course);
+
+        when(courseRepository.findById(courseId)).thenReturn(optionalCourse);
+
+        // Act
+        boolean result = courseService.updateCourse(dto);
+
+        // Assert
+        verify(courseRepository).findById(courseId);
+        verifyNoInteractions(blobService);
+        verify(courseRepository, times(1)).save(any(Course.class));
+        assertTrue(result);
+    }
+
+    @Test
+    public void given_updateCourseWithWrongCourseId_returnsFalse() throws IOException {
+        // Arrange
+        UpdateCourseWithFileDto dto = new UpdateCourseWithFileDto();
+        UUID courseId = UUID.randomUUID();
+        dto.setCourseId(courseId);
+
+        when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
+
+        // Act
+        boolean result = courseService.updateCourse(dto);
+
+        // Assert
+        verify(courseRepository).findById(courseId);
+        verifyNoInteractions(blobService);
+        verify(courseRepository, times(0)).save(any(Course.class));
+        assertFalse(result);
     }
 
     @Test
@@ -152,6 +301,7 @@ class CourseServiceImplTest {
 
         // Verify that the course was deleted
         verify(courseRepository, times(1)).delete(course);
+        verify(blobService, times(1)).deleteFile(course.getCourseImage());
     }
 
     @Test
@@ -169,6 +319,7 @@ class CourseServiceImplTest {
 
         // Verify that the course was not deleted
         verify(courseRepository, never()).delete(any(Course.class));
+        verify(blobService, never()).deleteFile(any(String.class));
     }
 
     @Test
@@ -267,5 +418,15 @@ class CourseServiceImplTest {
         int expected = 1;
 
         assertEquals(courses.size(), expected);
+    }
+
+    private MockMultipartFile getFile() throws IOException {
+        String name = "courseImage";
+        String originalFilename = "courseImage";
+        String contentType = "image/jpeg";
+        byte[] content = new byte[]{1, 2, 3};
+        InputStream inputStream = new ByteArrayInputStream(content);
+
+        return new MockMultipartFile(name, originalFilename, contentType, inputStream);
     }
 }

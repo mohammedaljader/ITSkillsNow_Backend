@@ -48,13 +48,13 @@ public class Course {
     private List<FavoriteCourse> favorites;
 
     @OneToMany(mappedBy = "course",
-            cascade = CascadeType.ALL, orphanRemoval = true
+            cascade= {CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.PERSIST}
     )
     @JsonIgnore
     private List<Lesson> lessons;
 
     @OneToMany(mappedBy = "course",
-            cascade = CascadeType.ALL, orphanRemoval = true
+            cascade= {CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.PERSIST}
     )
     @JsonIgnore
     private List<Quiz> quizzes;

@@ -5,6 +5,7 @@ import com.itskillsnow.courseservice.dto.request.course.UpdateCourseDto;
 import com.itskillsnow.courseservice.dto.response.CourseView;
 import com.itskillsnow.courseservice.model.User;
 import com.itskillsnow.courseservice.repository.UserRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -158,16 +160,17 @@ class CourseControllerIT {
     @Test
     void given_getAllCoursesByUser_withWrongUsername_returnsNoData(){
         // Send a GET request to retrieve all courses by user
-        ResponseEntity<List<CourseView>> response = restTemplate.exchange(baseUrl
-                        .concat("/user/").concat("Test"),
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<>() {});
+        HttpClientErrorException.BadRequest exception = Assertions.assertThrows(HttpClientErrorException.BadRequest.class, () ->
+                restTemplate.exchange(baseUrl
+                                .concat("/user/").concat("Test"),
+                        HttpMethod.GET,
+                        null,
+                        new ParameterizedTypeReference<>() {})
+        );
+
 
         // Verify the response
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        List<CourseView> courseViews = response.getBody();
-        assertNull(courseViews);
+        assertEquals(exception.getStatusCode(), HttpStatus.BAD_REQUEST);
     }
 
     @Test
@@ -242,15 +245,16 @@ class CourseControllerIT {
     @Test
     void given_getCourseById_withWrongId_returnsNull(){
         //Send a GET request to get course
-        ResponseEntity<CourseView> response = restTemplate.exchange(baseUrl.concat("/")
-                        .concat(UUID.randomUUID().toString()),
-                HttpMethod.GET,
-                null,
-                CourseView.class);
+        HttpClientErrorException.BadRequest exception = Assertions.assertThrows(HttpClientErrorException.BadRequest.class, () ->
+                restTemplate.exchange(baseUrl.concat("/")
+                                .concat(UUID.randomUUID().toString()),
+                        HttpMethod.GET,
+                        null,
+                        CourseView.class)
+        );
 
         // Verify the response
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNull(response.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
     }
 
 

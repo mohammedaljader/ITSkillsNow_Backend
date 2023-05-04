@@ -38,7 +38,7 @@ public class User {
     private List<FavoriteCourse> favoriteCourses;
 
     @OneToMany(mappedBy = "user",
-            cascade = CascadeType.ALL, orphanRemoval = true
+            cascade= {CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.PERSIST}
     )
     @JsonIgnore
     List<QuizUser> myQuizzes;

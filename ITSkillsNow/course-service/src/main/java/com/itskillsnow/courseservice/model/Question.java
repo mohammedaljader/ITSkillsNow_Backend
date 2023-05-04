@@ -27,7 +27,7 @@ public class Question {
     private Quiz quiz;
 
     @OneToMany(mappedBy = "question",
-            cascade = CascadeType.ALL, orphanRemoval = true
+            cascade= {CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.PERSIST}
     )
     @JsonIgnore
     private List<Option> options;

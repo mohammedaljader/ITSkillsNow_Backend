@@ -26,13 +26,13 @@ public class Quiz {
     private Course course;
 
     @OneToMany(mappedBy = "quiz",
-            cascade = CascadeType.ALL, orphanRemoval = true
+            cascade= {CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.PERSIST}
     )
     @JsonIgnore
     private List<Question> questions;
 
     @OneToMany(mappedBy = "quiz",
-            cascade = CascadeType.ALL, orphanRemoval = true
+            cascade= {CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.PERSIST}
     )
     @JsonIgnore
     private List<QuizUser> quizUsers;
