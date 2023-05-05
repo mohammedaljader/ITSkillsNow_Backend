@@ -14,7 +14,7 @@ public interface QuizService {
 
     boolean updateQuiz(UpdateQuizDto updateQuizDto);
 
-    boolean deleteQuiz(UUID quiz);
+    boolean deleteQuiz(UUID quizId);
 
     List<QuizView> getAllQuizzesByCourse(UUID courseId);
 
