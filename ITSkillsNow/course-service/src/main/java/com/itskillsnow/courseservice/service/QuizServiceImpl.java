@@ -2,13 +2,10 @@ package com.itskillsnow.courseservice.service;
 
 import com.itskillsnow.courseservice.dto.request.quiz.AddQuizDto;
 import com.itskillsnow.courseservice.dto.request.quiz.UpdateQuizDto;
-import com.itskillsnow.courseservice.dto.request.quiz.submitQuizDto;
 import com.itskillsnow.courseservice.dto.response.OptionView;
 import com.itskillsnow.courseservice.dto.response.QuestionView;
 import com.itskillsnow.courseservice.dto.response.QuizView;
 import com.itskillsnow.courseservice.exception.CourseNotFoundException;
-import com.itskillsnow.courseservice.exception.OptionNotFoundException;
-import com.itskillsnow.courseservice.exception.QuizNotFoundException;
 import com.itskillsnow.courseservice.model.Course;
 import com.itskillsnow.courseservice.model.Option;
 import com.itskillsnow.courseservice.model.Question;
@@ -21,10 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -76,30 +71,6 @@ public class QuizServiceImpl implements QuizService {
         return quizzes.stream()
                 .map(this::mapModelToDto).toList();
     }
-
-    @Override
-    public Integer checkQuizResult(UUID quizId, List<submitQuizDto> submitQuizzes) {
-        Quiz quizObj = quizRepository.findById(quizId)
-                .orElseThrow(() -> new QuizNotFoundException("Quiz was not found!"));
-
-        Map<UUID, UUID> submittedAnswerMap = submitQuizzes.stream()
-                .collect(Collectors.toMap(submitQuizDto::getQuestionId, submitQuizDto::getOptionId));
-
-        int score = 0;
-        for (Question question : quizObj.getQuestions()) {
-            UUID selectedOptionId = submittedAnswerMap.get(question.getQuestionId());
-            if (selectedOptionId != null) {
-                Option selectedOption = question.getOptions().stream()
-                        .filter(option -> option.getOptionId().equals(selectedOptionId))
-                        .findFirst().orElseThrow(() -> new OptionNotFoundException("Option not found"));
-                if (selectedOption.isOptionIsCorrect()) {
-                    score++;
-                }
-            }
-        }
-        return score;
-    }
-
 
     private Quiz mapDtoToModel(AddQuizDto addQuizDto, Course course){
         return Quiz.builder()
