@@ -1,13 +1,16 @@
 package com.itskillsnow.courseservice.controller;
 
 import com.itskillsnow.courseservice.dto.request.course.AddCourseDto;
+import com.itskillsnow.courseservice.dto.request.course.AddCourseWithFileDto;
 import com.itskillsnow.courseservice.dto.request.course.UpdateCourseDto;
+import com.itskillsnow.courseservice.dto.request.course.UpdateCourseWithFileDto;
 import com.itskillsnow.courseservice.dto.response.CourseView;
 import com.itskillsnow.courseservice.service.interfaces.CourseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,16 +22,28 @@ public class CourseController {
     private final CourseService courseService;
 
 
+    @PostMapping("/withoutImage")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CourseView addCourse(@RequestBody AddCourseDto addCourseDto){
+        return courseService.addCourse(addCourseDto);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Boolean addCourse(@RequestBody AddCourseDto addCourseDto){
-        return courseService.addCourse(addCourseDto);
+    public CourseView addCourseWithImage(@RequestBody AddCourseWithFileDto addCourseWithFileDto) throws IOException {
+        return courseService.addCourse(addCourseWithFileDto);
+    }
+
+    @PutMapping("/withoutImage")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public CourseView updateCourse(@RequestBody UpdateCourseDto updateCourseDto){
+        return courseService.updateCourse(updateCourseDto);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Boolean updateCourse(@RequestBody UpdateCourseDto updateCourseDto){
-        return courseService.updateCourse(updateCourseDto);
+    public CourseView updateCourseWithImage(@RequestBody UpdateCourseWithFileDto updateCourseWithFileDto) throws IOException {
+        return courseService.updateCourse(updateCourseWithFileDto);
     }
 
     @DeleteMapping("/{courseId}")

@@ -23,9 +23,3 @@ spring:
     console:
       enabled: true
       path: /h2-ui
-  cloud:
-    azure:
-      storage:
-        blob:
-          account-name: test
-          connection-string: test

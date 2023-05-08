@@ -6,6 +6,8 @@ import com.itskillsnow.courseservice.dto.request.course.UpdateCourseDto;
 import com.itskillsnow.courseservice.dto.request.course.UpdateCourseWithFileDto;
 import com.itskillsnow.courseservice.dto.response.CourseView;
 import com.itskillsnow.courseservice.exception.CourseNotFoundException;
+import com.itskillsnow.courseservice.exception.GeneralException;
+import com.itskillsnow.courseservice.exception.UserNotFoundException;
 import com.itskillsnow.courseservice.model.Course;
 import com.itskillsnow.courseservice.model.User;
 import com.itskillsnow.courseservice.repository.CourseRepository;
@@ -48,6 +50,16 @@ class CourseServiceImplTest {
 
     private CourseService courseService;
 
+    private static final UUID courseId = UUID.randomUUID();
+
+    private static final String courseName = "CourseName";
+    private static final String courseDescription = "CourseDescription";
+    private static final String courseImage = "CourseImage";
+    private static final Double coursePrice = 10.0;
+    private static final String courseType = "CourseType";
+    private static final String courseLanguage = "C#";
+    private static final String username = "Username";
+
 
     @BeforeEach
     void setUp() {
@@ -55,233 +67,275 @@ class CourseServiceImplTest {
     }
 
     @Test
-    public void given_addCourse_withCorrectData_returnsTrue() {
-        // Prepare test data
-        AddCourseDto courseDto = new AddCourseDto();
-        courseDto.setCourseName("Test Course");
-        courseDto.setCourseDescription("This is a test course");
-        courseDto.setUsername("Username");
+    public void given_addCourse_withCorrectData_expectToSaveCourse() {
+        // Arrange
+        AddCourseDto courseDto = addCourse();
+        User user = new User(username);
+        Course expectedCourse = getCourse(user);
 
-        User user = new User("Username");
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(courseRepository.save(any(Course.class))).thenReturn(expectedCourse);
 
-        when(userRepository.findByUsername("Username")).thenReturn(Optional.of(user));
-        when(courseRepository.save(any(Course.class))).thenReturn(new Course());
 
-        // Call the addCourse function
-        boolean result = courseService.addCourse(courseDto);
+        // Act
+        CourseView actual = courseService.addCourse(courseDto);
 
-        // Verify the result
-        assertTrue(result);
+        // Assert
+        assertEquals(actual.getCourseId(), courseId);
+        assertEquals(actual.getCourseName(), courseName);
+        assertEquals(actual.getCourseDescription(), courseDescription);
 
-        // Verify that the course was saved
+
         verify(courseRepository, times(1)).save(any(Course.class));
     }
 
     @Test
-    public void given_addCourseWithImage_returnsTrue() throws IOException {
+    public void given_addCourseWithImage_expectToSaveCourse() throws IOException {
         // Arrange
-        User user = new User();
-        user.setUsername("testUser");
         MockMultipartFile mockMultipartFile = getFile();
-        when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
+        AddCourseWithFileDto dto = addCourseWithFile(mockMultipartFile);
+        String newCourseImage = "newCourseImage";
+        User user = new User(username);
+        Course expectedCourse = getCourse(user);
+        expectedCourse.setCourseImage(newCourseImage);
+
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
         when(blobService.storeFile(anyString(),
                 any(InputStream.class),
                 anyLong())
-        ).thenReturn("Course_image");
+        ).thenReturn(newCourseImage);
+        when(courseRepository.save(any(Course.class))).thenReturn(expectedCourse);
 
-
-        AddCourseWithFileDto dto = new AddCourseWithFileDto();
-        dto.setCourseImage(mockMultipartFile);
-        dto.setUsername("testUser");
 
         // Act
-        boolean result = courseService.addCourse(dto);
+        CourseView actual = courseService.addCourse(dto);
 
         // Assert
-        verify(userRepository).findByUsername("testUser");
+        verify(userRepository).findByUsername(username);
         verify(blobService).storeFile(anyString(), any(InputStream.class), anyLong());
         verify(courseRepository).save(any(Course.class));
-        assertTrue(result);
+        assertEquals(actual.getCourseId(), courseId);
+        assertEquals(actual.getCourseName(), courseName);
+        assertEquals(actual.getCourseDescription(), courseDescription);
+
+        assertNotEquals(actual.getCourseImage(), courseImage);
     }
 
     @Test
-    public void given_addCourse_withNoUser_returnsFalse() throws IOException {
+    public void given_addCourse_withNoUser_returnsException() throws IOException {
         // Arrange
-        when(userRepository.findByUsername("testUser")).thenReturn(Optional.empty());
 
-        AddCourseWithFileDto dto = new AddCourseWithFileDto();
-        dto.setCourseImage(new MockMultipartFile("test-image", new byte[] {1, 2, 3}));
-        dto.setUsername("testUser");
+        MockMultipartFile mockMultipartFile = getFile();
+        AddCourseWithFileDto dto = addCourseWithFile(mockMultipartFile);
+
+        String expected = "User or course was not found!";
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+
 
         // Act
-        boolean result = courseService.addCourse(dto);
+        GeneralException actual = Assertions.assertThrows(GeneralException.class, () ->
+            courseService.addCourse(dto)
+        );
 
         // Assert
-        verify(userRepository).findByUsername("testUser");
+        verify(userRepository).findByUsername(username);
         verify(courseRepository, times(0)).save(any(Course.class));
-        verify(blobService, times(0)).storeFile(any(String.class), any(InputStream.class), any(Long.class));
-        assertFalse(result);
+        verify(blobService, times(0)).storeFile(any(String.class),
+                any(InputStream.class), any(Long.class));
+        assertEquals(actual.getMessage(), expected);
     }
 
     @Test
-    public void testAddCourse_noImage() throws IOException {
+    public void testAddCourse_withNoImage_returnsException() {
         // Arrange
         AddCourseWithFileDto dto = new AddCourseWithFileDto();
-        dto.setUsername("testUser");
+        dto.setUsername(username);
+
+        String expected = "User or course was not found!";
 
         // Act
-        boolean result = courseService.addCourse(dto);
+        GeneralException actual = Assertions.assertThrows(GeneralException.class, () ->
+                courseService.addCourse(dto)
+        );
 
         // Assert
-        verify(userRepository).findByUsername("testUser");
+        verify(userRepository).findByUsername(username);
         verify(courseRepository, times(0)).save(any(Course.class));
-        verify(blobService, times(0)).storeFile(any(String.class), any(InputStream.class), any(Long.class));
-        assertFalse(result);
+        verify(blobService, times(0)).storeFile(any(String.class),
+                any(InputStream.class), any(Long.class));
+        assertEquals(actual.getMessage(), expected);
     }
 
     @Test
-    public void given_addCourse_withWrongData_returnsFalse() {
-        // Prepare test data
-        AddCourseDto courseDto = new AddCourseDto();
-        courseDto.setCourseName("Test Course");
-        courseDto.setCourseDescription("This is a test course");
-        courseDto.setUsername("Username");
+    public void given_addCourse_withWrongData_returnsException() {
+        // Arrange
+        AddCourseDto courseDto = addCourse();
+        String expected = "User was not found!";
 
-        when(userRepository.findByUsername("Username")).thenReturn(Optional.empty());
+        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-        // Call the addCourse function
-        boolean result = courseService.addCourse(courseDto);
+        // Act
+        UserNotFoundException actual = Assertions.assertThrows(UserNotFoundException.class, () ->
+                courseService.addCourse(courseDto)
+        );
 
-        // Verify the result
-        assertFalse(result);
+        // Assert
+        assertEquals(actual.getMessage(), expected);
 
-        // Verify that the course was not saved
         verify(courseRepository, never()).save(any(Course.class));
     }
 
 
     @Test
-    public void given_updateCourse_withNewImage_returnsTrue() throws IOException {
+    public void given_updateCourse_withNewImage_expectToUpdateCourse() throws IOException {
         // Arrange
-        UpdateCourseWithFileDto dto = new UpdateCourseWithFileDto();
-        UUID courseId = UUID.randomUUID();
-        dto.setCourseId(courseId);
+        String newCourseName = "newCourseName";
+        String newCourseDescription = "newCourseDescription";
+        String newCourseImage = "newCourseImage";
+
         MockMultipartFile mockMultipartFile = getFile();
-        dto.setCourseImage(mockMultipartFile);
+        UpdateCourseWithFileDto dto = updateCourseWithFile(mockMultipartFile);
 
-        Course course = new Course();
-        course.setUser(new User());
-        course.setCourseImage("oldImage.jpg");
-        Optional<Course> optionalCourse = Optional.of(course);
+        dto.setCourseName(newCourseName);
+        dto.setCourseDescription(newCourseDescription);
 
-        when(courseRepository.findById(courseId)).thenReturn(optionalCourse);
+        User user = new User(username);
+        Course oldCourse = getCourse(user);
+
+        Course expected = getCourse(user);
+        expected.setCourseName(newCourseName);
+        expected.setCourseDescription(newCourseDescription);
+        expected.setCourseImage(newCourseImage);
+
+        when(courseRepository.findById(courseId)).thenReturn(Optional.of(oldCourse));
         when(blobService.storeFile(anyString(),
                 any(InputStream.class),
                 anyLong())
-        ).thenReturn("newImage.jpg");
+        ).thenReturn(newCourseImage);
+        when(courseRepository.save(any(Course.class))).thenReturn(expected);
 
 
         // Act
-        boolean result = courseService.updateCourse(dto);
+        CourseView actual = courseService.updateCourse(dto);
 
         // Assert
         verify(courseRepository).findById(courseId);
         verify(blobService).storeFile(anyString(), any(InputStream.class), anyLong());
         verify(courseRepository, times(1)).save(any(Course.class));
-        assertTrue(result);
+
+        assertEquals(actual.getCourseImage(), newCourseImage);
+        assertEquals(actual.getCourseName(), newCourseName);
+        assertEquals(actual.getCourseDescription(), newCourseDescription);
+        assertNotEquals(actual.getCourseImage(), oldCourse.getCourseImage());
     }
 
 
-
     @Test
-    public void given_updateCourse_withNoNewImage_keepTheOldImageAndReturnsTrue() throws IOException {
+    public void given_updateCourse_withNoNewImage_keepTheOldImageAndExpectToUpdateCourse() throws IOException {
         // Arrange
-        UpdateCourseWithFileDto dto = new UpdateCourseWithFileDto();
-        UUID courseId = UUID.randomUUID();
-        dto.setCourseId(courseId);
+        String newCourseName = "newCourseName";
+        String newCourseDescription = "newCourseDescription";
+        UpdateCourseWithFileDto dto = updateCourseWithFile(null);
+        dto.setCourseName(newCourseName);
+        dto.setCourseDescription(newCourseDescription);
 
-        Course course = new Course();
-        course.setUser(new User());
-        course.setCourseImage("oldImage.jpg");
-        Optional<Course> optionalCourse = Optional.of(course);
+        User user = new User(username);
+        Course oldCourse = getCourse(user);
 
-        when(courseRepository.findById(courseId)).thenReturn(optionalCourse);
+        Course expected = getCourse(user);
+        expected.setCourseName(newCourseName);
+        expected.setCourseDescription(newCourseDescription);
+
+        when(courseRepository.findById(courseId)).thenReturn(Optional.of(oldCourse));
+        when(courseRepository.save(any(Course.class))).thenReturn(expected);
 
         // Act
-        boolean result = courseService.updateCourse(dto);
+        CourseView actual = courseService.updateCourse(dto);
 
         // Assert
         verify(courseRepository).findById(courseId);
         verifyNoInteractions(blobService);
         verify(courseRepository, times(1)).save(any(Course.class));
-        assertTrue(result);
+
+        assertEquals(actual.getCourseImage(), oldCourse.getCourseImage());
+        assertEquals(actual.getCourseName(), newCourseName);
+        assertEquals(actual.getCourseDescription(), newCourseDescription);
     }
 
     @Test
-    public void given_updateCourseWithWrongCourseId_returnsFalse() throws IOException {
+    public void given_updateCourseWithWrongCourseId_returnsException() {
         // Arrange
-        UpdateCourseWithFileDto dto = new UpdateCourseWithFileDto();
-        UUID courseId = UUID.randomUUID();
-        dto.setCourseId(courseId);
+        UpdateCourseWithFileDto dto = updateCourseWithFile(null);
+
+        String expected = "Course was not found!";
 
         when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
 
         // Act
-        boolean result = courseService.updateCourse(dto);
+        CourseNotFoundException actual = Assertions.assertThrows(CourseNotFoundException.class, () ->
+                courseService.updateCourse(dto)
+        );
+
 
         // Assert
         verify(courseRepository).findById(courseId);
         verifyNoInteractions(blobService);
         verify(courseRepository, times(0)).save(any(Course.class));
-        assertFalse(result);
+
+        assertEquals(actual.getMessage(), expected);
     }
 
     @Test
-    public void given_updateCourse_withCorrectData_returnsTrue() {
-        // Prepare test data
-        UUID courseId = UUID.randomUUID();
-        UpdateCourseDto courseDto = new UpdateCourseDto();
-        courseDto.setCourseId(courseId);
-        courseDto.setCourseName("New Course Name");
-        courseDto.setCourseDescription("New course description");
+    public void given_updateCourse_withCorrectData_expectToUpdateCourse() {
+        // Arrange
+        String newCourseName = "newCourseName";
+        String newCourseDescription = "newCourseDescription";
+        User user = new User(username);
 
-        Course existingCourse = new Course();
-        existingCourse.setCourseId(courseId);
-        existingCourse.setCourseName("Old Course Name");
-        existingCourse.setCourseDescription("Old course description");
+        UpdateCourseDto courseDto = updateCourse();
+        courseDto.setCourseName(newCourseName);
+        courseDto.setCourseDescription(newCourseDescription);
 
-        when(courseRepository.findById(courseId)).thenReturn(Optional.of(existingCourse));
-        when(courseRepository.save(any(Course.class))).thenReturn(new Course());
+        Course oldCourse = getCourse(user);
 
-        // Call the updateCourse function
-        boolean result = courseService.updateCourse(courseDto);
+        Course expected = getCourse(user);
+        expected.setCourseName(newCourseName);
+        expected.setCourseDescription(newCourseDescription);
 
-        // Verify the result
-        assertTrue(result);
+        when(courseRepository.findById(courseId)).thenReturn(Optional.of(oldCourse));
+        when(courseRepository.save(any(Course.class))).thenReturn(expected);
 
-        // Verify that the course was updated
+        // Act
+        CourseView actual = courseService.updateCourse(courseDto);
+
+
+        // Assert
         verify(courseRepository, times(1)).save(any(Course.class));
+        assertEquals(actual.getCourseDescription(), newCourseDescription);
+        assertEquals(actual.getCourseName(), newCourseName);
+        assertEquals(actual.getCourseId(), oldCourse.getCourseId());
     }
 
     @Test
-    public void given_updateCourse_withWrongData_returnsFalse() {
-        // Prepare test data
-        UUID courseId = UUID.randomUUID();
-        UpdateCourseDto courseDto = new UpdateCourseDto();
-        courseDto.setCourseId(courseId);
-        courseDto.setCourseName("New Course Name");
-        courseDto.setCourseDescription("New course description");
+    public void given_updateCourse_withWrongId_returnsException() {
+        // Arrange
+        UpdateCourseDto courseDto = updateCourse();
 
         when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
 
-        // Call the updateCourse function
-        boolean result = courseService.updateCourse(courseDto);
+        String expected = "Course was not found!";
 
-        // Verify the result
-        assertFalse(result);
+        // Act
+        CourseNotFoundException actual = Assertions.assertThrows(CourseNotFoundException.class, () ->
+                courseService.updateCourse(courseDto)
+        );
 
-        // Verify that the course was not updated
+
+        // Assert
         verify(courseRepository, never()).save(any(Course.class));
+        assertEquals(actual.getMessage(), expected);
     }
 
     @Test
@@ -428,5 +482,46 @@ class CourseServiceImplTest {
         InputStream inputStream = new ByteArrayInputStream(content);
 
         return new MockMultipartFile(name, originalFilename, contentType, inputStream);
+    }
+
+    private Course getCourse(User user){
+        return Course.builder()
+                .courseId(courseId)
+                .courseName(courseName)
+                .courseDescription(courseDescription)
+                .courseImage(courseImage)
+                .coursePrice(coursePrice)
+                .courseType(courseType)
+                .courseLanguage(courseLanguage)
+                .user(user)
+                .build();
+    }
+
+    private AddCourseDto addCourse(){
+        return new AddCourseDto(courseName, courseDescription,
+                courseImage, coursePrice,
+                courseType, courseLanguage,
+                false, username);
+    }
+
+    private AddCourseWithFileDto addCourseWithFile(MockMultipartFile mockMultipartFile){
+        return new AddCourseWithFileDto(courseName, courseDescription,
+                mockMultipartFile, coursePrice,
+                courseType, courseLanguage,
+                false, username);
+    }
+
+    private UpdateCourseDto updateCourse(){
+        return new UpdateCourseDto(courseId ,courseName, courseDescription,
+                courseImage, coursePrice,
+                courseType, courseLanguage,
+                false, username);
+    }
+
+    private UpdateCourseWithFileDto updateCourseWithFile(MockMultipartFile mockMultipartFile){
+        return new UpdateCourseWithFileDto(courseId, courseName, courseDescription,
+                mockMultipartFile, coursePrice,
+                courseType, courseLanguage,
+                false, username);
     }
 }

@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.UUID;
 
 public interface CourseService {
-    Boolean addCourse(AddCourseDto courseDto);
+    CourseView addCourse(AddCourseDto courseDto);
 
-    Boolean addCourse(AddCourseWithFileDto courseDto) throws IOException;
+    CourseView addCourse(AddCourseWithFileDto courseDto) throws IOException;
 
-    Boolean updateCourse(UpdateCourseDto courseDto);
+    CourseView updateCourse(UpdateCourseDto courseDto);
 
-    Boolean updateCourse(UpdateCourseWithFileDto courseDto) throws IOException;
+    CourseView updateCourse(UpdateCourseWithFileDto courseDto) throws IOException;
 
     Boolean deleteCourse(UUID courseId);
 

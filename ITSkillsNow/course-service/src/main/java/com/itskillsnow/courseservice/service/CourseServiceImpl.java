@@ -6,6 +6,7 @@ import com.itskillsnow.courseservice.dto.request.course.UpdateCourseDto;
 import com.itskillsnow.courseservice.dto.request.course.UpdateCourseWithFileDto;
 import com.itskillsnow.courseservice.dto.response.CourseView;
 import com.itskillsnow.courseservice.exception.CourseNotFoundException;
+import com.itskillsnow.courseservice.exception.GeneralException;
 import com.itskillsnow.courseservice.exception.UserNotFoundException;
 import com.itskillsnow.courseservice.model.Course;
 import com.itskillsnow.courseservice.model.User;
@@ -35,49 +36,49 @@ public class CourseServiceImpl implements CourseService {
     private final BlobService blobService;
 
     @Override
-    public Boolean addCourse(AddCourseDto courseDto) {
+    public CourseView addCourse(AddCourseDto courseDto) {
         Optional<User> user = userRepository.findByUsername(courseDto.getUsername());
         if(user.isEmpty()){
-            return false;
+            throw new UserNotFoundException("User was not found!");
         }
         Course course = mapCreateDtoToModel(courseDto, user.get());
-        courseRepository.save(course);
-        return true;
+        Course savedCourse = courseRepository.save(course);
+        return mapModelToDto(savedCourse);
     }
 
     @Override
-    public Boolean addCourse(AddCourseWithFileDto courseDto) throws IOException {
+    public CourseView addCourse(AddCourseWithFileDto courseDto) throws IOException {
         Optional<User> user = userRepository.findByUsername(courseDto.getUsername());
         if(user.isEmpty() || courseDto.getCourseImage().isEmpty()){
-            return false;
+            throw new GeneralException("User or course was not found!");
         }
 
         String courseImage = blobService.storeFile(courseDto.getCourseImage().getOriginalFilename(),
                     courseDto.getCourseImage().getInputStream(),
                     courseDto.getCourseImage().getSize());
         Course newCourse = mapCreateDtoToModel(courseDto, user.get(), courseImage);
-        courseRepository.save(newCourse);
-        return true;
+        Course savedCourse = courseRepository.save(newCourse);
+        return mapModelToDto(savedCourse);
     }
 
     @Override
-    public Boolean updateCourse(UpdateCourseDto courseDto) {
+    public CourseView updateCourse(UpdateCourseDto courseDto) {
         Optional<Course> course = courseRepository.findById(courseDto.getCourseId());
         if(course.isEmpty()){
-            return false;
+            throw new CourseNotFoundException("Course was not found!");
         }
         Course updatedCourse = mapUpdateDtoToModel(courseDto,course.get().getUser());
-        courseRepository.save(updatedCourse);
-        return true;
+        Course savedCourse = courseRepository.save(updatedCourse);
+        return mapModelToDto(savedCourse);
     }
 
     @Override
-    public Boolean updateCourse(UpdateCourseWithFileDto courseDto) throws IOException {
+    public CourseView updateCourse(UpdateCourseWithFileDto courseDto) throws IOException {
         Optional<Course> course = courseRepository.findById(courseDto.getCourseId());
         String courseImage;
 
         if(course.isEmpty()){
-            return false;
+            throw new CourseNotFoundException("Course was not found!");
         }
 
         if(courseDto.getCourseImage() != null){
@@ -89,8 +90,8 @@ public class CourseServiceImpl implements CourseService {
         }
 
         Course updatedCourse = mapUpdateDtoToModel(courseDto,course.get().getUser(), courseImage);
-        courseRepository.save(updatedCourse);
-        return true;
+        Course savedCourse = courseRepository.save(updatedCourse);
+        return mapModelToDto(savedCourse);
     }
 
     @Override
