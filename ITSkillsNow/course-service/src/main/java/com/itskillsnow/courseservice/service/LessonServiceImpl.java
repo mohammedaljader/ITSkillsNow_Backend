@@ -30,25 +30,25 @@ public class LessonServiceImpl implements LessonService {
 
 
     @Override
-    public boolean addLesson(AddLessonDto addLessonDto) {
+    public LessonView addLesson(AddLessonDto addLessonDto) {
         Optional<Course> course = courseRepository.findById(addLessonDto.getCourseId());
         if(course.isEmpty()){
-            return false;
+            throw new CourseNotFoundException("Course was not found!");
         }
         Lesson lesson = mapDtoToModel(addLessonDto, course.get());
-        lessonRepository.save(lesson);
-        return true;
+        Lesson savedLesson = lessonRepository.save(lesson);
+        return mapModelToDto(savedLesson);
     }
 
     @Override
-    public boolean updateLesson(UpdateLessonDto updateLessonDto) {
+    public LessonView updateLesson(UpdateLessonDto updateLessonDto) {
         Optional<Lesson> lesson = lessonRepository.findById(updateLessonDto.getLessonId());
         if(lesson.isEmpty()){
-            return false;
+            throw new LessonNotFoundException("Lesson was not found!");
         }
-        Lesson updatedLesson = mapDtoToModel(updateLessonDto);
-        lessonRepository.save(updatedLesson);
-        return true;
+        Lesson updatedLesson = mapDtoToModel(updateLessonDto, lesson.get().getCourse());
+        Lesson savedLesson = lessonRepository.save(updatedLesson);
+        return mapModelToDto(savedLesson);
     }
 
     @Override
@@ -89,11 +89,12 @@ public class LessonServiceImpl implements LessonService {
                 .build();
     }
 
-    private Lesson mapDtoToModel(UpdateLessonDto updateLessonDto){
+    private Lesson mapDtoToModel(UpdateLessonDto updateLessonDto, Course course){
         return Lesson.builder()
                 .lessonId(updateLessonDto.getLessonId())
                 .lessonName(updateLessonDto.getLessonName())
                 .lessonContent(updateLessonDto.getLessonContent())
+                .course(course)
                 .build();
     }
 

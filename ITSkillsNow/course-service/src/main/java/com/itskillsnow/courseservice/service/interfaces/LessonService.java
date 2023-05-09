@@ -10,9 +10,9 @@ import java.util.UUID;
 
 public interface LessonService {
 
-    boolean addLesson(AddLessonDto addLessonDto);
+    LessonView addLesson(AddLessonDto addLessonDto);
 
-    boolean updateLesson(UpdateLessonDto updateLessonDto);
+    LessonView updateLesson(UpdateLessonDto updateLessonDto);
 
     boolean deleteLesson(UUID lessonId);
 

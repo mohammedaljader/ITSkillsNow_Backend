@@ -22,13 +22,13 @@ public class LessonController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Boolean addLesson(@RequestBody AddLessonDto addLessonDto){
+    public LessonView addLesson(@RequestBody AddLessonDto addLessonDto){
         return lessonService.addLesson(addLessonDto);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public Boolean updateLesson(@RequestBody UpdateLessonDto updateLessonDto){
+    public LessonView updateLesson(@RequestBody UpdateLessonDto updateLessonDto){
         return lessonService.updateLesson(updateLessonDto);
     }
 
