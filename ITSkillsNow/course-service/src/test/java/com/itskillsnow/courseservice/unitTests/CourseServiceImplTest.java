@@ -144,6 +144,7 @@ class CourseServiceImplTest {
         verify(courseRepository, times(0)).save(any(Course.class));
         verify(blobService, times(0)).storeFile(any(String.class),
                 any(InputStream.class), any(Long.class));
+        verify(blobService, times(0)).deleteFile(anyString());
         assertEquals(actual.getMessage(), expected);
     }
 
@@ -165,6 +166,7 @@ class CourseServiceImplTest {
         verify(courseRepository, times(0)).save(any(Course.class));
         verify(blobService, times(0)).storeFile(any(String.class),
                 any(InputStream.class), any(Long.class));
+        verify(blobService, times(0)).deleteFile(anyString());
         assertEquals(actual.getMessage(), expected);
     }
 
@@ -223,6 +225,7 @@ class CourseServiceImplTest {
         // Assert
         verify(courseRepository).findById(courseId);
         verify(blobService).storeFile(anyString(), any(InputStream.class), anyLong());
+        verify(blobService, times(1)).deleteFile(anyString());
         verify(courseRepository, times(1)).save(any(Course.class));
 
         assertEquals(actual.getCourseImage(), newCourseImage);
@@ -237,7 +240,8 @@ class CourseServiceImplTest {
         // Arrange
         String newCourseName = "newCourseName";
         String newCourseDescription = "newCourseDescription";
-        UpdateCourseWithFileDto dto = updateCourseWithFile(null);
+        MockMultipartFile mockMultipartFile = getEmptyFile();
+        UpdateCourseWithFileDto dto = updateCourseWithFile(mockMultipartFile);
         dto.setCourseName(newCourseName);
         dto.setCourseDescription(newCourseDescription);
 
@@ -344,6 +348,7 @@ class CourseServiceImplTest {
         UUID courseId = UUID.randomUUID();
         Course course = new Course();
         course.setCourseId(courseId);
+        course.setCourseImage("courseImage.jpg");
 
         when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
 
@@ -479,6 +484,16 @@ class CourseServiceImplTest {
         String originalFilename = "courseImage";
         String contentType = "image/jpeg";
         byte[] content = new byte[]{1, 2, 3};
+        InputStream inputStream = new ByteArrayInputStream(content);
+
+        return new MockMultipartFile(name, originalFilename, contentType, inputStream);
+    }
+
+    private MockMultipartFile getEmptyFile() throws IOException {
+        String name = "empty";
+        String originalFilename = "";
+        String contentType = "";
+        byte[] content = new byte[]{};
         InputStream inputStream = new ByteArrayInputStream(content);
 
         return new MockMultipartFile(name, originalFilename, contentType, inputStream);

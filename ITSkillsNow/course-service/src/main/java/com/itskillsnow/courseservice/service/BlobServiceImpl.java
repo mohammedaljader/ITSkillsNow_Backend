@@ -10,8 +10,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
-import java.nio.file.Paths;
 import java.util.UUID;
+
+import static com.itskillsnow.courseservice.util.FileNamingUtils.getFileBaseName;
+import static com.itskillsnow.courseservice.util.FileNamingUtils.getFileExtension;
+
 
 @Service
 @Slf4j
@@ -54,20 +57,5 @@ public class BlobServiceImpl implements BlobService {
     public void deleteFile(String filename) {
         BlobClient blobClient = containerClient.getBlobClient(filename);
         blobClient.deleteIfExists();
-    }
-
-    private String getFileExtension(String filename) {
-        int dotIndex = filename.lastIndexOf('.');
-        if (dotIndex > 0 && dotIndex < filename.length() - 1) {
-            return filename.substring(dotIndex + 1);
-        } else {
-            return "";
-        }
-    }
-
-    private String getFileBaseName(String filename) {
-        String basename = Paths.get(filename).getFileName().toString();
-        int dotIndex = basename.lastIndexOf('.');
-        return (dotIndex == -1) ? basename : basename.substring(0, dotIndex);
     }
 }

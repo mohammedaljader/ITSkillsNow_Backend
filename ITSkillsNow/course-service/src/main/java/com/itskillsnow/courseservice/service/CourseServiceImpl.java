@@ -14,12 +14,14 @@ import com.itskillsnow.courseservice.repository.CourseRepository;
 import com.itskillsnow.courseservice.repository.UserRepository;
 import com.itskillsnow.courseservice.service.interfaces.BlobService;
 import com.itskillsnow.courseservice.service.interfaces.CourseService;
+import com.itskillsnow.courseservice.util.FileNamingUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -75,16 +77,22 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public CourseView updateCourse(UpdateCourseWithFileDto courseDto) throws IOException {
         Optional<Course> course = courseRepository.findById(courseDto.getCourseId());
-        String courseImage;
 
         if(course.isEmpty()){
             throw new CourseNotFoundException("Course was not found!");
         }
 
-        if(courseDto.getCourseImage() != null){
+        String courseImage = courseDto.getCourseImage().getOriginalFilename();
+        String originalImage = FileNamingUtils.getOriginalFilename(course.get().getCourseImage());
+
+        if(!Objects.equals(courseDto.getCourseImage().getOriginalFilename(), "") &&
+                !Objects.equals(courseImage, originalImage)){
             courseImage = blobService.storeFile(courseDto.getCourseImage().getOriginalFilename(),
                     courseDto.getCourseImage().getInputStream(),
                     courseDto.getCourseImage().getSize());
+            //delete the old image from blob storage
+            String blobFileName = FileNamingUtils.getBlobFilename(course.get().getCourseImage());
+            blobService.deleteFile(blobFileName);
         }else {
             courseImage = course.get().getCourseImage();
         }
@@ -100,7 +108,9 @@ public class CourseServiceImpl implements CourseService {
         if(course.isEmpty()){
             return false;
         }
-        blobService.deleteFile(course.get().getCourseImage());
+        //delete the image from blob storage
+        String blobFileName = FileNamingUtils.getBlobFilename(course.get().getCourseImage());
+        blobService.deleteFile(blobFileName);
         course.ifPresent(courseRepository::delete);
         return true;
     }

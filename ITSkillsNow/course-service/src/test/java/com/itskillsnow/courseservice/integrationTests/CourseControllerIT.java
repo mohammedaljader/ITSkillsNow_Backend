@@ -17,11 +17,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -54,6 +51,7 @@ class CourseControllerIT {
     private static RestTemplate restTemplate;
 
     private static final String blobUrl = "https://example.com/blob/123456";
+    private static final String username = "User";
 
     @BeforeAll
     public static void init(){
@@ -64,7 +62,7 @@ class CourseControllerIT {
     public void setUp(){
         baseUrl = baseUrl.concat(":").concat(port+ "").concat("/api/course");
         //Create User
-        userRepository.save(new User("User"));
+        userRepository.save(new User(username));
 
         when(blobService.storeFile(anyString(),
                 ArgumentMatchers.any(InputStream.class),
@@ -280,18 +278,18 @@ class CourseControllerIT {
 
     private AddCourseDto getAddCourseDto(){
         return new AddCourseDto("Test", "Test", "Test", 12.99,
-                "Test", "Test", false, "User");
+                "Test", "Test", false, username);
     }
 
     private AddCourseWithFileDto getAddCourseDtoWithImage() throws IOException {
         MockMultipartFile mockMultipartFile = getFile();
         return new AddCourseWithFileDto("Test", "Test", mockMultipartFile, 13.99,
-                "Test", "Test", false, "User");
+                "Test", "Test", false, username);
     }
 
     private UpdateCourseDto getUpdateCourseDto(UUID courseId){
         return new UpdateCourseDto(courseId,"Test", "Test", "Test", 13.99,
-                "Test", "Test", false, "User");
+                "Test", "Test", false, username);
     }
 
     private MockMultipartFile getFile() throws IOException {

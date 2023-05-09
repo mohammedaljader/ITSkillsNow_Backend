@@ -9,6 +9,7 @@ import com.itskillsnow.courseservice.service.interfaces.CourseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,7 +31,18 @@ public class CourseController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CourseView addCourseWithImage(@RequestBody AddCourseWithFileDto addCourseWithFileDto) throws IOException {
+    public CourseView addCourseWithImage(@RequestParam String courseName,
+                                         @RequestParam String courseDescription,
+                                         @RequestParam("courseImage") MultipartFile courseImage,
+                                         @RequestParam Double coursePrice,
+                                         @RequestParam String courseType,
+                                         @RequestParam String courseLanguage,
+                                         @RequestParam Boolean isPublished,
+                                         @RequestParam String username) throws IOException {
+
+        AddCourseWithFileDto addCourseWithFileDto = new AddCourseWithFileDto(courseName, courseDescription,
+                courseImage, coursePrice, courseType,
+                courseLanguage, isPublished, username);
         return courseService.addCourse(addCourseWithFileDto);
     }
 
@@ -42,7 +54,18 @@ public class CourseController {
 
     @PutMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public CourseView updateCourseWithImage(@RequestBody UpdateCourseWithFileDto updateCourseWithFileDto) throws IOException {
+    public CourseView updateCourseWithImage(@RequestParam UUID courseId,
+                                            @RequestParam String courseName,
+                                            @RequestParam String courseDescription,
+                                            @RequestParam("courseImage") MultipartFile courseImage,
+                                            @RequestParam Double coursePrice,
+                                            @RequestParam String courseType,
+                                            @RequestParam String courseLanguage,
+                                            @RequestParam Boolean isPublished,
+                                            @RequestParam String username) throws IOException {
+        UpdateCourseWithFileDto updateCourseWithFileDto = new UpdateCourseWithFileDto(courseId, courseName, courseDescription,
+                courseImage, coursePrice, courseType,
+                courseLanguage, isPublished, username);
         return courseService.updateCourse(updateCourseWithFileDto);
     }
 
