@@ -21,6 +21,7 @@ public class FavoritesController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Boolean addCourseToFavorites(@RequestBody AddCourseToFavoritesDto addCourseToFavoritesDto){
+        // TODO: change the the http status to bad request if username or courseId are wrong
         return favoriteCourseService.addCourseToFavorites(addCourseToFavoritesDto);
     }
 
