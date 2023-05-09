@@ -3,6 +3,7 @@ package com.itskillsnow.courseservice.controller;
 import com.itskillsnow.courseservice.dto.request.quiz.AddQuizDto;
 import com.itskillsnow.courseservice.dto.request.quiz.UpdateQuizDto;
 import com.itskillsnow.courseservice.dto.response.QuizView;
+import com.itskillsnow.courseservice.dto.response.QuizWithoutQuestionView;
 import com.itskillsnow.courseservice.service.interfaces.QuizService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,25 +21,31 @@ public class QuizController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Boolean addQuiz(@RequestBody AddQuizDto addQuizDto){
+    public QuizWithoutQuestionView addQuiz(@RequestBody AddQuizDto addQuizDto){
         return quizService.addQuiz(addQuizDto);
     }
 
     @PutMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Boolean updateQuiz(@RequestBody UpdateQuizDto updateQuizDto){
+    @ResponseStatus(HttpStatus.OK)
+    public QuizWithoutQuestionView updateQuiz(@RequestBody UpdateQuizDto updateQuizDto){
         return quizService.updateQuiz(updateQuizDto);
     }
 
     @DeleteMapping("/{quizId}")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public Boolean deleteQuiz(@PathVariable String quizId){
         return quizService.deleteQuiz(UUID.fromString(quizId));
     }
 
     @GetMapping("/{courseId}")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public List<QuizView> getAllQuizzesByCourse(@PathVariable String courseId){
         return quizService.getAllQuizzesByCourse(UUID.fromString(courseId));
+    }
+
+    @GetMapping("/get/{courseId}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<QuizWithoutQuestionView> getAllQuizzesWithQuestionsByCourse(@PathVariable String courseId){
+        return quizService.getAllQuizzesWithoutQuestionsByCourse(UUID.fromString(courseId));
     }
 }
