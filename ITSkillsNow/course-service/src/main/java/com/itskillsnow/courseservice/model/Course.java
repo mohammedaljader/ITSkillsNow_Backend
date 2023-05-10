@@ -31,7 +31,7 @@ public class Course {
 
     private String courseLanguage;
 
-//    private Boolean courseIsPublished = false;
+    private Boolean courseIsPublished = false;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "username", nullable = false)
@@ -46,4 +46,31 @@ public class Course {
             cascade= {CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.PERSIST})
     @JsonIgnore
     private List<FavoriteCourse> favorites;
+
+    @OneToMany(mappedBy = "course",
+            cascade= {CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.PERSIST}
+    )
+    @JsonIgnore
+    private List<Lesson> lessons;
+
+    @OneToMany(mappedBy = "course",
+            cascade= {CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.PERSIST}
+    )
+    @JsonIgnore
+    private List<Quiz> quizzes;
+
+
+    public Course(UUID courseId, String courseName, String courseDescription,
+                  String courseImage, Double coursePrice, String courseType,
+                  String courseLanguage, Boolean courseIsPublished, User user) {
+        this.courseId = courseId;
+        this.courseName = courseName;
+        this.courseDescription = courseDescription;
+        this.courseImage = courseImage;
+        this.coursePrice = coursePrice;
+        this.courseType = courseType;
+        this.courseLanguage = courseLanguage;
+        this.courseIsPublished = courseIsPublished;
+        this.user = user;
+    }
 }

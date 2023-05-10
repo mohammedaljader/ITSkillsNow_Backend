@@ -1,17 +1,17 @@
-package com.itskillsnow.courseservice.dto.request;
-
+package com.itskillsnow.courseservice.dto.request.course;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddCourseDto {
+public class AddCourseWithFileDto {
     private String courseName;
     private String courseDescription;
-    private String courseImage;
+    private MultipartFile courseImage;
     private Double coursePrice;
     private String courseType;
     private String courseLanguage;

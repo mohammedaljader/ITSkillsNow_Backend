@@ -1,18 +1,27 @@
 package com.itskillsnow.courseservice.service;
 
-import com.itskillsnow.courseservice.dto.request.AddCourseDto;
-import com.itskillsnow.courseservice.dto.request.UpdateCourseDto;
+import com.itskillsnow.courseservice.dto.request.course.AddCourseDto;
+import com.itskillsnow.courseservice.dto.request.course.AddCourseWithFileDto;
+import com.itskillsnow.courseservice.dto.request.course.UpdateCourseDto;
+import com.itskillsnow.courseservice.dto.request.course.UpdateCourseWithFileDto;
 import com.itskillsnow.courseservice.dto.response.CourseView;
+import com.itskillsnow.courseservice.exception.CourseNotFoundException;
+import com.itskillsnow.courseservice.exception.GeneralException;
+import com.itskillsnow.courseservice.exception.UserNotFoundException;
 import com.itskillsnow.courseservice.model.Course;
 import com.itskillsnow.courseservice.model.User;
 import com.itskillsnow.courseservice.repository.CourseRepository;
 import com.itskillsnow.courseservice.repository.UserRepository;
+import com.itskillsnow.courseservice.service.interfaces.BlobService;
 import com.itskillsnow.courseservice.service.interfaces.CourseService;
+import com.itskillsnow.courseservice.util.FileNamingUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -26,26 +35,71 @@ public class CourseServiceImpl implements CourseService {
 
     private final UserRepository userRepository;
 
+    private final BlobService blobService;
+
     @Override
-    public Boolean addCourse(AddCourseDto courseDto) {
+    public CourseView addCourse(AddCourseDto courseDto) {
         Optional<User> user = userRepository.findByUsername(courseDto.getUsername());
         if(user.isEmpty()){
-            return false;
+            throw new UserNotFoundException("User was not found!");
         }
         Course course = mapCreateDtoToModel(courseDto, user.get());
-        courseRepository.save(course);
-        return true;
+        Course savedCourse = courseRepository.save(course);
+        return mapModelToDto(savedCourse);
     }
 
     @Override
-    public Boolean updateCourse(UpdateCourseDto courseDto) {
+    public CourseView addCourse(AddCourseWithFileDto courseDto) throws IOException {
+        Optional<User> user = userRepository.findByUsername(courseDto.getUsername());
+        if(user.isEmpty() || courseDto.getCourseImage().isEmpty()){
+            throw new GeneralException("User or course was not found!");
+        }
+
+        String courseImage = blobService.storeFile(courseDto.getCourseImage().getOriginalFilename(),
+                    courseDto.getCourseImage().getInputStream(),
+                    courseDto.getCourseImage().getSize());
+        Course newCourse = mapCreateDtoToModel(courseDto, user.get(), courseImage);
+        Course savedCourse = courseRepository.save(newCourse);
+        return mapModelToDto(savedCourse);
+    }
+
+    @Override
+    public CourseView updateCourse(UpdateCourseDto courseDto) {
         Optional<Course> course = courseRepository.findById(courseDto.getCourseId());
         if(course.isEmpty()){
-            return false;
+            throw new CourseNotFoundException("Course was not found!");
         }
         Course updatedCourse = mapUpdateDtoToModel(courseDto,course.get().getUser());
-        courseRepository.save(updatedCourse);
-        return true;
+        Course savedCourse = courseRepository.save(updatedCourse);
+        return mapModelToDto(savedCourse);
+    }
+
+    @Override
+    public CourseView updateCourse(UpdateCourseWithFileDto courseDto) throws IOException {
+        Optional<Course> course = courseRepository.findById(courseDto.getCourseId());
+
+        if(course.isEmpty()){
+            throw new CourseNotFoundException("Course was not found!");
+        }
+
+        String courseImage = courseDto.getCourseImage().getOriginalFilename();
+        String originalImage = FileNamingUtils.getOriginalFilename(course.get().getCourseImage());
+
+        if(!Objects.equals(courseDto.getCourseImage().getOriginalFilename(), "") &&
+                !Objects.equals(courseImage, originalImage)){
+            courseImage = blobService.storeFile(courseDto.getCourseImage().getOriginalFilename(),
+                    courseDto.getCourseImage().getInputStream(),
+                    courseDto.getCourseImage().getSize());
+            //delete the old image from blob storage
+            String blobFileName = FileNamingUtils.getBlobFilename(course.get().getCourseImage());
+            blobService.deleteFile(blobFileName);
+        }else {
+            courseImage = course.get().getCourseImage();
+        }
+
+        Course updatedCourse = mapUpdateDtoToModel(courseDto,course.get().getUser(), courseImage);
+        Course savedCourse = courseRepository.save(updatedCourse);
+        return mapModelToDto(savedCourse);
     }
 
     @Override
@@ -54,6 +108,9 @@ public class CourseServiceImpl implements CourseService {
         if(course.isEmpty()){
             return false;
         }
+        //delete the image from blob storage
+        String blobFileName = FileNamingUtils.getBlobFilename(course.get().getCourseImage());
+        blobService.deleteFile(blobFileName);
         course.ifPresent(courseRepository::delete);
         return true;
     }
@@ -62,8 +119,7 @@ public class CourseServiceImpl implements CourseService {
     public CourseView getCourseById(UUID courseId) {
         Optional<Course> course = courseRepository.findById(courseId);
         if(course.isEmpty()){
-            //TODO: proper Exceptions
-            return null;
+            throw new CourseNotFoundException("Course with id: ".concat(courseId.toString()).concat(" not found!"));
         }
         return mapModelToDto(course.get());
     }
@@ -72,8 +128,7 @@ public class CourseServiceImpl implements CourseService {
     public List<CourseView> getAllCoursesByUser(String username) {
         Optional<User> user = userRepository.findByUsername(username);
         if(user.isEmpty()){
-            //TODO: proper Exceptions
-            return null;
+            throw new UserNotFoundException("User with username: ".concat(username).concat(" not found!"));
         }
         List<Course> courses = courseRepository.findAllByUser(user.get());
         return courses.stream()
@@ -114,16 +169,34 @@ public class CourseServiceImpl implements CourseService {
                 .build();
     }
 
-    private Course mapUpdateDtoToModel(UpdateCourseDto courseDto, User user){
+    private Course mapCreateDtoToModel(AddCourseWithFileDto courseDto, User user, String courseImage){
         return Course.builder()
-                .courseId(courseDto.getCourseId())
                 .courseName(courseDto.getCourseName())
                 .courseDescription(courseDto.getCourseDescription())
-                .courseImage(courseDto.getCourseImage())
+                .courseImage(courseImage)
                 .coursePrice(courseDto.getCoursePrice())
                 .courseType(courseDto.getCourseType())
                 .courseLanguage(courseDto.getCourseLanguage())
                 .user(user)
                 .build();
+    }
+
+
+    private Course mapUpdateDtoToModel(UpdateCourseDto courseDto, User user){
+        return new Course(courseDto.getCourseId(), courseDto.getCourseName(),
+                courseDto.getCourseDescription(), courseDto.getCourseImage(),
+                courseDto.getCoursePrice(), courseDto.getCourseType(),
+                courseDto.getCourseLanguage(),
+                courseDto.isPublished(), user);
+    }
+
+
+    private Course mapUpdateDtoToModel(UpdateCourseWithFileDto courseDto, User user, String courseImage){
+        return new Course(courseDto.getCourseId(), courseDto.getCourseName(),
+                courseDto.getCourseDescription(), courseImage,
+                courseDto.getCoursePrice(), courseDto.getCourseType(),
+                courseDto.getCourseLanguage(),
+                courseDto.isPublished(), user);
+
     }
 }

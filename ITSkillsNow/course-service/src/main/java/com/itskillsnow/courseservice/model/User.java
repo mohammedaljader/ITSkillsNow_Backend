@@ -2,16 +2,14 @@ package com.itskillsnow.courseservice.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")
@@ -36,6 +34,12 @@ public class User {
     )
     @JsonIgnore
     private List<FavoriteCourse> favoriteCourses;
+
+    @OneToMany(mappedBy = "user",
+            cascade= {CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.PERSIST}
+    )
+    @JsonIgnore
+    List<QuizUser> myQuizzes;
 
     public User(String username) {
         this.username = username;

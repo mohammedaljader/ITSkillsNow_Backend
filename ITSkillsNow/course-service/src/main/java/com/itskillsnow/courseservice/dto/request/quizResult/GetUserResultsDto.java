@@ -1,4 +1,4 @@
-package com.itskillsnow.courseservice.dto.request;
+package com.itskillsnow.courseservice.dto.request.quizResult;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +9,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CourseIdDto {
-    private UUID courseId;
+public class GetUserResultsDto {
+    private UUID quizId;
+    private String username;
 }

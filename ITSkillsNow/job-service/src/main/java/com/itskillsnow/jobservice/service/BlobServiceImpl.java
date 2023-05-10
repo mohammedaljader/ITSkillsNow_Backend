@@ -4,6 +4,7 @@ import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.models.BlobItem;
+import com.itskillsnow.jobservice.exception.BlobServiceException;
 import com.itskillsnow.jobservice.service.interfaces.BlobService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,7 +60,7 @@ public class BlobServiceImpl implements BlobService {
             log.info(blobClient.getBlobUrl());
             return true;
         } catch (Exception e) {
-            throw new RuntimeException("Error uploading file to Azure Blob Storage", e);
+            throw new BlobServiceException("Error uploading file to Azure Blob Storage", e);
         }
     }
 
@@ -78,7 +79,7 @@ public class BlobServiceImpl implements BlobService {
         }
     }
 
-    public String getFileBaseName(String filename) {
+    private String getFileBaseName(String filename) {
         String basename = Paths.get(filename).getFileName().toString();
         int dotIndex = basename.lastIndexOf('.');
         return (dotIndex == -1) ? basename : basename.substring(0, dotIndex);

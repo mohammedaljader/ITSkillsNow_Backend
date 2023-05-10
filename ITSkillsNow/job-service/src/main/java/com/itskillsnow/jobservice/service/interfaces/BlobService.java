@@ -8,8 +8,5 @@ public interface BlobService {
     List<String> getAllFiles();
     String downloadFile(String blobItem);
     Boolean storeFile(String filename, InputStream content, long length);
-
     boolean deleteFile(String filename);
-
-
 }
