@@ -181,29 +181,22 @@ public class CourseServiceImpl implements CourseService {
                 .build();
     }
 
+
     private Course mapUpdateDtoToModel(UpdateCourseDto courseDto, User user){
-        return Course.builder()
-                .courseId(courseDto.getCourseId())
-                .courseName(courseDto.getCourseName())
-                .courseDescription(courseDto.getCourseDescription())
-                .courseImage(courseDto.getCourseImage())
-                .coursePrice(courseDto.getCoursePrice())
-                .courseType(courseDto.getCourseType())
-                .courseLanguage(courseDto.getCourseLanguage())
-                .user(user)
-                .build();
+        return new Course(courseDto.getCourseId(), courseDto.getCourseName(),
+                courseDto.getCourseDescription(), courseDto.getCourseImage(),
+                courseDto.getCoursePrice(), courseDto.getCourseType(),
+                courseDto.getCourseLanguage(),
+                courseDto.isPublished(), user);
     }
 
+
     private Course mapUpdateDtoToModel(UpdateCourseWithFileDto courseDto, User user, String courseImage){
-        return Course.builder()
-                .courseId(courseDto.getCourseId())
-                .courseName(courseDto.getCourseName())
-                .courseDescription(courseDto.getCourseDescription())
-                .courseImage(courseImage)
-                .coursePrice(courseDto.getCoursePrice())
-                .courseType(courseDto.getCourseType())
-                .courseLanguage(courseDto.getCourseLanguage())
-                .user(user)
-                .build();
+        return new Course(courseDto.getCourseId(), courseDto.getCourseName(),
+                courseDto.getCourseDescription(), courseImage,
+                courseDto.getCoursePrice(), courseDto.getCourseType(),
+                courseDto.getCourseLanguage(),
+                courseDto.isPublished(), user);
+
     }
 }

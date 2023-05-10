@@ -37,7 +37,7 @@ public class QuizServiceImpl implements QuizService {
         if(course.isEmpty()){
             throw new CourseNotFoundException("Course was not found!");
         }
-        Quiz quiz = mapDtoToModel(addQuizDto, course.get());
+        Quiz quiz = mapAddDtoToModel(addQuizDto, course.get());
         Quiz savedQuiz = quizRepository.save(quiz);
         return mapQuizWithoutQuestionModelToDto(savedQuiz);
     }
@@ -48,7 +48,7 @@ public class QuizServiceImpl implements QuizService {
         if(quiz.isEmpty()){
             throw new QuizNotFoundException("Quiz was not found!");
         }
-        Quiz updatedQuiz = mapDtoToModel(updateQuizDto, quiz.get().getCourse());
+        Quiz updatedQuiz = mapUpdateDtoToModel(updateQuizDto, quiz.get().getCourse());
         Quiz savedQuiz = quizRepository.save(updatedQuiz);
         return mapQuizWithoutQuestionModelToDto(savedQuiz);
     }
@@ -83,19 +83,15 @@ public class QuizServiceImpl implements QuizService {
                 .map(this::mapQuizWithoutQuestionModelToDto).toList();
     }
 
-    private Quiz mapDtoToModel(AddQuizDto addQuizDto, Course course){
+    private Quiz mapAddDtoToModel(AddQuizDto addQuizDto, Course course){
         return Quiz.builder()
                 .quizName(addQuizDto.getQuizName())
                 .course(course)
                 .build();
     }
 
-    private Quiz mapDtoToModel(UpdateQuizDto updateQuizDto, Course course){
-        return Quiz.builder()
-                .quizId(updateQuizDto.getQuizId())
-                .quizName(updateQuizDto.getQuizName())
-                .course(course)
-                .build();
+    private Quiz mapUpdateDtoToModel(UpdateQuizDto updateQuizDto, Course course){
+        return new Quiz(updateQuizDto.getQuizId(), updateQuizDto.getQuizName(), course);
     }
 
     private QuizWithoutQuestionView mapQuizWithoutQuestionModelToDto(Quiz quiz){

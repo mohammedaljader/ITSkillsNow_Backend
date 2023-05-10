@@ -36,4 +36,10 @@ public class Quiz {
     )
     @JsonIgnore
     private List<QuizUser> quizUsers;
+
+    public Quiz(UUID quizId, String quizName, Course course) {
+        this.quizId = quizId;
+        this.quizName = quizName;
+        this.course = course;
+    }
 }

@@ -35,7 +35,7 @@ public class QuizUserServiceImpl implements QuizUserService {
 
 
     @Override
-    public Boolean submitQuiz(UUID quizId, String username, List<UserAnswersDto> submitQuizzes) {
+    public QuizResultView submitQuiz(UUID quizId, String username, List<UserAnswersDto> submitQuizzes) {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new QuizNotFoundException("Quiz was not found!"));
 
@@ -43,15 +43,19 @@ public class QuizUserServiceImpl implements QuizUserService {
                 .orElseThrow(() -> new UserNotFoundException("User was not found!"));
 
         Integer quizResult = checkQuizResult(quiz, submitQuizzes);
+        int questionsSize = quiz.getQuestions().size();
+        Integer grade =  (quizResult * 100) / questionsSize;
 
         QuizUser quizUser = QuizUser.builder()
                 .quiz(quiz)
                 .user(user)
                 .score(quizResult)
+                .questionsSize(questionsSize)
+                .grade(grade)
                 .build();
 
-        quizUserRepository.save(quizUser);
-        return true;
+        QuizUser savedResult = quizUserRepository.save(quizUser);
+        return mapResultsToDto(savedResult);
     }
 
     @Override
@@ -105,6 +109,8 @@ public class QuizUserServiceImpl implements QuizUserService {
                 .quiz(quizView)
                 .username(quizUser.getUser().getUsername())
                 .result(quizUser.getScore())
+                .grade(quizUser.getGrade())
+                .questionsSize(quizUser.getQuestionsSize())
                 .build();
     }
 

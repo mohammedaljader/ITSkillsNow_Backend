@@ -31,4 +31,11 @@ public class Question {
     )
     @JsonIgnore
     private List<Option> options;
+
+
+    public Question(UUID questionId, String questionName, Quiz quiz) {
+        this.questionId = questionId;
+        this.questionName = questionName;
+        this.quiz = quiz;
+    }
 }

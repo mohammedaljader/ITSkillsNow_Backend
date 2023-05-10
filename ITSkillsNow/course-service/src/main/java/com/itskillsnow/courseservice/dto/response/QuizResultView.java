@@ -16,4 +16,6 @@ public class QuizResultView {
     private String username;
     private QuizView quiz;
     private Integer result;
+    private Integer questionsSize;
+    private Integer grade;
 }

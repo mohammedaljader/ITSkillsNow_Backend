@@ -24,4 +24,8 @@ public class QuizUser {
 
 
     private Integer score;
+
+    private Integer questionsSize;
+
+    private Integer grade;
 }

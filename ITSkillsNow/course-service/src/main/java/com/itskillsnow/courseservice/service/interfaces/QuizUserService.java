@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface QuizUserService {
 
-    Boolean submitQuiz(UUID quizId, String username, List<UserAnswersDto> userAnswers);
+    QuizResultView submitQuiz(UUID quizId, String username, List<UserAnswersDto> userAnswers);
 
     QuizResultView getQuizResultByUser(UUID quizId, String username);
 

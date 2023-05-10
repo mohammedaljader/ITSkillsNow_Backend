@@ -157,11 +157,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     private Question mapUpdatedQuestionDtoToModel(UpdateQuestionDto updateQuestionDto, Quiz quiz){
-        return Question.builder()
-                .questionId(updateQuestionDto.getQuestionId())
-                .questionName(updateQuestionDto.getQuestionName())
-                .quiz(quiz)
-                .build();
+        return new Question(updateQuestionDto.getQuestionId(), updateQuestionDto.getQuestionName(), quiz);
     }
 
     private Option mapUpdatedOptionDtoToModel(UpdateOptionDto updateOptionDto, Question question){

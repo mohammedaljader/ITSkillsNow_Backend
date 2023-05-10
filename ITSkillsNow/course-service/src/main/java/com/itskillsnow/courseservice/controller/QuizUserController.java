@@ -19,7 +19,7 @@ public class QuizUserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    public Boolean submitQuiz(@RequestBody SubmitQuizDto submitQuizDto){
+    public QuizResultView submitQuiz(@RequestBody SubmitQuizDto submitQuizDto){
         return quizUserService.submitQuiz(submitQuizDto.getQuizId(),
                 submitQuizDto.getUsername(), submitQuizDto.getUserAnswers());
     }

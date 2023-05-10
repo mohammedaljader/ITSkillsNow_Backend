@@ -59,4 +59,18 @@ public class Course {
     @JsonIgnore
     private List<Quiz> quizzes;
 
+
+    public Course(UUID courseId, String courseName, String courseDescription,
+                  String courseImage, Double coursePrice, String courseType,
+                  String courseLanguage, Boolean courseIsPublished, User user) {
+        this.courseId = courseId;
+        this.courseName = courseName;
+        this.courseDescription = courseDescription;
+        this.courseImage = courseImage;
+        this.coursePrice = coursePrice;
+        this.courseType = courseType;
+        this.courseLanguage = courseLanguage;
+        this.courseIsPublished = courseIsPublished;
+        this.user = user;
+    }
 }
