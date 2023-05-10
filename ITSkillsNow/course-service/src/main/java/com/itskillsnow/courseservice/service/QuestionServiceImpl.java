@@ -6,6 +6,8 @@ import com.itskillsnow.courseservice.dto.request.question.AddQuestionDto;
 import com.itskillsnow.courseservice.dto.request.question.UpdateQuestionDto;
 import com.itskillsnow.courseservice.dto.response.OptionView;
 import com.itskillsnow.courseservice.dto.response.QuestionView;
+import com.itskillsnow.courseservice.dto.response.QuestionWithoutOptionView;
+import com.itskillsnow.courseservice.exception.OptionNotFoundException;
 import com.itskillsnow.courseservice.exception.QuestionNotFoundException;
 import com.itskillsnow.courseservice.exception.QuizNotFoundException;
 import com.itskillsnow.courseservice.model.Option;
@@ -41,7 +43,7 @@ public class QuestionServiceImpl implements QuestionService {
         if(quiz.isEmpty()){
             return false;
         }
-        Question question = mapQuestionDtoToModel(addQuestionDto, quiz.get());
+        Question question = mapUpdatedQuestionDtoToModel(addQuestionDto, quiz.get());
         Question savedQuestion = questionRepository.save(question);
 
         List<Option> options = optionDtoList.stream()
@@ -52,25 +54,25 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public boolean addQuestion(AddQuestionDto addQuestionDto) {
+    public QuestionWithoutOptionView addQuestion(AddQuestionDto addQuestionDto) {
         Optional<Quiz> quiz = quizRepository.findById(addQuestionDto.getQuizId());
         if(quiz.isEmpty()){
-            return false;
+            throw new QuizNotFoundException("Quiz was not found!");
         }
-        Question question = mapQuestionDtoToModel(addQuestionDto, quiz.get());
-        questionRepository.save(question);
-        return true;
+        Question question = mapUpdatedQuestionDtoToModel(addQuestionDto, quiz.get());
+        Question savedQuestion = questionRepository.save(question);
+        return mapQuestionModelWithoutOptionToDto(savedQuestion);
     }
 
     @Override
-    public boolean updateQuestion(UpdateQuestionDto updateQuestionDto) {
+    public QuestionWithoutOptionView updateQuestion(UpdateQuestionDto updateQuestionDto) {
         Optional<Question> question = questionRepository.findById(updateQuestionDto.getQuestionId());
         if(question.isEmpty()){
-            return false;
+            throw new QuestionNotFoundException("Question was not found!");
         }
-        Question updatedQuestion = mapQuestionDtoToModel(updateQuestionDto);
-        questionRepository.save(updatedQuestion);
-        return true;
+        Question updatedQuestion = mapUpdatedQuestionDtoToModel(updateQuestionDto, question.get().getQuiz());
+        Question savedQuestion = questionRepository.save(updatedQuestion);
+        return mapQuestionModelWithoutOptionToDto(savedQuestion);
     }
 
     @Override
@@ -84,25 +86,25 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public boolean addOption(AddOptionDto addOptionDto) {
+    public OptionView addOption(AddOptionDto addOptionDto) {
         Optional<Question> question = questionRepository.findById(addOptionDto.getQuestionId());
         if(question.isEmpty()){
-            return false;
+            throw new QuestionNotFoundException("Question was not found!");
         }
         Option option = mapOptionDtoToModel(addOptionDto, question.get());
-        optionRepository.save(option);
-        return true;
+        Option savedOption = optionRepository.save(option);
+        return mapOptionModelToDto(savedOption);
     }
 
     @Override
-    public boolean updateOption(UpdateOptionDto updateOptionDto) {
+    public OptionView updateOption(UpdateOptionDto updateOptionDto) {
         Optional<Option> option = optionRepository.findById(updateOptionDto.getOptionId());
         if(option.isEmpty()){
-            return false;
+            throw new OptionNotFoundException("Option was not found!");
         }
-        Option updatedOption = mapOptionDtoToModel(updateOptionDto);
-        optionRepository.save(updatedOption);
-        return true;
+        Option updatedOption = mapUpdatedOptionDtoToModel(updateOptionDto, option.get().getQuestion());
+        Option savedOption = optionRepository.save(updatedOption);
+        return mapOptionModelToDto(savedOption);
     }
 
     @Override
@@ -139,7 +141,7 @@ public class QuestionServiceImpl implements QuestionService {
                 .toList();
     }
 
-    private Question mapQuestionDtoToModel(AddQuestionDto addQuestionDto, Quiz quiz){
+    private Question mapUpdatedQuestionDtoToModel(AddQuestionDto addQuestionDto, Quiz quiz){
         return Question.builder()
                 .questionName(addQuestionDto.getQuestionName())
                 .quiz(quiz)
@@ -154,18 +156,20 @@ public class QuestionServiceImpl implements QuestionService {
                 .build();
     }
 
-    private Question mapQuestionDtoToModel(UpdateQuestionDto updateQuestionDto){
+    private Question mapUpdatedQuestionDtoToModel(UpdateQuestionDto updateQuestionDto, Quiz quiz){
         return Question.builder()
                 .questionId(updateQuestionDto.getQuestionId())
                 .questionName(updateQuestionDto.getQuestionName())
+                .quiz(quiz)
                 .build();
     }
 
-    private Option mapOptionDtoToModel(UpdateOptionDto updateOptionDto){
+    private Option mapUpdatedOptionDtoToModel(UpdateOptionDto updateOptionDto, Question question){
         return Option.builder()
                 .optionId(updateOptionDto.getOptionId())
                 .optionName(updateOptionDto.getOptionName())
                 .optionIsCorrect(updateOptionDto.isOptionIsCorrect())
+                .question(question)
                 .build();
     }
 
@@ -185,6 +189,13 @@ public class QuestionServiceImpl implements QuestionService {
                 .optionId(option.getOptionId())
                 .optionName(option.getOptionName())
                 .optionIsCorrect(option.isOptionIsCorrect())
+                .build();
+    }
+
+    private QuestionWithoutOptionView mapQuestionModelWithoutOptionToDto(Question question){
+        return QuestionWithoutOptionView.builder()
+                .questionId(question.getQuestionId())
+                .questionName(question.getQuestionName())
                 .build();
     }
 }

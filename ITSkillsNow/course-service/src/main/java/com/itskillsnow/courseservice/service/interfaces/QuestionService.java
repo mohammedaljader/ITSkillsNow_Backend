@@ -6,6 +6,7 @@ import com.itskillsnow.courseservice.dto.request.question.AddQuestionDto;
 import com.itskillsnow.courseservice.dto.request.question.UpdateQuestionDto;
 import com.itskillsnow.courseservice.dto.response.OptionView;
 import com.itskillsnow.courseservice.dto.response.QuestionView;
+import com.itskillsnow.courseservice.dto.response.QuestionWithoutOptionView;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,15 +15,15 @@ public interface QuestionService {
 
     boolean addQuestion(AddQuestionDto addQuestionDto, List<AddOptionDto> optionDtoList);
 
-    boolean addQuestion(AddQuestionDto addQuestionDto);
+    QuestionWithoutOptionView addQuestion(AddQuestionDto addQuestionDto);
 
-    boolean updateQuestion(UpdateQuestionDto updateQuestionDto);
+    QuestionWithoutOptionView updateQuestion(UpdateQuestionDto updateQuestionDto);
 
     boolean deleteQuestion(UUID questionId);
 
-    boolean addOption(AddOptionDto addOptionDto);
+    OptionView addOption(AddOptionDto addOptionDto);
 
-    boolean updateOption(UpdateOptionDto updateOptionDto);
+    OptionView updateOption(UpdateOptionDto updateOptionDto);
 
     boolean deleteOption(UUID optionId);
 

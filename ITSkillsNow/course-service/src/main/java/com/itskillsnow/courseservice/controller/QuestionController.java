@@ -7,6 +7,7 @@ import com.itskillsnow.courseservice.dto.request.question.AddQuestionWithOptionD
 import com.itskillsnow.courseservice.dto.request.question.UpdateQuestionDto;
 import com.itskillsnow.courseservice.dto.response.OptionView;
 import com.itskillsnow.courseservice.dto.response.QuestionView;
+import com.itskillsnow.courseservice.dto.response.QuestionWithoutOptionView;
 import com.itskillsnow.courseservice.service.interfaces.QuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,13 +32,13 @@ public class QuestionController {
 
     @PostMapping("/new")
     @ResponseStatus(HttpStatus.CREATED)
-    public Boolean addQuestion(@RequestBody AddQuestionDto addQuestionDto){
+    public QuestionWithoutOptionView addQuestion(@RequestBody AddQuestionDto addQuestionDto){
         return questionService.addQuestion(addQuestionDto);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public Boolean updateQuestion(@RequestBody UpdateQuestionDto updateQuestionDto){
+    public QuestionWithoutOptionView updateQuestion(@RequestBody UpdateQuestionDto updateQuestionDto){
         return questionService.updateQuestion(updateQuestionDto);
     }
 
@@ -47,31 +48,31 @@ public class QuestionController {
         return questionService.deleteQuestion(UUID.fromString(questionId));
     }
 
-    @PostMapping("/option")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Boolean addOption(@RequestBody AddOptionDto addOptionDto){
-        return questionService.addOption(addOptionDto);
-    }
-
-    @PutMapping("/option")
-    @ResponseStatus(HttpStatus.OK)
-    public Boolean updateOption(@RequestBody UpdateOptionDto updateOptionDto){
-        return questionService.updateOption(updateOptionDto);
-    }
-
-    @DeleteMapping("/option/{optionId}")
-    @ResponseStatus(HttpStatus.OK)
-    public Boolean updateOption(@PathVariable String optionId){
-        return questionService.deleteOption(UUID.fromString(optionId));
-    }
-
     @GetMapping("/{quizId}")
     @ResponseStatus(HttpStatus.OK)
     public List<QuestionView> getAllQuestionByQuiz(@PathVariable String quizId){
         return questionService.getAllQuestionByQuiz(UUID.fromString(quizId));
     }
 
-    @GetMapping("/{questionId}")
+    @PostMapping("/option")
+    @ResponseStatus(HttpStatus.CREATED)
+    public OptionView addOption(@RequestBody AddOptionDto addOptionDto){
+        return questionService.addOption(addOptionDto);
+    }
+
+    @PutMapping("/option")
+    @ResponseStatus(HttpStatus.OK)
+    public OptionView updateOption(@RequestBody UpdateOptionDto updateOptionDto){
+        return questionService.updateOption(updateOptionDto);
+    }
+
+    @DeleteMapping("/option/{optionId}")
+    @ResponseStatus(HttpStatus.OK)
+    public Boolean deleteOption(@PathVariable String optionId){
+        return questionService.deleteOption(UUID.fromString(optionId));
+    }
+
+    @GetMapping("/option/{questionId}")
     @ResponseStatus(HttpStatus.OK)
     public List<OptionView> getAllOptionsByQuestion(@PathVariable String questionId){
         return questionService.getAllOptionsByQuestion(UUID.fromString(questionId));
