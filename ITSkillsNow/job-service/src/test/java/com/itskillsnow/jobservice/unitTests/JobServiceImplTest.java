@@ -147,6 +147,7 @@ class JobServiceImplTest {
         UUID jobId = UUID.randomUUID();
         Job job = new Job();
         job.setJobId(jobId);
+        job.setJobImage("jobImage.jpg");
 
         when(jobRepository.findById(jobId)).thenReturn(Optional.of(job));
 

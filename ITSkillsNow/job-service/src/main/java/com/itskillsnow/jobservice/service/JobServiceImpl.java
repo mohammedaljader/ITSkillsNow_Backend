@@ -75,7 +75,7 @@ public class JobServiceImpl implements JobService {
         if(job.isEmpty()){
             return false;
         }
-        Job updatedJob = mapUpdateJobDtoToModel(jobDto, job.get().getUser());
+        Job updatedJob = mapUpdateJobDtoToModel(job.get(),jobDto);
         jobRepository.save(updatedJob);
         return true;
     }
@@ -111,7 +111,12 @@ public class JobServiceImpl implements JobService {
         if(job.isEmpty()){
             return false;
         }
+
+        //delete the image from blob storage
+        String blobFileName = FileNamingUtils.getBlobFilename(job.get().getJobImage());
+        blobService.deleteFile(blobFileName);
         jobRepository.delete(job.get());
+
         return true;
     }
 
@@ -189,19 +194,16 @@ public class JobServiceImpl implements JobService {
                 .build();
     }
 
-    private Job mapUpdateJobDtoToModel(UpdateJobDto jobDto, User user){
-        return Job.builder()
-                .jobId(jobDto.getJobId())
-                .jobName(jobDto.getJobName())
-                .jobDescription(jobDto.getJobDescription())
-                .jobImage(jobDto.getJobImage())
-                .jobAddress(jobDto.getJobAddress())
-                .jobCategory(jobDto.getJobCategory())
-                .jobEducationLevel(jobDto.getJobEducationLevel())
-                .jobType(jobDto.getJobType())
-                .jobHours(jobDto.getJobHours())
-                .user(user)
-                .build();
+    private Job mapUpdateJobDtoToModel(Job job, UpdateJobDto jobDto){
+        job.setJobName(jobDto.getJobName());
+        job.setJobDescription(job.getJobDescription());
+        job.setJobImage(jobDto.getJobImage());
+        job.setJobAddress(jobDto.getJobAddress());
+        job.setJobCategory(jobDto.getJobCategory());
+        job.setJobEducationLevel(jobDto.getJobEducationLevel());
+        job.setJobType(jobDto.getJobType());
+        job.setJobHours(jobDto.getJobHours());
+        return job;
     }
 
     private Job mapUpdateJobDtoToModel(Job job,UpdateJobWithFileDto jobDto, String jobImage){

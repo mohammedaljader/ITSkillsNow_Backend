@@ -1,16 +1,16 @@
 package com.itskillsnow.jobservice.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "job_application")
@@ -18,6 +18,14 @@ public class JobApplication {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID applicationId;
+
+    private LocalDate applicationDate;
+
+    private LocalTime applicationTime;
+
+    private String applicationCv;
+
+    private String applicationMotivation;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "username", nullable = false)
