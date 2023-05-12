@@ -49,7 +49,7 @@ public class AuthController {
         return authService.refreshToken(refreshToken);
     }
 
-    @DeleteMapping("/deleteMe")
+    @PostMapping("/deleteMe")
     @ResponseStatus(HttpStatus.OK)
     public boolean deleteMe(@RequestBody DeleteUserDto userDto){
         return authService.deleteMe(userDto.getUsername(), userDto.getPassword());

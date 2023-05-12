@@ -300,7 +300,7 @@ class AuthControllerIT {
         HttpEntity<DeleteUserDto> requestEntity = new HttpEntity<>(deleteUserDto, headers);
 
         ResponseEntity<Boolean> responseEntity = restTemplate.exchange(baseUrl.concat("/").concat("deleteMe"),
-                HttpMethod.DELETE, requestEntity, Boolean.class);
+                HttpMethod.POST, requestEntity, Boolean.class);
 
 
         // assert that the response status code is 200 OK
