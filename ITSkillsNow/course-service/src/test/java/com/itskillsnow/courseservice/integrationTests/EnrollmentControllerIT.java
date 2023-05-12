@@ -1,12 +1,14 @@
 package com.itskillsnow.courseservice.integrationTests;
 
 import com.itskillsnow.courseservice.dto.request.enrollment.AddEnrollmentDto;
+import com.itskillsnow.courseservice.dto.response.CourseView;
 import com.itskillsnow.courseservice.dto.response.EnrollmentView;
 import com.itskillsnow.courseservice.model.Course;
 import com.itskillsnow.courseservice.model.User;
 import com.itskillsnow.courseservice.repository.CourseRepository;
 import com.itskillsnow.courseservice.repository.UserRepository;
 import com.itskillsnow.courseservice.service.interfaces.BlobService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.InputStream;
@@ -132,11 +135,14 @@ public class EnrollmentControllerIT {
         AddEnrollmentDto addEnrollmentDto = new AddEnrollmentDto(courseId1, "wrongUsername");
 
         // Send a POST request to enroll to course
-        ResponseEntity<Boolean> result = restTemplate.exchange(baseUrl, HttpMethod.POST,
-                new HttpEntity<>(addEnrollmentDto), new ParameterizedTypeReference<>() {});
+        HttpClientErrorException.BadRequest response = Assertions.assertThrows(
+                HttpClientErrorException.BadRequest.class, () ->
+                        restTemplate.exchange(baseUrl, HttpMethod.POST,
+                                new HttpEntity<>(addEnrollmentDto), new ParameterizedTypeReference<>() {})
+        );
 
 
-        assertEquals(Boolean.FALSE, result.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
     @Test

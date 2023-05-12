@@ -188,11 +188,14 @@ public class LessonControllerIT {
     @Test
     void given_deleteLesson_withWrongLessonId_returnsFalse() {
         // Send a DELETE request
-        ResponseEntity<Boolean> result = restTemplate.exchange(baseUrl.concat("/").concat(UUID.randomUUID().toString()),
-                HttpMethod.DELETE, null, new ParameterizedTypeReference<>() {});
+        HttpClientErrorException.BadRequest response = Assertions.assertThrows(
+                HttpClientErrorException.BadRequest.class, () ->
+                        restTemplate.exchange(baseUrl.concat("/").concat(UUID.randomUUID().toString()),
+                                HttpMethod.DELETE, null, new ParameterizedTypeReference<>() {})
+        );
 
         // Verify
-        assertEquals(Boolean.FALSE, result.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
     @Test

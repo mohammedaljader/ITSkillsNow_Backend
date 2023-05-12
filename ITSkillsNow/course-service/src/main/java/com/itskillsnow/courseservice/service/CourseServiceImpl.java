@@ -65,25 +65,21 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseView updateCourse(UpdateCourseDto courseDto) {
-        Optional<Course> course = courseRepository.findById(courseDto.getCourseId());
-        if(course.isEmpty()){
-            throw new CourseNotFoundException("Course was not found!");
-        }
-        Course updatedCourse = mapUpdateDtoToModel(courseDto,course.get().getUser());
+        Course course = courseRepository.findById(courseDto.getCourseId())
+                .orElseThrow(() -> new CourseNotFoundException("Course was not found!"));
+
+        Course updatedCourse = mapUpdateDtoToModel(course, courseDto);
         Course savedCourse = courseRepository.save(updatedCourse);
         return mapModelToDto(savedCourse);
     }
 
     @Override
     public CourseView updateCourse(UpdateCourseWithFileDto courseDto) throws IOException {
-        Optional<Course> course = courseRepository.findById(courseDto.getCourseId());
-
-        if(course.isEmpty()){
-            throw new CourseNotFoundException("Course was not found!");
-        }
+        Course course = courseRepository.findById(courseDto.getCourseId())
+                .orElseThrow(() -> new CourseNotFoundException("Course was not found!"));
 
         String courseImage = courseDto.getCourseImage().getOriginalFilename();
-        String originalImage = FileNamingUtils.getOriginalFilename(course.get().getCourseImage());
+        String originalImage = FileNamingUtils.getOriginalFilename(course.getCourseImage());
 
         if(!Objects.equals(courseDto.getCourseImage().getOriginalFilename(), "") &&
                 !Objects.equals(courseImage, originalImage)){
@@ -91,13 +87,13 @@ public class CourseServiceImpl implements CourseService {
                     courseDto.getCourseImage().getInputStream(),
                     courseDto.getCourseImage().getSize());
             //delete the old image from blob storage
-            String blobFileName = FileNamingUtils.getBlobFilename(course.get().getCourseImage());
+            String blobFileName = FileNamingUtils.getBlobFilename(course.getCourseImage());
             blobService.deleteFile(blobFileName);
         }else {
-            courseImage = course.get().getCourseImage();
+            courseImage = course.getCourseImage();
         }
 
-        Course updatedCourse = mapUpdateDtoToModel(courseDto,course.get().getUser(), courseImage);
+        Course updatedCourse = mapUpdateDtoToModel(course, courseDto, courseImage);
         Course savedCourse = courseRepository.save(updatedCourse);
         return mapModelToDto(savedCourse);
     }
@@ -181,22 +177,26 @@ public class CourseServiceImpl implements CourseService {
                 .build();
     }
 
-
-    private Course mapUpdateDtoToModel(UpdateCourseDto courseDto, User user){
-        return new Course(courseDto.getCourseId(), courseDto.getCourseName(),
-                courseDto.getCourseDescription(), courseDto.getCourseImage(),
-                courseDto.getCoursePrice(), courseDto.getCourseType(),
-                courseDto.getCourseLanguage(),
-                courseDto.isPublished(), user);
+    private Course mapUpdateDtoToModel(Course course ,UpdateCourseDto courseDto){
+        course.setCourseName(courseDto.getCourseName());
+        course.setCourseDescription(courseDto.getCourseDescription());
+        course.setCourseImage(courseDto.getCourseImage());
+        course.setCoursePrice(courseDto.getCoursePrice());
+        course.setCourseType(courseDto.getCourseType());
+        course.setCourseLanguage(courseDto.getCourseLanguage());
+        course.setCourseIsPublished(courseDto.isPublished());
+        return course;
     }
 
-
-    private Course mapUpdateDtoToModel(UpdateCourseWithFileDto courseDto, User user, String courseImage){
-        return new Course(courseDto.getCourseId(), courseDto.getCourseName(),
-                courseDto.getCourseDescription(), courseImage,
-                courseDto.getCoursePrice(), courseDto.getCourseType(),
-                courseDto.getCourseLanguage(),
-                courseDto.isPublished(), user);
+    private Course mapUpdateDtoToModel(Course course, UpdateCourseWithFileDto courseDto, String courseImage){
+        course.setCourseName(courseDto.getCourseName());
+        course.setCourseDescription(courseDto.getCourseDescription());
+        course.setCourseImage(courseImage);
+        course.setCoursePrice(courseDto.getCoursePrice());
+        course.setCourseType(courseDto.getCourseType());
+        course.setCourseLanguage(courseDto.getCourseLanguage());
+        course.setCourseIsPublished(courseDto.isPublished());
+        return course;
 
     }
 }

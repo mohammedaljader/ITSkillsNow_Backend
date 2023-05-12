@@ -31,53 +31,54 @@ public class QuizServiceImpl implements QuizService {
     private final QuizRepository quizRepository;
     private final CourseRepository courseRepository;
 
+    private static final String courseNotFound = "Course was not found!";
+
+    private static final String quizNotFound = "Quiz was not found!";
+
     @Override
     public QuizWithoutQuestionView addQuiz(AddQuizDto addQuizDto) {
-        Optional<Course> course = courseRepository.findById(addQuizDto.getCourseId());
-        if(course.isEmpty()){
-            throw new CourseNotFoundException("Course was not found!");
-        }
-        Quiz quiz = mapAddDtoToModel(addQuizDto, course.get());
+        Course course = courseRepository.findById(addQuizDto.getCourseId())
+                .orElseThrow(() -> new CourseNotFoundException(courseNotFound));
+
+        Quiz quiz = mapAddDtoToModel(addQuizDto, course);
         Quiz savedQuiz = quizRepository.save(quiz);
         return mapQuizWithoutQuestionModelToDto(savedQuiz);
     }
 
     @Override
     public QuizWithoutQuestionView updateQuiz(UpdateQuizDto updateQuizDto) {
-        Optional<Quiz> quiz = quizRepository.findById(updateQuizDto.getQuizId());
-        if(quiz.isEmpty()){
-            throw new QuizNotFoundException("Quiz was not found!");
-        }
-        Quiz updatedQuiz = mapUpdateDtoToModel(updateQuizDto, quiz.get().getCourse());
+        Quiz quiz = quizRepository.findById(updateQuizDto.getQuizId())
+                .orElseThrow(() -> new QuizNotFoundException(quizNotFound));
+
+        Quiz updatedQuiz = mapUpdateDtoToModel(quiz, updateQuizDto);
         Quiz savedQuiz = quizRepository.save(updatedQuiz);
         return mapQuizWithoutQuestionModelToDto(savedQuiz);
     }
 
     @Override
     public boolean deleteQuiz(UUID quizId) {
-        Optional<Quiz> quiz = quizRepository.findById(quizId);
-        if(quiz.isEmpty()){
-            return false;
-        }
-        quizRepository.delete(quiz.get());
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new QuizNotFoundException(quizNotFound));
+
+        quizRepository.delete(quiz);
         return true;
     }
 
     @Override
     public List<QuizView> getAllQuizzesByCourse(UUID courseId) {
-        Optional<Course> course = courseRepository.findById(courseId);
-        if(course.isEmpty()){
-            throw new CourseNotFoundException("Course was not found!!");
-        }
-        List<Quiz> quizzes = quizRepository.findByCourse(course.get());
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new CourseNotFoundException(courseNotFound));
+
+        List<Quiz> quizzes = quizRepository.findByCourse(course);
         return quizzes.stream()
                 .map(this::mapModelToDto).toList();
     }
 
     @Override
     public List<QuizWithoutQuestionView> getAllQuizzesWithoutQuestionsByCourse(UUID courseId) {
-        Course course = courseRepository.findById(courseId).
-                orElseThrow(() ->  new CourseNotFoundException("Course was not found!!"));
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new CourseNotFoundException(courseNotFound));
+
         List<Quiz> quizzes = quizRepository.findByCourse(course);
         return quizzes.stream()
                 .map(this::mapQuizWithoutQuestionModelToDto).toList();
@@ -90,8 +91,10 @@ public class QuizServiceImpl implements QuizService {
                 .build();
     }
 
-    private Quiz mapUpdateDtoToModel(UpdateQuizDto updateQuizDto, Course course){
-        return new Quiz(updateQuizDto.getQuizId(), updateQuizDto.getQuizName(), course);
+
+    private Quiz mapUpdateDtoToModel(Quiz quiz, UpdateQuizDto updateQuizDto){
+        quiz.setQuizName(updateQuizDto.getQuizName());
+        return quiz;
     }
 
     private QuizWithoutQuestionView mapQuizWithoutQuestionModelToDto(Quiz quiz){

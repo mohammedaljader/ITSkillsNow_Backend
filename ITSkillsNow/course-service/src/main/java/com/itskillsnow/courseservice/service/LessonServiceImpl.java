@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -31,57 +30,51 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public LessonView addLesson(AddLessonDto addLessonDto) {
-        Optional<Course> course = courseRepository.findById(addLessonDto.getCourseId());
-        if(course.isEmpty()){
-            throw new CourseNotFoundException("Course was not found!");
-        }
-        Lesson lesson = mapDtoToModel(addLessonDto, course.get());
+        Course course = courseRepository.findById(addLessonDto.getCourseId())
+                .orElseThrow(() -> new CourseNotFoundException("Course was not found!"));
+
+        Lesson lesson = mapAddLessonDtoToModel(addLessonDto, course);
         Lesson savedLesson = lessonRepository.save(lesson);
         return mapModelToDto(savedLesson);
     }
 
     @Override
     public LessonView updateLesson(UpdateLessonDto updateLessonDto) {
-        Optional<Lesson> lesson = lessonRepository.findById(updateLessonDto.getLessonId());
-        if(lesson.isEmpty()){
-            throw new LessonNotFoundException("Lesson was not found!");
-        }
-        Lesson updatedLesson = mapDtoToModel(updateLessonDto, lesson.get().getCourse());
+        Lesson lesson = lessonRepository.findById(updateLessonDto.getLessonId())
+                .orElseThrow(() -> new LessonNotFoundException("Lesson was not found!"));
+
+        Lesson updatedLesson = mapUpdateLessonDtoToModel(lesson, updateLessonDto);
         Lesson savedLesson = lessonRepository.save(updatedLesson);
         return mapModelToDto(savedLesson);
     }
 
     @Override
     public boolean deleteLesson(UUID lessonId) {
-        Optional<Lesson> lesson = lessonRepository.findById(lessonId);
-        if(lesson.isEmpty()){
-            return false;
-        }
-        lessonRepository.delete(lesson.get());
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new LessonNotFoundException("Lesson was not found!"));
+
+        lessonRepository.delete(lesson);
         return true;
     }
 
     @Override
     public List<LessonView> getAllLessonsByCourse(UUID courseId) {
-        Optional<Course> course = courseRepository.findById(courseId);
-        if(course.isEmpty()){
-            throw new CourseNotFoundException("Course was not found!");
-        }
-        List<Lesson> lessons = lessonRepository.findByCourse(course.get());
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new CourseNotFoundException("Course was not found!"));
+
+        List<Lesson> lessons = lessonRepository.findByCourse(course);
         return lessons.stream().map(this::mapModelToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public LessonView getLessonById(UUID lessonId) {
-        Optional<Lesson> lesson = lessonRepository.findById(lessonId);
-        if(lesson.isEmpty()){
-            throw new LessonNotFoundException("Lesson was not found!");
-        }
-        return mapModelToDto(lesson.get());
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new LessonNotFoundException("Lesson was not found!"));
+        return mapModelToDto(lesson);
     }
 
-    private Lesson mapDtoToModel(AddLessonDto addLessonDto, Course course){
+    private Lesson mapAddLessonDtoToModel(AddLessonDto addLessonDto, Course course){
         return Lesson.builder()
                 .lessonName(addLessonDto.getLessonName())
                 .lessonContent(addLessonDto.getLessonContent())
@@ -89,13 +82,11 @@ public class LessonServiceImpl implements LessonService {
                 .build();
     }
 
-    private Lesson mapDtoToModel(UpdateLessonDto updateLessonDto, Course course){
-        return Lesson.builder()
-                .lessonId(updateLessonDto.getLessonId())
-                .lessonName(updateLessonDto.getLessonName())
-                .lessonContent(updateLessonDto.getLessonContent())
-                .course(course)
-                .build();
+
+    private Lesson mapUpdateLessonDtoToModel(Lesson lesson, UpdateLessonDto updateLessonDto){
+        lesson.setLessonName(updateLessonDto.getLessonName());
+        lesson.setLessonContent(updateLessonDto.getLessonContent());
+        return lesson;
     }
 
     private LessonView mapModelToDto(Lesson lesson){

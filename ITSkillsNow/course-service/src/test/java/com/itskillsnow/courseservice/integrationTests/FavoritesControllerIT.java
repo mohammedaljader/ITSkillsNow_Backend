@@ -136,12 +136,15 @@ public class FavoritesControllerIT {
         AddCourseToFavoritesDto addCourseToFavoritesDto = new AddCourseToFavoritesDto(courseId1, "WrongUsername");
 
         // Send a POST request to add course to favorites
-        ResponseEntity<Boolean> result = restTemplate.exchange(baseUrl, HttpMethod.POST,
-                new HttpEntity<>(addCourseToFavoritesDto), new ParameterizedTypeReference<>() {});
+        HttpClientErrorException.BadRequest response = Assertions.assertThrows(
+                HttpClientErrorException.BadRequest.class, () ->
+                        restTemplate.exchange(baseUrl, HttpMethod.POST,
+                                new HttpEntity<>(addCourseToFavoritesDto), new ParameterizedTypeReference<>() {})
+        );
 
 
-        assertEquals(Boolean.FALSE, result.getBody());
-        assertEquals(HttpStatus.CREATED, result.getStatusCode());
+        // verify
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
 

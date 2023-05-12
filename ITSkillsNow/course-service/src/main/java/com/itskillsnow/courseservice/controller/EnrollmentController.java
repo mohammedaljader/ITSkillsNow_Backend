@@ -21,7 +21,6 @@ public class EnrollmentController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Boolean enrollToCourse(@RequestBody AddEnrollmentDto addEnrollmentDto){
-        // TODO: change the the http status to bad request if username or courseId are wrong
         return enrollmentService.enrollToCourse(addEnrollmentDto);
     }
 

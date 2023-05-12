@@ -228,10 +228,10 @@ class CourseServiceImplTest {
         verify(blobService, times(1)).deleteFile(anyString());
         verify(courseRepository, times(1)).save(any(Course.class));
 
-        assertEquals(actual.getCourseImage(), newCourseImage);
-        assertEquals(actual.getCourseName(), newCourseName);
-        assertEquals(actual.getCourseDescription(), newCourseDescription);
-        assertNotEquals(actual.getCourseImage(), oldCourse.getCourseImage());
+        assertEquals(newCourseImage, actual.getCourseImage());
+        assertEquals(newCourseName, actual.getCourseName());
+        assertEquals(newCourseDescription, actual.getCourseDescription());
+        assertEquals(newCourseImage, actual.getCourseImage());
     }
 
 

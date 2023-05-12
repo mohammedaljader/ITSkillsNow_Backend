@@ -3,6 +3,8 @@ package com.itskillsnow.courseservice.unitTests;
 
 import com.itskillsnow.courseservice.dto.request.favorites.AddCourseToFavoritesDto;
 import com.itskillsnow.courseservice.dto.response.FavoriteCourseView;
+import com.itskillsnow.courseservice.exception.CourseNotFoundException;
+import com.itskillsnow.courseservice.exception.FavoriteCourseNotFound;
 import com.itskillsnow.courseservice.exception.UserNotFoundException;
 import com.itskillsnow.courseservice.model.Course;
 import com.itskillsnow.courseservice.model.FavoriteCourse;
@@ -30,6 +32,12 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class FavoriteCourseServiceImplTest {
+
+    private static final String userNotFound = "User was not found!";
+
+    private static final String courseNotFound = "Course was not found!";
+
+    private static final String favoriteNotFound = "Favorite course was not found!";
 
     @Mock
     private CourseRepository courseRepository;
@@ -79,19 +87,19 @@ public class FavoriteCourseServiceImplTest {
         // Arrange
         Course course = getCourse(new User("WrongUsername"));
         AddCourseToFavoritesDto addCourseToFavoritesDto = new AddCourseToFavoritesDto(course.getCourseId(), "WrongUsername");
-        boolean expected = false;
 
         when(userRepository.findByUsername("WrongUsername")).thenReturn(Optional.empty());
-        when(courseRepository.findById(course.getCourseId())).thenReturn(Optional.of(course));
 
         // Act
-        boolean actual = favoriteCourseService.addCourseToFavorites(addCourseToFavoritesDto);
+        UserNotFoundException actual = Assertions.assertThrows(UserNotFoundException.class, () ->
+                favoriteCourseService.addCourseToFavorites(addCourseToFavoritesDto)
+        );
 
         // Assert
-        assertEquals(expected, actual);
+        assertEquals(userNotFound, actual.getMessage());
 
         verify(userRepository, times(1)).findByUsername("WrongUsername");
-        verify(courseRepository, times(1)).findById(course.getCourseId());
+        verify(courseRepository, times(0)).findById(course.getCourseId());
         verify(favoriteCourseRepository, times(0)).save(any(FavoriteCourse.class));
     }
 
@@ -102,16 +110,17 @@ public class FavoriteCourseServiceImplTest {
         User user = new User(username);
         Course course = getCourse(user);
         AddCourseToFavoritesDto addCourseToFavoritesDto = new AddCourseToFavoritesDto(course.getCourseId(), username);
-        boolean expected = false;
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
         when(courseRepository.findById(course.getCourseId())).thenReturn(Optional.empty());
 
         // Act
-        boolean actual = favoriteCourseService.addCourseToFavorites(addCourseToFavoritesDto);
+        CourseNotFoundException actual = Assertions.assertThrows(CourseNotFoundException.class, () ->
+                favoriteCourseService.addCourseToFavorites(addCourseToFavoritesDto)
+        );
 
         // Assert
-        assertEquals(expected, actual);
+        assertEquals(courseNotFound, actual.getMessage());
 
         verify(userRepository, times(1)).findByUsername(username);
         verify(courseRepository, times(1)).findById(course.getCourseId());
@@ -144,15 +153,16 @@ public class FavoriteCourseServiceImplTest {
     void givenDeleteCourseToFavorites_withWrongFavoriteCourseId_returnsTrue(){
         // Arrange
         UUID favoriteId = UUID.randomUUID();
-        boolean expected = false;
 
         when(favoriteCourseRepository.findById(favoriteId)).thenReturn(Optional.empty());
 
         // Act
-        boolean actual = favoriteCourseService.deleteCourseFromFavorites(favoriteId);
+        FavoriteCourseNotFound actual = Assertions.assertThrows(FavoriteCourseNotFound.class, () ->
+                favoriteCourseService.deleteCourseFromFavorites(favoriteId)
+        );
 
         // Assert
-        assertEquals(expected, actual);
+        assertEquals(favoriteNotFound, actual.getMessage());
 
         verify(favoriteCourseRepository, times(1)).findById(favoriteId);
         verify(favoriteCourseRepository, times(0)).delete(any(FavoriteCourse.class));

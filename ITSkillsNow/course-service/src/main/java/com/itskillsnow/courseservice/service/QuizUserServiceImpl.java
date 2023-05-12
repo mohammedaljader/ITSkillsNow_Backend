@@ -33,14 +33,20 @@ public class QuizUserServiceImpl implements QuizUserService {
 
     private final QuizUserRepository quizUserRepository;
 
+    private static final String quizNotFound = "Quiz was not found!";
+
+    private static final String userNotFound = "User was not found!";
+
+    private static final String optionNotFound = "Option was not found!";
+
 
     @Override
     public QuizResultView submitQuiz(UUID quizId, String username, List<UserAnswersDto> submitQuizzes) {
         Quiz quiz = quizRepository.findById(quizId)
-                .orElseThrow(() -> new QuizNotFoundException("Quiz was not found!"));
+                .orElseThrow(() -> new QuizNotFoundException(quizNotFound));
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User was not found!"));
+                .orElseThrow(() -> new UserNotFoundException(userNotFound));
 
         Integer quizResult = checkQuizResult(quiz, submitQuizzes);
         int questionsSize = quiz.getQuestions().size();
@@ -61,10 +67,10 @@ public class QuizUserServiceImpl implements QuizUserService {
     @Override
     public QuizResultView getQuizResultByUser(UUID quizId, String username) {
         Quiz quiz = quizRepository.findById(quizId)
-                .orElseThrow(() -> new QuizNotFoundException("Quiz was not found!"));
+                .orElseThrow(() -> new QuizNotFoundException(quizNotFound));
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User was not found!"));
+                .orElseThrow(() -> new UserNotFoundException(userNotFound));
 
         QuizUser quizUser = quizUserRepository.findByQuizAndUser(quiz, user);
         return mapResultsToDto(quizUser);
@@ -73,7 +79,7 @@ public class QuizUserServiceImpl implements QuizUserService {
     @Override
     public List<QuizResultView> getAllQuizzesResultByUser(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User was not found!"));
+                .orElseThrow(() -> new UserNotFoundException(userNotFound));
 
         List<QuizUser> quizzesResult = quizUserRepository.findAllByUser(user);
         return quizzesResult.stream()
@@ -92,7 +98,7 @@ public class QuizUserServiceImpl implements QuizUserService {
             if (selectedOptionId != null) {
                 Option selectedOption = question.getOptions().stream()
                         .filter(option -> option.getOptionId().equals(selectedOptionId))
-                        .findFirst().orElseThrow(() -> new OptionNotFoundException("Option not found"));
+                        .findFirst().orElseThrow(() -> new OptionNotFoundException(optionNotFound));
                 if (selectedOption.isOptionIsCorrect()) {
                     score++;
                 }

@@ -3,6 +3,8 @@ package com.itskillsnow.courseservice.service;
 import com.itskillsnow.courseservice.dto.request.favorites.AddCourseToFavoritesDto;
 import com.itskillsnow.courseservice.dto.response.CourseView;
 import com.itskillsnow.courseservice.dto.response.FavoriteCourseView;
+import com.itskillsnow.courseservice.exception.CourseNotFoundException;
+import com.itskillsnow.courseservice.exception.FavoriteCourseNotFound;
 import com.itskillsnow.courseservice.exception.UserNotFoundException;
 import com.itskillsnow.courseservice.model.Course;
 import com.itskillsnow.courseservice.model.FavoriteCourse;
@@ -33,35 +35,39 @@ public class FavoriteCourseServiceImpl implements FavoriteCourseService {
 
     private final CourseRepository courseRepository;
 
+    private static final String userNotFound = "User was not found!";
+
+    private static final String courseNotFound = "Course was not found!";
+
+    private static final String favoriteNotFound = "Favorite course was not found!";
+
     @Override
     public boolean addCourseToFavorites(AddCourseToFavoritesDto addCourseToFavoritesDto) {
-        Optional<User> user = userRepository.findByUsername(addCourseToFavoritesDto.getUsername());
-        Optional<Course> course = courseRepository.findById(addCourseToFavoritesDto.getCourseId());
-        if(user.isEmpty() || course.isEmpty()){
-            return false;
-        }
-        FavoriteCourse favoriteCourse = mapDtoToModel(user.get(), course.get());
+        User user = userRepository.findByUsername(addCourseToFavoritesDto.getUsername())
+                .orElseThrow(() -> new UserNotFoundException(userNotFound));
+
+        Course course = courseRepository.findById(addCourseToFavoritesDto.getCourseId())
+                .orElseThrow(() -> new CourseNotFoundException(courseNotFound));
+
+        FavoriteCourse favoriteCourse = mapDtoToModel(user, course);
         favoriteCourseRepository.save(favoriteCourse);
         return true;
     }
 
     @Override
     public boolean deleteCourseFromFavorites(UUID favoriteId) {
-        Optional<FavoriteCourse> favoriteCourse = favoriteCourseRepository.findById(favoriteId);
-        if(favoriteCourse.isEmpty()){
-            return false;
-        }
-        favoriteCourseRepository.delete(favoriteCourse.get());
+        FavoriteCourse favoriteCourse = favoriteCourseRepository.findById(favoriteId)
+                        .orElseThrow(() -> new FavoriteCourseNotFound(favoriteNotFound));
+        favoriteCourseRepository.delete(favoriteCourse);
         return true;
     }
 
     @Override
     public List<FavoriteCourseView> getAllFavorites(String username) {
-        Optional<User> user = userRepository.findByUsername(username);
-        if(user.isEmpty()){
-            throw new UserNotFoundException("User was not found!");
-        }
-        return favoriteCourseRepository.findAllByUser(user.get())
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(userNotFound));
+
+        return favoriteCourseRepository.findAllByUser(user)
                 .stream()
                 .map(this::mapModelToDto)
                 .collect(Collectors.toList());

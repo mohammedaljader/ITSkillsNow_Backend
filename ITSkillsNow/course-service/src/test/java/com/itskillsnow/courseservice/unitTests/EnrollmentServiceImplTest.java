@@ -2,6 +2,7 @@ package com.itskillsnow.courseservice.unitTests;
 
 import com.itskillsnow.courseservice.dto.request.enrollment.AddEnrollmentDto;
 import com.itskillsnow.courseservice.dto.response.EnrollmentView;
+import com.itskillsnow.courseservice.exception.CourseNotFoundException;
 import com.itskillsnow.courseservice.exception.UserNotFoundException;
 import com.itskillsnow.courseservice.model.Course;
 import com.itskillsnow.courseservice.model.Enrollment;
@@ -41,6 +42,10 @@ class EnrollmentServiceImplTest {
 
     private static final String username = "User";
 
+    private static final String userNotFound = "User was not found!";
+
+    private static final String courseNotFound = "Course was not found!";
+
     @BeforeEach
     void setUp() {
         enrollmentService = new EnrollmentServiceImpl(enrollmentRepository, userRepository, courseRepository);
@@ -76,19 +81,19 @@ class EnrollmentServiceImplTest {
         Course course = getCourse(new User("WrongUsername"));
         AddEnrollmentDto addEnrollmentDto = new AddEnrollmentDto(course.getCourseId(),
                 "WrongUsername");
-        boolean expected = false;
 
         when(userRepository.findByUsername("WrongUsername")).thenReturn(Optional.empty());
-        when(courseRepository.findById(course.getCourseId())).thenReturn(Optional.of(course));
 
         // Act
-        boolean actual = enrollmentService.enrollToCourse(addEnrollmentDto);
+        UserNotFoundException actual = Assertions.assertThrows(UserNotFoundException.class, () ->
+                enrollmentService.enrollToCourse(addEnrollmentDto)
+        );
 
         // Assert
-        assertEquals(expected, actual);
+        assertEquals(userNotFound, actual.getMessage());
 
         verify(userRepository, times(1)).findByUsername("WrongUsername");
-        verify(courseRepository, times(1)).findById(course.getCourseId());
+        verify(courseRepository, times(0)).findById(course.getCourseId());
         verify(enrollmentRepository, times(0)).save(any(Enrollment.class));
     }
 
@@ -99,16 +104,17 @@ class EnrollmentServiceImplTest {
         User user = new User(username);
         Course course = getCourse(user);
         AddEnrollmentDto addEnrollmentDto = new AddEnrollmentDto(course.getCourseId(), username);
-        boolean expected = false;
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
         when(courseRepository.findById(course.getCourseId())).thenReturn(Optional.empty());
 
         // Act
-        boolean actual = enrollmentService.enrollToCourse(addEnrollmentDto);
+        CourseNotFoundException actual = Assertions.assertThrows(CourseNotFoundException.class, () ->
+                enrollmentService.enrollToCourse(addEnrollmentDto)
+        );
 
         // Assert
-        assertEquals(expected, actual);
+        assertEquals(courseNotFound, actual.getMessage());
 
         verify(userRepository, times(1)).findByUsername(username);
         verify(courseRepository, times(1)).findById(course.getCourseId());
