@@ -48,7 +48,9 @@ public class FavoriteJobServiceImpl implements FavoriteJobService {
 
     @Override
     public Boolean deleteJobFromFavorites(UUID favoriteId) {
-        favoriteJobRepository.deleteById(favoriteId);
+        FavoriteJob favoriteJob = favoriteJobRepository.findById(favoriteId)
+                .orElseThrow(() -> new FavoriteJobNotFoundException("Favorite job was not found"));
+        favoriteJobRepository.delete(favoriteJob);
         return true;
     }
 
