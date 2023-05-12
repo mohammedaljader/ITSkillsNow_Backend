@@ -111,7 +111,12 @@ public class JobServiceImpl implements JobService {
         if(job.isEmpty()){
             return false;
         }
+
+        //delete the image from blob storage
+        String blobFileName = FileNamingUtils.getBlobFilename(job.get().getJobImage());
+        blobService.deleteFile(blobFileName);
         jobRepository.delete(job.get());
+
         return true;
     }
 
