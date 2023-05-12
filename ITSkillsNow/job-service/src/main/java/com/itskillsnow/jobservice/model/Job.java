@@ -18,9 +18,12 @@ public class Job {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID jobId;
+
     private String jobName;
 
     private String jobDescription;
+
+    private String jobImage;
 
     private String jobAddress;
 
@@ -29,7 +32,6 @@ public class Job {
     private String jobEducationLevel;
 
     private String jobType;
-
 
     private Integer jobHours;
 

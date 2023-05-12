@@ -1,4 +1,4 @@
-package com.itskillsnow.jobservice.dto.response;
+package com.itskillsnow.jobservice.dto.request.job;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class JobView {
+public class UpdateJobDto {
     private UUID jobId;
 
     private String jobName;

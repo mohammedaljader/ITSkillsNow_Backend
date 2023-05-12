@@ -1,6 +1,7 @@
-package com.itskillsnow.jobservice.dto.request;
+package com.itskillsnow.jobservice.dto.request.job;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class AddJobDto {
     private String jobName;
 

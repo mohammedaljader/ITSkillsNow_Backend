@@ -1,4 +1,4 @@
-package com.itskillsnow.jobservice.dto.request;
+package com.itskillsnow.jobservice.dto.request.blob;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

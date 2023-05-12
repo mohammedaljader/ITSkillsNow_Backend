@@ -1,10 +1,11 @@
 package com.itskillsnow.jobservice.integrationTests;
 
-import com.itskillsnow.jobservice.dto.request.AddJobDto;
-import com.itskillsnow.jobservice.dto.request.UpdateJobDto;
+import com.itskillsnow.jobservice.dto.request.job.AddJobDto;
+import com.itskillsnow.jobservice.dto.request.job.UpdateJobDto;
 import com.itskillsnow.jobservice.dto.response.JobView;
 import com.itskillsnow.jobservice.model.User;
 import com.itskillsnow.jobservice.repository.UserRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -57,7 +59,7 @@ class JobControllerIT {
         AddJobDto jobDto = getAddJobDto();
 
         // Send a POST request to add the job
-        Boolean result = restTemplate.postForObject(baseUrl, jobDto, Boolean.class);
+        Boolean result = restTemplate.postForObject(baseUrl.concat("/withoutImage"), jobDto, Boolean.class);
 
         // Send a GET request to retrieve all jobs
         ResponseEntity<List<JobView>> response = restTemplate.exchange(baseUrl, HttpMethod.GET,
@@ -80,7 +82,7 @@ class JobControllerIT {
         jobDto.setUsername("");
 
         // Send a POST request to add the job
-        Boolean result = restTemplate.postForObject(baseUrl, jobDto, Boolean.class);
+        Boolean result = restTemplate.postForObject(baseUrl.concat("/withoutImage"), jobDto, Boolean.class);
 
         // Send a GET request to retrieve all jobs
         ResponseEntity<List<JobView>> response = restTemplate.exchange(baseUrl, HttpMethod.GET,
@@ -95,7 +97,7 @@ class JobControllerIT {
     void given_updateJob_withCorrectData_returnsTrue(){
         // Create a new job
         AddJobDto jobDto = getAddJobDto();
-        restTemplate.postForObject(baseUrl, jobDto, Boolean.class);
+        restTemplate.postForObject(baseUrl.concat("/withoutImage"), jobDto, Boolean.class);
         // Send a GET request to retrieve all jobs
         ResponseEntity<List<JobView>> jobs = restTemplate.exchange(baseUrl, HttpMethod.GET,
                 null, new ParameterizedTypeReference<>() {});
@@ -107,7 +109,7 @@ class JobControllerIT {
 
 
         //Send a PUT request to update job
-        ResponseEntity<Boolean> response = restTemplate.exchange(baseUrl,
+        ResponseEntity<Boolean> response = restTemplate.exchange(baseUrl.concat("/withoutImage"),
                 HttpMethod.PUT,
                 new HttpEntity<>(updateJobDto),
                 Boolean.class);
@@ -123,7 +125,7 @@ class JobControllerIT {
         UpdateJobDto updateJobDto = getUpdateJobDto(UUID.randomUUID());
 
         //Send a PUT request to update job
-        ResponseEntity<Boolean> response = restTemplate.exchange(baseUrl,
+        ResponseEntity<Boolean> response = restTemplate.exchange(baseUrl.concat("/withoutImage"),
                 HttpMethod.PUT,
                 new HttpEntity<>(updateJobDto),
                 Boolean.class);
@@ -137,7 +139,7 @@ class JobControllerIT {
     void given_getAllJobsByUser_withCorrectUsername_returnsAllJobsOfUser(){
         // Create a new job
         AddJobDto jobDto = getAddJobDto();
-        restTemplate.postForObject(baseUrl, jobDto, Boolean.class);
+        restTemplate.postForObject(baseUrl.concat("/withoutImage"), jobDto, Boolean.class);
 
         // Send a GET request to retrieve all jobs by user
         ResponseEntity<List<JobView>> response = restTemplate.exchange(baseUrl.concat("/user/").concat(jobDto.getUsername()),
@@ -156,21 +158,22 @@ class JobControllerIT {
     @Test
     void given_getAllJobsByUser_withWrongUsername_returnsNoData(){
         // Send a GET request to retrieve all jobs by user
-        ResponseEntity<List<JobView>> response = restTemplate.exchange(baseUrl.concat("/user/").concat("Test"),
-                HttpMethod.GET,
-                null, new ParameterizedTypeReference<>() {});
+        HttpClientErrorException.BadRequest response = Assertions.assertThrows(
+                HttpClientErrorException.BadRequest.class, () ->
+                        restTemplate.exchange(baseUrl.concat("/user/").concat("Test"),
+                                HttpMethod.GET,
+                                null, new ParameterizedTypeReference<>() {})
+        );
 
         // Verify the response
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        List<JobView> jobViews = response.getBody();
-        assertNull(jobViews);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
     @Test
     void given_deleteJob_withCorrectJobId_returnsTrue(){
         // Create a new job
         AddJobDto jobDto = getAddJobDto();
-        restTemplate.postForObject(baseUrl, jobDto, Boolean.class);
+        restTemplate.postForObject(baseUrl.concat("/withoutImage"), jobDto, Boolean.class);
         // Send a GET request to retrieve all jobs
         ResponseEntity<List<JobView>> jobs = restTemplate.exchange(baseUrl, HttpMethod.GET,
                 null, new ParameterizedTypeReference<>() {});
@@ -209,7 +212,7 @@ class JobControllerIT {
     void given_getJobById_withCorrectId_returnsJob(){
         // Create a new job
         AddJobDto jobDto = getAddJobDto();
-        restTemplate.postForObject(baseUrl, jobDto, Boolean.class);
+        restTemplate.postForObject(baseUrl.concat("/withoutImage"), jobDto, Boolean.class);
         // Send a GET request to retrieve all jobs
         ResponseEntity<List<JobView>> jobs = restTemplate.exchange(baseUrl, HttpMethod.GET,
                 null, new ParameterizedTypeReference<>() {});
@@ -251,7 +254,7 @@ class JobControllerIT {
     }
 
     private UpdateJobDto getUpdateJobDto(UUID jobId){
-        return new UpdateJobDto(jobId,"Test", "Test", "Test", "Test",
+        return new UpdateJobDto(jobId,"Test", "Test", "Test", "Test", "Test",
                 "Test", "Test", 9, "User");
     }
 }

@@ -1,14 +1,17 @@
 package com.itskillsnow.jobservice.unitTests;
 
-import com.itskillsnow.jobservice.dto.request.AddJobDto;
-import com.itskillsnow.jobservice.dto.request.UpdateJobDto;
+import com.itskillsnow.jobservice.dto.request.job.AddJobDto;
+import com.itskillsnow.jobservice.dto.request.job.UpdateJobDto;
 import com.itskillsnow.jobservice.dto.response.JobView;
+import com.itskillsnow.jobservice.exception.UserNotFoundException;
 import com.itskillsnow.jobservice.model.Job;
 import com.itskillsnow.jobservice.model.User;
 import com.itskillsnow.jobservice.repository.JobRepository;
 import com.itskillsnow.jobservice.repository.UserRepository;
 import com.itskillsnow.jobservice.service.JobServiceImpl;
+import com.itskillsnow.jobservice.service.interfaces.BlobService;
 import com.itskillsnow.jobservice.service.interfaces.JobService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,12 +38,16 @@ class JobServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private BlobService blobService;
+
     private JobService jobService;
+
 
 
     @BeforeEach
     void setUp() {
-        jobService = new JobServiceImpl(jobRepository, userRepository);
+        jobService = new JobServiceImpl(jobRepository, userRepository, blobService);
     }
 
     @Test
@@ -240,14 +247,17 @@ class JobServiceImplTest {
     public void given_getAllJobsByUser_withWrongData_returnsNull() {
         // Prepare test data
         String username = "Username";
+        String expected = "User was not found!";
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
         // Call the getAllJobsByUser function
-        List<JobView> result = jobService.getAllJobsByUserId(username);
+        UserNotFoundException actual = Assertions.assertThrows(UserNotFoundException.class, () ->
+                jobService.getAllJobsByUserId(username)
+        );
 
         // Verify the result
-        assertNull(result);
+        assertEquals(expected, actual.getMessage());
 
         // Verify that the user was not retrieved from the database
         verify(userRepository, times(1)).findByUsername(username);

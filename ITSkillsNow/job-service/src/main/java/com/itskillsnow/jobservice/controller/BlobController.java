@@ -1,6 +1,6 @@
 package com.itskillsnow.jobservice.controller;
 
-import com.itskillsnow.jobservice.dto.request.AddFileDto;
+import com.itskillsnow.jobservice.dto.request.blob.AddFileDto;
 import com.itskillsnow.jobservice.service.interfaces.BlobService;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +20,6 @@ public class BlobController {
     private final BlobService service;
 
 
-    @GetMapping("/")
-    public List<String> blobItems() {
-        return service.getAllFiles();
-    }
 
     @GetMapping("/download/{filename}")
     public String download(@PathVariable String filename) {
@@ -31,8 +27,8 @@ public class BlobController {
     }
 
     @DeleteMapping("/{filename}")
-    public Boolean delete(@PathVariable String filename) {
-        return service.deleteFile(filename);
+    public void delete(@PathVariable String filename) {
+        service.deleteFile(filename);
     }
 
     @PostMapping("/upload")
@@ -40,12 +36,7 @@ public class BlobController {
         log.info("Filename :" + addFileDto.getFile().getOriginalFilename());
         log.info("Size:" +  addFileDto.getFile().getSize());
         log.info("ContentType:" +  addFileDto.getFile().getContentType());
-        Boolean storeFile = service.storeFile(addFileDto.getFile().getOriginalFilename(),
+        return service.storeFile(addFileDto.getFile().getOriginalFilename(),
                 addFileDto.getFile().getInputStream(), addFileDto.getFile().getSize());
-        if(storeFile){
-            return addFileDto.getFile().getOriginalFilename() + " Has been saved as a blob-item!!!";
-        }else{
-            return "The file " + addFileDto.getFile().getOriginalFilename() + " already exists in Azure Blob Storage";
-        }
     }
 }

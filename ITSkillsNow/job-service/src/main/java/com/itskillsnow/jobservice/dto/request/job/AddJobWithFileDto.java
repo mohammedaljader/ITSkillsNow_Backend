@@ -1,24 +1,21 @@
-package com.itskillsnow.jobservice.dto.response;
+package com.itskillsnow.jobservice.dto.request.job;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class JobView {
-    private UUID jobId;
-
+@Builder
+public class AddJobWithFileDto {
     private String jobName;
 
     private String jobDescription;
 
-    private String jobImage;
+    private MultipartFile jobImage;
 
     private String jobAddress;
 
