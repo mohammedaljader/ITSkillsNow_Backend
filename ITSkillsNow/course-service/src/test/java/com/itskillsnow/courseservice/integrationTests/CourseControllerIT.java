@@ -1,7 +1,6 @@
 package com.itskillsnow.courseservice.integrationTests;
 
 import com.itskillsnow.courseservice.dto.request.course.AddCourseDto;
-import com.itskillsnow.courseservice.dto.request.course.AddCourseWithFileDto;
 import com.itskillsnow.courseservice.dto.request.course.UpdateCourseDto;
 import com.itskillsnow.courseservice.dto.response.CourseView;
 import com.itskillsnow.courseservice.model.User;
@@ -18,12 +17,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Objects;
@@ -281,24 +277,8 @@ class CourseControllerIT {
                 "Test", "Test", false, username);
     }
 
-    private AddCourseWithFileDto getAddCourseDtoWithImage() throws IOException {
-        MockMultipartFile mockMultipartFile = getFile();
-        return new AddCourseWithFileDto("Test", "Test", mockMultipartFile, 13.99,
-                "Test", "Test", false, username);
-    }
-
     private UpdateCourseDto getUpdateCourseDto(UUID courseId){
         return new UpdateCourseDto(courseId,"Test", "Test", "Test", 13.99,
                 "Test", "Test", false, username);
-    }
-
-    private MockMultipartFile getFile() throws IOException {
-        String name = "courseImage";
-        String originalFilename = "courseImage";
-        String contentType = "image/jpeg";
-        byte[] content = new byte[]{1, 2, 3};
-        InputStream inputStream = new ByteArrayInputStream(content);
-
-        return new MockMultipartFile(name, originalFilename, contentType, inputStream);
     }
 }

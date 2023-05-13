@@ -22,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -37,13 +36,19 @@ public class QuestionServiceImpl implements QuestionService {
 
     private final QuizRepository quizRepository;
 
+    private static final String quizNotFound = "Quiz was not found!";
+
+    private static final String questionNotFound = "Question was not found!";
+
+    private static final String optionNotFound = "Option was not found!";
+
+
     @Override
     public boolean addQuestion(AddQuestionDto addQuestionDto, List<AddOptionDto> optionDtoList) {
-        Optional<Quiz> quiz = quizRepository.findById(addQuestionDto.getQuizId());
-        if(quiz.isEmpty()){
-            return false;
-        }
-        Question question = mapUpdatedQuestionDtoToModel(addQuestionDto, quiz.get());
+        Quiz quiz = quizRepository.findById(addQuestionDto.getQuizId())
+                .orElseThrow(() -> new QuizNotFoundException(quizNotFound));
+
+        Question question = mapUpdatedQuestionDtoToModel(addQuestionDto, quiz);
         Question savedQuestion = questionRepository.save(question);
 
         List<Option> options = optionDtoList.stream()
@@ -55,75 +60,68 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public QuestionWithoutOptionView addQuestion(AddQuestionDto addQuestionDto) {
-        Optional<Quiz> quiz = quizRepository.findById(addQuestionDto.getQuizId());
-        if(quiz.isEmpty()){
-            throw new QuizNotFoundException("Quiz was not found!");
-        }
-        Question question = mapUpdatedQuestionDtoToModel(addQuestionDto, quiz.get());
+        Quiz quiz = quizRepository.findById(addQuestionDto.getQuizId())
+                .orElseThrow(() -> new QuizNotFoundException(quizNotFound));
+
+        Question question = mapUpdatedQuestionDtoToModel(addQuestionDto, quiz);
         Question savedQuestion = questionRepository.save(question);
         return mapQuestionModelWithoutOptionToDto(savedQuestion);
     }
 
     @Override
     public QuestionWithoutOptionView updateQuestion(UpdateQuestionDto updateQuestionDto) {
-        Optional<Question> question = questionRepository.findById(updateQuestionDto.getQuestionId());
-        if(question.isEmpty()){
-            throw new QuestionNotFoundException("Question was not found!");
-        }
-        Question updatedQuestion = mapUpdatedQuestionDtoToModel(updateQuestionDto, question.get().getQuiz());
+        Question question = questionRepository.findById(updateQuestionDto.getQuestionId())
+                .orElseThrow(() -> new QuestionNotFoundException(questionNotFound));
+
+        Question updatedQuestion = mapUpdatedQuestionDtoToModel(question, updateQuestionDto);
         Question savedQuestion = questionRepository.save(updatedQuestion);
         return mapQuestionModelWithoutOptionToDto(savedQuestion);
     }
 
     @Override
     public boolean deleteQuestion(UUID questionId) {
-        Optional<Question> question = questionRepository.findById(questionId);
-        if(question.isEmpty()){
-            return false;
-        }
-        questionRepository.delete(question.get());
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new QuestionNotFoundException(questionNotFound));
+
+        questionRepository.delete(question);
         return true;
     }
 
     @Override
     public OptionView addOption(AddOptionDto addOptionDto) {
-        Optional<Question> question = questionRepository.findById(addOptionDto.getQuestionId());
-        if(question.isEmpty()){
-            throw new QuestionNotFoundException("Question was not found!");
-        }
-        Option option = mapOptionDtoToModel(addOptionDto, question.get());
+        Question question = questionRepository.findById(addOptionDto.getQuestionId())
+                .orElseThrow(() -> new QuestionNotFoundException(questionNotFound));
+
+        Option option = mapOptionDtoToModel(addOptionDto, question);
         Option savedOption = optionRepository.save(option);
         return mapOptionModelToDto(savedOption);
     }
 
     @Override
     public OptionView updateOption(UpdateOptionDto updateOptionDto) {
-        Optional<Option> option = optionRepository.findById(updateOptionDto.getOptionId());
-        if(option.isEmpty()){
-            throw new OptionNotFoundException("Option was not found!");
-        }
-        Option updatedOption = mapUpdatedOptionDtoToModel(updateOptionDto, option.get().getQuestion());
+        Option option = optionRepository.findById(updateOptionDto.getOptionId())
+                .orElseThrow(() -> new OptionNotFoundException(optionNotFound));
+
+        Option updatedOption = mapUpdatedOptionDtoToModel(option, updateOptionDto);
         Option savedOption = optionRepository.save(updatedOption);
         return mapOptionModelToDto(savedOption);
     }
 
     @Override
     public boolean deleteOption(UUID optionId) {
-        Optional<Option> option = optionRepository.findById(optionId);
-        if(option.isEmpty()){
-            return false;
-        }
-        optionRepository.delete(option.get());
+        Option option = optionRepository.findById(optionId)
+                .orElseThrow(() -> new OptionNotFoundException(optionNotFound));
+
+        optionRepository.delete(option);
         return true;
     }
 
     @Override
     public List<QuestionView> getAllQuestionByQuiz(UUID quizId) {
-        Optional<Quiz> quiz = quizRepository.findById(quizId);
-        if(quiz.isEmpty()){
-            throw new QuizNotFoundException("Quiz was not found!");
-        }
-        return questionRepository.findByQuiz(quiz.get())
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new QuizNotFoundException(quizNotFound));
+
+        return questionRepository.findByQuiz(quiz)
                 .stream()
                 .map(this::mapQuestionModelToDto)
                 .toList();
@@ -131,11 +129,10 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public List<OptionView> getAllOptionsByQuestion(UUID questionId) {
-        Optional<Question> question = questionRepository.findById(questionId);
-        if(question.isEmpty()){
-            throw new QuestionNotFoundException("Question was not found!");
-        }
-        return optionRepository.findByQuestion(question.get())
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new QuestionNotFoundException(questionNotFound));
+
+        return optionRepository.findByQuestion(question)
                 .stream()
                 .map(this::mapOptionModelToDto)
                 .toList();
@@ -156,17 +153,15 @@ public class QuestionServiceImpl implements QuestionService {
                 .build();
     }
 
-    private Question mapUpdatedQuestionDtoToModel(UpdateQuestionDto updateQuestionDto, Quiz quiz){
-        return new Question(updateQuestionDto.getQuestionId(), updateQuestionDto.getQuestionName(), quiz);
+    private Question mapUpdatedQuestionDtoToModel(Question question, UpdateQuestionDto updateQuestionDto){
+        question.setQuestionName(updateQuestionDto.getQuestionName());
+        return question;
     }
 
-    private Option mapUpdatedOptionDtoToModel(UpdateOptionDto updateOptionDto, Question question){
-        return Option.builder()
-                .optionId(updateOptionDto.getOptionId())
-                .optionName(updateOptionDto.getOptionName())
-                .optionIsCorrect(updateOptionDto.isOptionIsCorrect())
-                .question(question)
-                .build();
+    private Option mapUpdatedOptionDtoToModel(Option option, UpdateOptionDto updateOptionDto){
+        option.setOptionName(updateOptionDto.getOptionName());
+        option.setOptionIsCorrect(updateOptionDto.isOptionIsCorrect());
+        return option;
     }
 
     private QuestionView mapQuestionModelToDto(Question question){

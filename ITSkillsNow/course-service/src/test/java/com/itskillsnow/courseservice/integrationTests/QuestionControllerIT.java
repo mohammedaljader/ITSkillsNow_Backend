@@ -152,12 +152,15 @@ public class QuestionControllerIT {
                 addOption3, addOption4));
 
         // Send a POST request
-        ResponseEntity<Boolean> result = restTemplate.exchange(baseUrl, HttpMethod.POST,
-                new HttpEntity<>(request), new ParameterizedTypeReference<>() {});
+        HttpClientErrorException.BadRequest response = Assertions.assertThrows(
+                HttpClientErrorException.BadRequest.class, () ->
+                        restTemplate.exchange(baseUrl, HttpMethod.POST,
+                                new HttpEntity<>(request), new ParameterizedTypeReference<>() {})
+        );
 
 
         // Verify
-        assertEquals(Boolean.FALSE, result.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
     @Test
@@ -257,13 +260,16 @@ public class QuestionControllerIT {
     @Test
     void given_deleteQuestion_withWrongQuestionId_returnsFalse() {
         // Send a DELETE request
-        ResponseEntity<Boolean> response = restTemplate.exchange(baseUrl.concat("/")
-                        .concat(UUID.randomUUID().toString())
-                , HttpMethod.DELETE, null, new ParameterizedTypeReference<>() {});
+        HttpClientErrorException.BadRequest response = Assertions.assertThrows(
+                HttpClientErrorException.BadRequest.class, () ->
+                        restTemplate.exchange(baseUrl.concat("/")
+                                        .concat(UUID.randomUUID().toString())
+                                , HttpMethod.DELETE, null, new ParameterizedTypeReference<>() {})
+        );
 
 
         // Verify
-        assertEquals(Boolean.FALSE, response.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
 
@@ -372,14 +378,17 @@ public class QuestionControllerIT {
         UUID optionId = UUID.randomUUID();
 
         // Send a DELETE request
-        ResponseEntity<Boolean> response = restTemplate.exchange(baseUrl.concat("/option/")
-                        .concat(optionId.toString())
-                , HttpMethod.DELETE,
-                null, new ParameterizedTypeReference<>() {});
+        HttpClientErrorException.BadRequest response = Assertions.assertThrows(
+                HttpClientErrorException.BadRequest.class, () ->
+                        restTemplate.exchange(baseUrl.concat("/option/")
+                                        .concat(optionId.toString())
+                                , HttpMethod.DELETE,
+                                null, new ParameterizedTypeReference<>() {})
+        );
 
 
         // Verify
-        assertEquals(Boolean.FALSE, response.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
 

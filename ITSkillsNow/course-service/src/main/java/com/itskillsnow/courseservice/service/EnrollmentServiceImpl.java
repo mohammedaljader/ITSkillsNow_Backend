@@ -3,6 +3,7 @@ package com.itskillsnow.courseservice.service;
 import com.itskillsnow.courseservice.dto.request.enrollment.AddEnrollmentDto;
 import com.itskillsnow.courseservice.dto.response.CourseView;
 import com.itskillsnow.courseservice.dto.response.EnrollmentView;
+import com.itskillsnow.courseservice.exception.CourseNotFoundException;
 import com.itskillsnow.courseservice.exception.UserNotFoundException;
 import com.itskillsnow.courseservice.model.Course;
 import com.itskillsnow.courseservice.model.Enrollment;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,25 +32,29 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
     private final CourseRepository courseRepository;
 
+    private static final String userNotFound = "User was not found!";
+
+    private static final String courseNotFound = "Course was not found!";
+
     @Override
     public boolean enrollToCourse(AddEnrollmentDto addEnrollmentDto) {
-        Optional<User> user = userRepository.findByUsername(addEnrollmentDto.getUsername());
-        Optional<Course> course = courseRepository.findById(addEnrollmentDto.getCourseId());
-        if(user.isEmpty() || course.isEmpty()){
-            return false;
-        }
-        Enrollment enrollment = mapDtoToModel(user.get(), course.get());
+        User user = userRepository.findByUsername(addEnrollmentDto.getUsername())
+                .orElseThrow(() -> new UserNotFoundException(userNotFound));
+
+        Course course = courseRepository.findById(addEnrollmentDto.getCourseId())
+                .orElseThrow(() -> new CourseNotFoundException(courseNotFound));
+
+        Enrollment enrollment = mapDtoToModel(user, course);
         enrollmentRepository.save(enrollment);
         return true;
     }
 
     @Override
     public List<EnrollmentView> getAllEnrollments(String username) {
-        Optional<User> user = userRepository.findByUsername(username);
-        if(user.isEmpty()){
-            throw new UserNotFoundException("User was not found!");
-        }
-        return enrollmentRepository.findAllByUser(user.get())
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(userNotFound));
+
+        return enrollmentRepository.findAllByUser(user)
                 .stream()
                 .map(this::mapModelToDto)
                 .collect(Collectors.toList());

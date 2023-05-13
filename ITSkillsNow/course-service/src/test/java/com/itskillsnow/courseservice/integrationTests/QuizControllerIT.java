@@ -190,12 +190,15 @@ public class QuizControllerIT {
 
     @Test
     void given_deleteQuiz_withWrongQuizId_returnsFalse() {
-        // Send a PUT request
-        ResponseEntity<Boolean> result = restTemplate.exchange(baseUrl.concat("/").concat(UUID.randomUUID().toString()),
-                HttpMethod.DELETE, null, new ParameterizedTypeReference<>() {});
+        // Send a DELETE request
+        HttpClientErrorException.BadRequest response = Assertions.assertThrows(
+                HttpClientErrorException.BadRequest.class, () ->
+                        restTemplate.exchange(baseUrl.concat("/").concat(UUID.randomUUID().toString()),
+                                HttpMethod.DELETE, null, new ParameterizedTypeReference<>() {})
+        );
 
         // Verify
-        assertEquals(Boolean.FALSE, result.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
     @Test
