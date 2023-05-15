@@ -58,6 +58,8 @@ public class AuthorizationFilter implements WebFilter {
         boolean valid;
         if (roles.contains("ADMIN")) {
             valid = validator.isAdmin.test(exchange.getRequest());
+        } else if (roles.contains("COMPANY")) {
+            valid = validator.isCompany.test(exchange.getRequest());
         } else if (roles.contains("USER")) {
             valid = validator.isUser.test(exchange.getRequest());
         } else {

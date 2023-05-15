@@ -31,7 +31,8 @@ public class RouteValidator {
 
     // URL: /api/ServiceName/user/**
     public static final List<String> userEndpoints = List.of(
-            "/api/job/messages",
+            "/api/job",
+            "/api/course",
             "/auth/deleteMe"
     );
 
