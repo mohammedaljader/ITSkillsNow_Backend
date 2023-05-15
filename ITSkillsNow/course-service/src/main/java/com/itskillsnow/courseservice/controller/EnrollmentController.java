@@ -1,6 +1,5 @@
 package com.itskillsnow.courseservice.controller;
 
-import com.itskillsnow.courseservice.dto.request.course.AddCourseDto;
 import com.itskillsnow.courseservice.dto.request.enrollment.AddEnrollmentDto;
 import com.itskillsnow.courseservice.dto.response.EnrollmentView;
 import com.itskillsnow.courseservice.service.interfaces.EnrollmentService;

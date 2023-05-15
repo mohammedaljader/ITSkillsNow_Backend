@@ -4,6 +4,7 @@ package com.itskillsnow.authservice.controller;
 import com.itskillsnow.authservice.dto.AddUserDto;
 import com.itskillsnow.authservice.dto.AuthRequest;
 import com.itskillsnow.authservice.dto.AuthResponse;
+import com.itskillsnow.authservice.dto.request.AddRoleDto;
 import com.itskillsnow.authservice.dto.request.DeleteUserDto;
 import com.itskillsnow.authservice.model.User;
 import com.itskillsnow.authservice.service.ServiceInterfaces.AuthService;
@@ -53,5 +54,11 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     public boolean deleteMe(@RequestBody DeleteUserDto userDto){
         return authService.deleteMe(userDto.getUsername(), userDto.getPassword());
+    }
+
+    @PostMapping("/addRole")
+    @ResponseStatus(HttpStatus.OK)
+    public boolean addRole(@RequestBody AddRoleDto addRoleDto){
+        return authService.addRole(addRoleDto.getRole(), addRoleDto.getUsername());
     }
 }

@@ -9,7 +9,6 @@ import java.util.function.Predicate;
 @Component
 public class RouteValidator {
 
-    // URL: /api/ServiceName/open/**
     public static final List<String> openApiEndpoints = List.of(
             "/auth/register",
             "/auth/login",
@@ -17,19 +16,18 @@ public class RouteValidator {
             "/eureka"
     );
 
-    // URL: /api/ServiceName/admin/**
     public static final List<String> adminEndpoints = List.of(
             "/api/course",
-            "/api/job"
+            "/api/job",
+            "/auth/addRole"
     );
 
-    // URL: /api/ServiceName/company/**
     public static final List<String> companyEndpoints = List.of(
             "/api/course",
             "/api/job"
     );
 
-    // URL: /api/ServiceName/user/**
+
     public static final List<String> userEndpoints = List.of(
             "/api/job",
             "/api/course",

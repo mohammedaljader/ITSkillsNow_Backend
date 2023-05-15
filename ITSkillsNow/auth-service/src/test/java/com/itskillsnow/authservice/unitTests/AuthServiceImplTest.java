@@ -3,6 +3,8 @@ package com.itskillsnow.authservice.unitTests;
 import com.itskillsnow.authservice.dto.AuthResponse;
 import com.itskillsnow.authservice.event.AuthEvent;
 import com.itskillsnow.authservice.event.UserPayload;
+import com.itskillsnow.authservice.exception.UserNotFoundException;
+import com.itskillsnow.authservice.model.Role;
 import com.itskillsnow.authservice.model.User;
 import com.itskillsnow.authservice.rabbitmq.RabbitMQSender;
 import com.itskillsnow.authservice.repository.UserRepository;
@@ -19,6 +21,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -104,6 +107,54 @@ class AuthServiceImplTest {
                 .sendMessage("auth.exchange", "auth.create", expectedEvent);
     }
 
+    @Test
+    void given_addRole_withCorrectData_shouldReturnsTrue() {
+        User user = new User();
+        user.setEmail("test@test.com");
+        user.setUsername("testUser");
+        user.setPassword("testPass");
+        user.setFullName("Test User");
+        user.setRoles(List.of(Role.USER));
+
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
+
+        Boolean result = authService.addRole("ADMIN", user.getUsername());
+
+        assertEquals(Boolean.TRUE, result);
+        verify(userRepository, times(1)).findByUsername(user.getUsername());
+    }
+
+    @Test
+    void given_addRole_RoleAlreadyExists_shouldReturnsFalse() {
+        User user = new User();
+        user.setEmail("test@test.com");
+        user.setUsername("testUser");
+        user.setPassword("testPass");
+        user.setFullName("Test User");
+        user.setRoles(List.of(Role.USER));
+
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
+
+        Boolean result = authService.addRole("USER", user.getUsername());
+
+        assertEquals(Boolean.FALSE, result);
+        verify(userRepository, times(1)).findByUsername(user.getUsername());
+    }
+
+
+    @Test
+    void given_addRole_UserNotFound_shouldReturnsException() {
+        String username = "Wrong_Username";
+        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+
+        UserNotFoundException actual = Assertions.assertThrows(UserNotFoundException.class, () ->
+                authService.addRole("USER", username)
+        );
+
+        assertEquals("User was not found!", actual.getMessage());
+    }
+
 
     @Test
     void given_generateToken_withExistingUser_shouldReturnAuthResponse() {
@@ -164,11 +215,12 @@ class AuthServiceImplTest {
 
         User user = new User(UUID.randomUUID().toString(),username, "some_password", "USER");
         user.setFullName(fullName);
+        user.setRoles(List.of(Role.USER));
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
         String accessToken = "some_access_token";
         String newRefreshToken = "new_some_refresh_token";
-        AuthResponse expectedResponse = new AuthResponse(accessToken, newRefreshToken, username, fullName);
+        AuthResponse expectedResponse = new AuthResponse(accessToken, newRefreshToken, username, fullName, user.getRoles());
         when(jwtService.generateTokens(user, username)).thenReturn(
                 Map.of("accessToken", accessToken, "refreshToken", newRefreshToken)
         );

@@ -2,6 +2,7 @@ package com.itskillsnow.authservice.service;
 
 
 import com.itskillsnow.authservice.dto.AuthResponse;
+import com.itskillsnow.authservice.exception.UserNotFoundException;
 import com.itskillsnow.authservice.model.Role;
 import com.itskillsnow.authservice.model.User;
 import com.itskillsnow.authservice.event.AuthEvent;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -66,7 +68,9 @@ public class AuthServiceImpl implements AuthService {
             return null;
         }
         Map<String, String> tokens = jwtService.generateTokens(user.get(), username);
-        return new AuthResponse(tokens.get("accessToken"), tokens.get("refreshToken"), username, user.get().getFullName());
+        return new AuthResponse(tokens.get("accessToken"),
+                tokens.get("refreshToken"), username,
+                user.get().getFullName(), user.get().getRoles());
     }
 
     @Override
@@ -99,6 +103,22 @@ public class AuthServiceImpl implements AuthService {
         }else {
             return false;
         }
+    }
+
+    @Override
+    public boolean addRole(String role, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User was not found!"));
+
+        List<Role> roles = new ArrayList<>(user.getRoles());
+
+        if (roles.contains(Role.valueOf(role))) {
+            return false;
+        }
+
+        roles.add(Role.valueOf(role));
+        user.setRoles(roles);
+        return true;
     }
 
     @Override
