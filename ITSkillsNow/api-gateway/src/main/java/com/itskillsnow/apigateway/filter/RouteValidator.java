@@ -12,21 +12,36 @@ public class RouteValidator {
     public static final List<String> openApiEndpoints = List.of(
             "/auth/register",
             "/auth/login",
+            "/auth/validate",
             "/eureka"
     );
 
     public static final List<String> adminEndpoints = List.of(
             "/api/course",
+            "/api/job",
+            "/auth/addRole"
+    );
+
+    public static final List<String> companyEndpoints = List.of(
+            "/api/course",
             "/api/job"
     );
 
+
     public static final List<String> userEndpoints = List.of(
-            "/api/job/messages"
+            "/api/job",
+            "/api/course",
+            "/auth/deleteMe"
     );
 
 
     public Predicate<ServerHttpRequest> isAdmin =
             request -> adminEndpoints
+                    .stream()
+                    .anyMatch(uri -> request.getURI().getPath().contains(uri));
+
+    public Predicate<ServerHttpRequest> isCompany =
+            request -> companyEndpoints
                     .stream()
                     .anyMatch(uri -> request.getURI().getPath().contains(uri));
 

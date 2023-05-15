@@ -3,6 +3,7 @@ package com.itskillsnow.authservice.integrationTests;
 import com.itskillsnow.authservice.dto.AddUserDto;
 import com.itskillsnow.authservice.dto.AuthRequest;
 import com.itskillsnow.authservice.dto.AuthResponse;
+import com.itskillsnow.authservice.dto.request.AddRoleDto;
 import com.itskillsnow.authservice.dto.request.DeleteUserDto;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -127,6 +128,7 @@ class AuthControllerIT {
         assertNotNull(authResponse);
         assertNotNull(authResponse.getAccessToken());
         assertNotNull(authResponse.getRefreshToken());
+        assertNotNull(authResponse.getRoles());
     }
 
     @Test
@@ -309,6 +311,79 @@ class AuthControllerIT {
         // assert that the response body is true
         assertEquals(Boolean.TRUE, responseEntity.getBody());
 
+    }
+
+    @Test
+    void testAddRole() {
+        // create a new user to test the login endpoint
+        AddUserDto user = new AddUserDto();
+        user.setFullName("John Doe3");
+        user.setUsername("johnDoe3");
+        user.setEmail("johndoe3@example.com");
+        user.setPassword("password3");
+
+        // register the user
+        restTemplate.postForObject(baseUrl + "/register", user, String.class);
+
+        // create the authentication request
+        AuthRequest authRequest = new AuthRequest();
+        authRequest.setUsername("johnDoe3");
+        authRequest.setPassword("password3");
+
+         restTemplate.postForEntity(baseUrl + "/login", authRequest, AuthResponse.class);
+
+        AddRoleDto addRoleDto = new AddRoleDto("ADMIN", user.getUsername());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<AddRoleDto> requestEntity = new HttpEntity<>(addRoleDto, headers);
+
+        ResponseEntity<Boolean> responseEntity = restTemplate.exchange(baseUrl.concat("/").concat("addRole"),
+                HttpMethod.POST, requestEntity, Boolean.class);
+
+
+        // assert that the response status code is 200 OK
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+        // assert that the response body is true
+        assertEquals(Boolean.TRUE, responseEntity.getBody());
+    }
+
+
+    @Test
+    void testAddRole_roleAlreadyExistsReturnsFalse() {
+        // create a new user to test the login endpoint
+        AddUserDto user = new AddUserDto();
+        user.setFullName("John Doe3");
+        user.setUsername("johnDoe3");
+        user.setEmail("johndoe3@example.com");
+        user.setPassword("password3");
+
+        // register the user
+        restTemplate.postForObject(baseUrl + "/register", user, String.class);
+
+        // create the authentication request
+        AuthRequest authRequest = new AuthRequest();
+        authRequest.setUsername("johnDoe3");
+        authRequest.setPassword("password3");
+
+        restTemplate.postForEntity(baseUrl + "/login", authRequest, AuthResponse.class);
+
+        AddRoleDto addRoleDto = new AddRoleDto("USER", user.getUsername());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<AddRoleDto> requestEntity = new HttpEntity<>(addRoleDto, headers);
+
+        ResponseEntity<Boolean> responseEntity = restTemplate.exchange(baseUrl.concat("/").concat("addRole"),
+                HttpMethod.POST, requestEntity, Boolean.class);
+
+
+        // assert that the response status code is 200 OK
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+        // assert that the response body is true
+        assertEquals(Boolean.FALSE, responseEntity.getBody());
     }
 
 }

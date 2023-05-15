@@ -20,7 +20,7 @@ import java.util.Map;
 public class JwtServiceImpl implements JwtService {
 
 
-    private static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
+    private static final String JWT_SC = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
 
 
     @Override
@@ -81,7 +81,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private Key getSignKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET);
+        byte[] keyBytes = Decoders.BASE64.decode(JWT_SC);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

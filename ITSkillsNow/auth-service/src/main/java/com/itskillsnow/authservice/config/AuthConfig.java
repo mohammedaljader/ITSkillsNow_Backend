@@ -31,6 +31,7 @@ public class AuthConfig {
                         "/auth/deleteMe",
                         "/auth/login",
                         "/auth/validate",
+                        "/auth/addRole",
                         "/auth/refresh/**").permitAll()
                 .and()
                 .build();
