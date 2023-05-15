@@ -204,6 +204,9 @@ jobs:
           command: mvn -f ITSkillsNow/user-service failsafe:integration-test
 
   sonarcloud-course-service:
+    branches:
+      only:
+        - main
     docker:
       - image: cimg/openjdk:17.0
     parallelism: 4
@@ -215,6 +218,9 @@ jobs:
   
   
   sonarcloud-job-service:
+    branches:
+      only:
+        - main
     docker:
       - image: cimg/openjdk:17.0
     parallelism: 4
@@ -225,6 +231,9 @@ jobs:
           command: mvn -f ITSkillsNow/job-service clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=Job-service -Dsonar.organization=itskillsnow -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=26678f78f20da2818d5114e4fd92c17ddce384b8
 
   sonarcloud-user-service:
+    branches:
+      only:
+        - main
     docker:
       - image: cimg/openjdk:17.0
     parallelism: 4
@@ -236,6 +245,9 @@ jobs:
 
   
   sonarcloud-auth-service:
+    branches:
+      only:
+        - master
     docker:
       - image: cimg/openjdk:17.0
     parallelism: 4
