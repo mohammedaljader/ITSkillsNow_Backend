@@ -140,6 +140,17 @@ public class CourseServiceImpl implements CourseService {
                 .toList();
     }
 
+    @Override
+    public List<CourseView> filterCourses(String courseName, String courseType, String courseLanguage,
+                                          Double minPrice, Double maxPrice) {
+        List<Course> courses = courseRepository.findAllByCourseNameOrCourseTypeOrCourseLanguageOrCoursePriceBetween(
+                courseName, courseType, courseLanguage, minPrice, maxPrice);
+        return courses
+                .stream()
+                .map(this::mapModelToDto)
+                .toList();
+    }
+
     private CourseView mapModelToDto(Course course){
         return CourseView.builder()
                 .courseId(course.getCourseId())

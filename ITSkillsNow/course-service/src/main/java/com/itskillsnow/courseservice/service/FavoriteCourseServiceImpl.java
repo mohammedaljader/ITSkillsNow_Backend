@@ -49,6 +49,10 @@ public class FavoriteCourseServiceImpl implements FavoriteCourseService {
         Course course = courseRepository.findById(addCourseToFavoritesDto.getCourseId())
                 .orElseThrow(() -> new CourseNotFoundException(courseNotFound));
 
+        if(favoriteCourseRepository.existsByCourse(course)){
+            return false;
+        }
+
         FavoriteCourse favoriteCourse = mapDtoToModel(user, course);
         favoriteCourseRepository.save(favoriteCourse);
         return true;

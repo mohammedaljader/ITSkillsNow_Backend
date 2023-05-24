@@ -26,4 +26,8 @@ public interface CourseService {
     List<CourseView> getAllCoursesByUser(String username);
 
     List<CourseView> getAllCourses();
+
+    List<CourseView> filterCourses(String courseName, String courseType,
+                                   String courseLanguage,
+                                   Double minPrice, Double maxPrice);
 }

@@ -6,10 +6,7 @@ import com.itskillsnow.courseservice.dto.response.CourseView;
 import com.itskillsnow.courseservice.model.User;
 import com.itskillsnow.courseservice.repository.UserRepository;
 import com.itskillsnow.courseservice.service.interfaces.BlobService;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -268,6 +265,86 @@ class CourseControllerIT {
 
         // Verify the response
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+    }
+
+
+    @Test
+    void given_filterCoursesWithMinAndMaxPrice_returnFilteredCourses() {
+
+        // Create a new course
+        AddCourseDto courseDto = getAddCourseDto();
+        AddCourseDto courseDto1 = getAddCourseDto();
+        courseDto1.setCoursePrice(20.0);
+        AddCourseDto courseDto2 = getAddCourseDto();
+        courseDto2.setCoursePrice(30.0);
+
+        // Send a POST request to add the course
+        restTemplate.postForObject(baseUrl.concat("/withoutImage"), courseDto, CourseView.class);
+        restTemplate.postForObject(baseUrl.concat("/withoutImage"), courseDto1, CourseView.class);
+        restTemplate.postForObject(baseUrl.concat("/withoutImage"), courseDto2, CourseView.class);
+
+        Double minPrice = 20.0;
+        Double maxPrice = 30.0;
+
+
+        // Send a GET request to retrieve all courses
+        ResponseEntity<List<CourseView>> response = restTemplate.exchange(
+                baseUrl + "/filter?minPrice={minPrice}&maxPrice={maxPrice}",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {},
+                minPrice, maxPrice
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        List<CourseView> filteredCourses = response.getBody();
+        assertNotNull(filteredCourses);
+        assertEquals(2, response.getBody().size());
+    }
+
+    @Test
+    void given_filterCoursesWithMinAndMaxPriceAndTypeAndLanguage_returnFilteredCourses() {
+
+        // Create a new course
+        AddCourseDto courseDto = getAddCourseDto();
+        AddCourseDto courseDto1 = getAddCourseDto();
+        courseDto1.setCoursePrice(20.0);
+        courseDto1.setCourseLanguage("English");
+        courseDto1.setCourseType("Computer science");
+        AddCourseDto courseDto2 = getAddCourseDto();
+        courseDto2.setCoursePrice(30.0);
+        courseDto2.setCourseLanguage("Arabic");
+        courseDto2.setCourseType("Math");
+        AddCourseDto courseDto3 = getAddCourseDto();
+        courseDto3.setCourseLanguage("French");
+        courseDto3.setCourseType("Math");
+
+
+        // Send a POST request to add the course
+        restTemplate.postForObject(baseUrl.concat("/withoutImage"), courseDto, CourseView.class);
+        restTemplate.postForObject(baseUrl.concat("/withoutImage"), courseDto1, CourseView.class);
+        restTemplate.postForObject(baseUrl.concat("/withoutImage"), courseDto2, CourseView.class);
+        restTemplate.postForObject(baseUrl.concat("/withoutImage"), courseDto3, CourseView.class);
+
+        Double minPrice = 20.0;
+        Double maxPrice = 30.0;
+        String courseType = "Math";
+        String courseLanguage = "English";
+
+
+        // Send a GET request to retrieve all courses
+        ResponseEntity<List<CourseView>> response = restTemplate.exchange(
+                baseUrl + "/filter?maxPrice={maxPrice}&minPrice={minPrice}&courseType={courseType}&courseLanguage={courseLanguage}",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {},
+                minPrice, maxPrice, courseType, courseLanguage
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        List<CourseView> filteredCourses = response.getBody();
+        assertNotNull(filteredCourses);
+        assertEquals(3, response.getBody().size());
     }
 
 
