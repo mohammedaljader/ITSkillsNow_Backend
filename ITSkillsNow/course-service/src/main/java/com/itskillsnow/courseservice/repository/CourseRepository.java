@@ -10,4 +10,7 @@ import java.util.UUID;
 
 public interface CourseRepository extends JpaRepository<Course, UUID> {
     List<Course> findAllByUser(User user);
+
+    List<Course> findAllByCourseNameOrCourseTypeOrCourseLanguageOrCoursePriceBetween(String courseName, String courseType,
+                                                                 String courseLanguage, Double minPrice, Double maxPrice);
 }

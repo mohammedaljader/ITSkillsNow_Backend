@@ -93,4 +93,15 @@ public class CourseController {
         return courseService.getAllCourses();
     }
 
+    @GetMapping("/filter")
+    @ResponseStatus(HttpStatus.OK)
+    public List<CourseView> filterCourses(
+            @RequestParam(required = false) String courseName,
+            @RequestParam(required = false) String courseType,
+            @RequestParam(required = false) String courseLanguage,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice
+    ) {
+        return courseService.filterCourses(courseName, courseType, courseLanguage, minPrice, maxPrice);
+    }
 }
