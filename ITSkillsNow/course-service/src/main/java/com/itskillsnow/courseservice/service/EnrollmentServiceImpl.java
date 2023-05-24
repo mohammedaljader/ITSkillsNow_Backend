@@ -44,6 +44,10 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         Course course = courseRepository.findById(addEnrollmentDto.getCourseId())
                 .orElseThrow(() -> new CourseNotFoundException(courseNotFound));
 
+        if(enrollmentRepository.existsByCourse(course)){
+            return false;
+        }
+
         Enrollment enrollment = mapDtoToModel(user, course);
         enrollmentRepository.save(enrollment);
         return true;

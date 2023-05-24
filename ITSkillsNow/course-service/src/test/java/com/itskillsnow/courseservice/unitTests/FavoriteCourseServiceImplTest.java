@@ -68,6 +68,7 @@ public class FavoriteCourseServiceImplTest {
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
         when(courseRepository.findById(course.getCourseId())).thenReturn(Optional.of(course));
+        when(favoriteCourseRepository.existsByCourse(course)).thenReturn(false);
 
         // Act
         boolean actual = favoriteCourseService.addCourseToFavorites(addCourseToFavoritesDto);
@@ -78,6 +79,32 @@ public class FavoriteCourseServiceImplTest {
         verify(userRepository, times(1)).findByUsername(username);
         verify(courseRepository, times(1)).findById(course.getCourseId());
         verify(favoriteCourseRepository, times(1)).save(any(FavoriteCourse.class));
+        verify(favoriteCourseRepository, times(1)).existsByCourse(course);
+
+    }
+
+    @Test
+    void givenCourseToFavorites_courseAlreadyExistsInFavoriteList_returnsFalse(){
+        // Arrange
+        User user = new User(username);
+        Course course = getCourse(user);
+        AddCourseToFavoritesDto addCourseToFavoritesDto = new AddCourseToFavoritesDto(course.getCourseId(), username);
+        boolean expected = false;
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(courseRepository.findById(course.getCourseId())).thenReturn(Optional.of(course));
+        when(favoriteCourseRepository.existsByCourse(course)).thenReturn(true);
+
+        // Act
+        boolean actual = favoriteCourseService.addCourseToFavorites(addCourseToFavoritesDto);
+
+        // Assert
+        assertEquals(expected, actual);
+
+        verify(userRepository, times(1)).findByUsername(username);
+        verify(courseRepository, times(1)).findById(course.getCourseId());
+        verify(favoriteCourseRepository, times(0)).save(any(FavoriteCourse.class));
+        verify(favoriteCourseRepository, times(1)).existsByCourse(course);
 
     }
 
@@ -101,6 +128,7 @@ public class FavoriteCourseServiceImplTest {
         verify(userRepository, times(1)).findByUsername("WrongUsername");
         verify(courseRepository, times(0)).findById(course.getCourseId());
         verify(favoriteCourseRepository, times(0)).save(any(FavoriteCourse.class));
+        verify(favoriteCourseRepository, times(0)).existsByCourse(any(Course.class));
     }
 
 
@@ -125,6 +153,7 @@ public class FavoriteCourseServiceImplTest {
         verify(userRepository, times(1)).findByUsername(username);
         verify(courseRepository, times(1)).findById(course.getCourseId());
         verify(favoriteCourseRepository, times(0)).save(any(FavoriteCourse.class));
+        verify(favoriteCourseRepository, times(0)).existsByCourse(any(Course.class));
     }
 
     @Test

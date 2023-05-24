@@ -62,6 +62,7 @@ class EnrollmentServiceImplTest {
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
         when(courseRepository.findById(course.getCourseId())).thenReturn(Optional.of(course));
+        when(enrollmentRepository.existsByCourse(course)).thenReturn(false);
 
         // Act
         boolean actual = enrollmentService.enrollToCourse(addEnrollmentDto);
@@ -72,6 +73,32 @@ class EnrollmentServiceImplTest {
         verify(userRepository, times(1)).findByUsername(username);
         verify(courseRepository, times(1)).findById(course.getCourseId());
         verify(enrollmentRepository, times(1)).save(any(Enrollment.class));
+        verify(enrollmentRepository, times(1)).existsByCourse(course);
+
+    }
+
+    @Test
+    void givenEnrollToCourse_userAlreadyEnrolledToCourse_returnsFalse(){
+        // Arrange
+        User user = new User(username);
+        Course course = getCourse(user);
+        AddEnrollmentDto addEnrollmentDto = new AddEnrollmentDto(course.getCourseId(), username);
+        boolean expected = false;
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(courseRepository.findById(course.getCourseId())).thenReturn(Optional.of(course));
+        when(enrollmentRepository.existsByCourse(course)).thenReturn(true);
+
+        // Act
+        boolean actual = enrollmentService.enrollToCourse(addEnrollmentDto);
+
+        // Assert
+        assertEquals(expected, actual);
+
+        verify(userRepository, times(1)).findByUsername(username);
+        verify(courseRepository, times(1)).findById(course.getCourseId());
+        verify(enrollmentRepository, times(0)).save(any(Enrollment.class));
+        verify(enrollmentRepository, times(1)).existsByCourse(course);
 
     }
 
@@ -95,6 +122,7 @@ class EnrollmentServiceImplTest {
         verify(userRepository, times(1)).findByUsername("WrongUsername");
         verify(courseRepository, times(0)).findById(course.getCourseId());
         verify(enrollmentRepository, times(0)).save(any(Enrollment.class));
+        verify(enrollmentRepository, times(0)).existsByCourse(any(Course.class));
     }
 
 
@@ -119,6 +147,7 @@ class EnrollmentServiceImplTest {
         verify(userRepository, times(1)).findByUsername(username);
         verify(courseRepository, times(1)).findById(course.getCourseId());
         verify(enrollmentRepository, times(0)).save(any(Enrollment.class));
+        verify(enrollmentRepository, times(0)).existsByCourse(any(Course.class));
     }
 
 
