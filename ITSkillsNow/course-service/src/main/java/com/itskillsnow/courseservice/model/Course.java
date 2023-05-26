@@ -21,8 +21,7 @@ public class Course {
 
     private String courseName;
 
-    @Lob
-    @Column(length=8192)
+    @Column(length=60000)
     private String courseDescription;
 
     private String courseImage;

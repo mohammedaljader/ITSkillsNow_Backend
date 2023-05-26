@@ -24,6 +24,9 @@ public class RabbitMQListener {
     @RabbitListener(queues = "auth.queue")
     public void createUser(AuthEvent event){
         UserPayload payload = event.getUserPayload();
+        if(payload.getUserId() == null){
+            return;
+        }
         User user = new User(UUID.fromString(payload.getUserId()), payload.getUsername(),
                 payload.getFullName(), payload.getEmail(), null);
 
