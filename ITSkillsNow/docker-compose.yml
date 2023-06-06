@@ -139,6 +139,20 @@ services:
       - rabbitmq
       - zipkin
 
+  mail-service:
+    image: mohammedaljader2000/mail-service
+    container_name: mail-service
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - rabbitmq_port=5672
+    ports:
+      - "8000:8000"
+    networks:
+      - spring
+      - rabbitmqNetwork
+    depends_on:
+      - rabbitmq
+
   zipkin:
     image: openzipkin/zipkin
     container_name: zipkin
@@ -155,12 +169,15 @@ services:
       - "15672:15672"
     networks:
       - spring
+      - rabbitmqNetwork
 
 
 networks:
   postgres:
     driver: bridge
   spring:
+    driver: bridge
+  rabbitmqNetwork:
     driver: bridge
 
 volumes:
