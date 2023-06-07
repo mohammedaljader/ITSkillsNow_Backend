@@ -6,6 +6,9 @@ import com.itskillsnow.authservice.dto.AuthRequest;
 import com.itskillsnow.authservice.dto.AuthResponse;
 import com.itskillsnow.authservice.dto.request.AddRoleDto;
 import com.itskillsnow.authservice.dto.request.DeleteUserDto;
+import com.itskillsnow.authservice.exception.InvalidAccessException;
+import com.itskillsnow.authservice.exception.InvalidCodeException;
+import com.itskillsnow.authservice.exception.OtpCodeNotFoundException;
 import com.itskillsnow.authservice.model.User;
 import com.itskillsnow.authservice.service.ServiceInterfaces.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -60,5 +63,26 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     public boolean addRole(@RequestBody AddRoleDto addRoleDto){
         return authService.addRole(addRoleDto.getRole(), addRoleDto.getUsername());
+    }
+
+    @PostMapping("/login-multiFactor")
+    public String loginWithMultiFactor(@RequestBody AuthRequest authRequest) {
+        Authentication authenticate = authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(),
+                        authRequest.getPassword()));
+        if (authenticate.isAuthenticated()) {
+            return authService.createOtpCode(authRequest.getUsername());
+        } else {
+            throw new InvalidAccessException("invalid access");
+        }
+    }
+
+    @PostMapping("/login-multiFactor/{otpCode}")
+    public AuthResponse checkMultiFactor(@PathVariable String otpCode) {
+        if (authService.checkOtpCode(otpCode)) {
+            return authService.generateTokenWithOtpCode(otpCode);
+        } else {
+            throw new InvalidCodeException("invalid code!");
+        }
     }
 }

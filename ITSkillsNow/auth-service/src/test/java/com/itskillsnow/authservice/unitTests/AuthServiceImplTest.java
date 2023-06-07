@@ -7,6 +7,7 @@ import com.itskillsnow.authservice.exception.UserNotFoundException;
 import com.itskillsnow.authservice.model.Role;
 import com.itskillsnow.authservice.model.User;
 import com.itskillsnow.authservice.rabbitmq.RabbitMQSender;
+import com.itskillsnow.authservice.repository.OTPCodeRepository;
 import com.itskillsnow.authservice.repository.UserRepository;
 import com.itskillsnow.authservice.service.AuthServiceImpl;
 import com.itskillsnow.authservice.service.ServiceInterfaces.JwtService;
@@ -46,10 +47,13 @@ class AuthServiceImplTest {
     @Mock
     private RabbitMQSender rabbitMQSender;
 
+    @Mock
+    private OTPCodeRepository otpCodeRepository;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        authService = new AuthServiceImpl(userRepository, passwordEncoder, jwtService, rabbitMQSender);
+        authService = new AuthServiceImpl(userRepository, passwordEncoder, jwtService, rabbitMQSender, otpCodeRepository);
     }
 
     @Test

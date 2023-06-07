@@ -32,6 +32,7 @@ public class AuthConfig {
                         "/auth/login",
                         "/auth/validate",
                         "/auth/addRole",
+                        "/auth/login-multiFactor/**",
                         "/auth/refresh/**").permitAll()
                 .and()
                 .build();

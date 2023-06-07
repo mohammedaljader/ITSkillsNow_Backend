@@ -17,12 +17,23 @@ public class RabbitMQConfig {
     private final ConnectionFactory connectionFactory;
 
     public static final String QUEUE = "auth.queue";
+
+    public static final String MESSAGE_QUEUE = "auth_message_queue";
     public static final String EXCHANGE = "auth.exchange";
+
+    public static final String MESSAGE_EXCHANGE = "auth_message_exchange";
     public static final String ROUTING_KEY = "auth.*";
+
+    public static final String MESSAGE_ROUTING_KEY = "auth_message_routingKey";
 
     @Bean
     public TopicExchange authExchange() {
         return new TopicExchange(EXCHANGE);
+    }
+
+    @Bean
+    public TopicExchange messageExchange() {
+        return new TopicExchange(MESSAGE_EXCHANGE);
     }
 
     @Bean
@@ -31,8 +42,18 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Binding authBinding(TopicExchange userExchange, Queue userQueue) {
-        return BindingBuilder.bind(userQueue).to(userExchange).with(ROUTING_KEY);
+    public Queue messageQueue() {
+        return new Queue(MESSAGE_QUEUE);
+    }
+
+    @Bean
+    public Binding authBinding() {
+        return BindingBuilder.bind(authQueue()).to(authExchange()).with(ROUTING_KEY);
+    }
+
+    @Bean
+    public Binding messageBinding() {
+        return BindingBuilder.bind(messageQueue()).to(messageExchange()).with(MESSAGE_ROUTING_KEY);
     }
 
     @Bean
