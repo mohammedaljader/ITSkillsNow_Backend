@@ -18,6 +18,7 @@ public class OTPCode {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID otpId;
 
+    @Column(unique = true)
     private String otpCode;
 
     private String username;

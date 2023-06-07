@@ -3,7 +3,9 @@ package com.itskillsnow.authservice.unitTests;
 import com.itskillsnow.authservice.dto.AuthResponse;
 import com.itskillsnow.authservice.event.AuthEvent;
 import com.itskillsnow.authservice.event.UserPayload;
+import com.itskillsnow.authservice.exception.OtpCodeNotFoundException;
 import com.itskillsnow.authservice.exception.UserNotFoundException;
+import com.itskillsnow.authservice.model.OTPCode;
 import com.itskillsnow.authservice.model.Role;
 import com.itskillsnow.authservice.model.User;
 import com.itskillsnow.authservice.rabbitmq.RabbitMQSender;
@@ -21,7 +23,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -312,5 +314,124 @@ class AuthServiceImplTest {
         Assertions.assertFalse(result);
         verify(userRepository, never()).delete(any());
         verify(rabbitMQSender, never()).sendMessage(any(), any(), any());
+    }
+
+    @Test
+    public void given_createOtpCode_withCorrectUsername_shouldReturnMessage() {
+        User user = new User();
+        user.setUsername("testUser");
+        user.setPassword("encoded_password");
+        user.setEmail("test@test.com");
+        String expected = "Code sent to your email for multi factor authentication";
+
+        when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
+
+        String actual = authService.createOtpCode("testUser");
+
+
+        Assertions.assertEquals(expected ,actual);
+
+
+        verify(userRepository, times(1)).findByUsername("testUser");
+        verify(otpCodeRepository, times(1)).save(any(OTPCode.class));
+        verify(rabbitMQSender, times(1)).sendMessage(any(), any(), any());
+    }
+
+    @Test
+    public void given_createOtpCode_withWrongUsername_shouldException() {
+        String expected = "User was not found!";
+
+        when(userRepository.findByUsername("testUser")).thenReturn(Optional.empty());
+
+        UserNotFoundException actual = Assertions.assertThrows(UserNotFoundException.class, () ->
+                authService.createOtpCode("testUser")
+        );
+
+        Assertions.assertEquals(expected ,actual.getMessage());
+
+        verify(userRepository, times(1)).findByUsername("testUser");
+        verify(otpCodeRepository, never()).save(any(OTPCode.class));
+        verify(rabbitMQSender, never()).sendMessage(any(), any(), any());
+    }
+
+
+    @Test
+    public void given_checkOtpCode_withCorrectOtpCode_shouldTrue() {
+        OTPCode otpCode = OTPCode.builder()
+                .username("username")
+                .otpCode("231234")
+                .createdAt(LocalTime.now())
+                .build();
+
+        when(otpCodeRepository.findByOtpCode("231234")).thenReturn(Optional.of(otpCode));
+
+        boolean actual = authService.checkOtpCode("231234");
+
+
+        assertTrue(actual);
+
+        verify(otpCodeRepository, times(1)).findByOtpCode("231234");
+    }
+
+
+    @Test
+    public void given_checkOtpCode_withWrongOtpCode_shouldFalse() {
+        when(otpCodeRepository.findByOtpCode("212334")).thenReturn(Optional.empty());
+
+        boolean actual = authService.checkOtpCode("212334");
+
+        assertFalse(actual);
+
+        verify(otpCodeRepository, times(1)).findByOtpCode("212334");
+    }
+
+    @Test
+    public void given_generateTokenWithOtpCode_withCorrectOtpCode_shouldReturnTokens() {
+        User user = new User();
+        user.setEmail("test@test.com");
+        user.setUsername("testUser");
+        user.setPassword("testPass");
+        user.setFullName("Test User");
+
+        OTPCode otpCode = OTPCode.builder()
+                .username("testUser")
+                .otpCode("231234")
+                .createdAt(LocalTime.now())
+                .build();
+
+        when(otpCodeRepository.findByOtpCode("231234")).thenReturn(Optional.of(otpCode));
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+        when(jwtService.generateTokens(any(User.class), anyString())).thenReturn(Map.of("accessToken",
+                "some_access_token", "refreshToken", "some_refresh_token"));
+
+
+        AuthResponse actual = authService.generateTokenWithOtpCode("231234");
+
+
+        Assertions.assertEquals("some_access_token" ,actual.getAccessToken());
+
+
+        verify(otpCodeRepository, times(1)).findByOtpCode("231234");
+        verify(otpCodeRepository, times(1)).delete(any(OTPCode.class));
+        verify(userRepository, times(1)).findByUsername("testUser");
+        verify(jwtService, times(1)).generateTokens(any(User.class), anyString());
+    }
+
+    @Test
+    public void given_generateTokenWithOtpCode_withWrongOtpCode_shouldException() {
+        String expected = "Code was not found!";
+
+        when(otpCodeRepository.findByOtpCode("123456")).thenReturn(Optional.empty());
+
+        OtpCodeNotFoundException actual = Assertions.assertThrows(OtpCodeNotFoundException.class, () ->
+                authService.generateTokenWithOtpCode("123456")
+        );
+
+        Assertions.assertEquals(expected ,actual.getMessage());
+
+        verify(otpCodeRepository, times(1)).findByOtpCode("123456");
+        verify(otpCodeRepository, times(0)).delete(any(OTPCode.class));
+        verify(userRepository, times(0)).findByUsername("testUser");
+        verify(jwtService, times(0)).generateTokens(any(User.class), anyString());
     }
 }

@@ -141,7 +141,8 @@ public class AuthServiceImpl implements AuthService {
                 .username(username)
                 .createdAt(LocalTime.now())
                 .build();
-        // SEND it to mail service
+
+        // SEND the code it to mail service
         try {
             MessageEvent messageEvent = new MessageEvent(user.getFullName(),
                     user.getEmail(), generatedOTP,
@@ -149,10 +150,10 @@ public class AuthServiceImpl implements AuthService {
 
             rabbitMQSender.sendMessage("auth_message_exchange", "auth_message_routingKey",
                     messageEvent);
-            log.info("User sent successfully!");
+            log.info("Message sent successfully!");
         }catch (Exception ex){
             log.error(ex.getMessage());
-            log.info("Error while sending user");
+            log.info("Error while sending message");
         }
 
         //Save it
