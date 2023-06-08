@@ -2,20 +2,26 @@ package com.itskillsnow.authservice.service;
 
 
 import com.itskillsnow.authservice.dto.AuthResponse;
+import com.itskillsnow.authservice.event.MessageEvent;
+import com.itskillsnow.authservice.exception.OtpCodeNotFoundException;
 import com.itskillsnow.authservice.exception.UserNotFoundException;
+import com.itskillsnow.authservice.model.OTPCode;
 import com.itskillsnow.authservice.model.Role;
 import com.itskillsnow.authservice.model.User;
 import com.itskillsnow.authservice.event.AuthEvent;
 import com.itskillsnow.authservice.event.UserPayload;
 import com.itskillsnow.authservice.rabbitmq.RabbitMQSender;
+import com.itskillsnow.authservice.repository.OTPCodeRepository;
 import com.itskillsnow.authservice.repository.UserRepository;
 import com.itskillsnow.authservice.service.ServiceInterfaces.AuthService;
 import com.itskillsnow.authservice.service.ServiceInterfaces.JwtService;
+import com.itskillsnow.authservice.util.OtpGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +39,8 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
 
     private final RabbitMQSender rabbitMQSender;
+
+    private final OTPCodeRepository otpCodeRepository;
 
 
     @Override
@@ -119,6 +127,58 @@ public class AuthServiceImpl implements AuthService {
         roles.add(Role.valueOf(role));
         user.setRoles(roles);
         return true;
+    }
+
+    @Override
+    public String createOtpCode(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User was not found!"));
+
+        String generatedOTP = OtpGenerator.generateOTP();
+
+        OTPCode otpCode = OTPCode.builder()
+                .otpCode(generatedOTP)
+                .username(username)
+                .createdAt(LocalTime.now())
+                .build();
+
+        // SEND the code it to mail service
+        try {
+            MessageEvent messageEvent = new MessageEvent(user.getFullName(),
+                    user.getEmail(), generatedOTP,
+                    "login to ITSkillsNow", "Your code to log in to ITSkillsNow is");
+
+            rabbitMQSender.sendMessage("auth_message_exchange", "auth_message_routingKey",
+                    messageEvent);
+            log.info("Message sent successfully!");
+        }catch (Exception ex){
+            log.error(ex.getMessage());
+            log.info("Error while sending message");
+        }
+
+        //Save it
+        otpCodeRepository.save(otpCode);
+        return "Code sent to your email for multi factor authentication";
+    }
+
+    @Override
+    public void deleteOtpCode(String username) {
+        otpCodeRepository.deleteAllByUsername(username);
+    }
+
+    @Override
+    public boolean checkOtpCode(String otpCode) {
+        Optional<OTPCode> code = otpCodeRepository.findByOtpCode(otpCode);
+        return code.isPresent();
+    }
+
+    @Override
+    public AuthResponse generateTokenWithOtpCode(String otpCode) {
+        OTPCode code = otpCodeRepository.findByOtpCode(otpCode)
+                .orElseThrow(() -> new OtpCodeNotFoundException("Code was not found!"));
+
+        otpCodeRepository.deleteAllByUsername(code.getUsername());
+        return this.generateToken(code.getUsername());
     }
 
     @Override

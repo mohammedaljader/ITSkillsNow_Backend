@@ -10,4 +10,8 @@ public interface AuthService {
     AuthResponse refreshToken(String refreshToken);
     boolean deleteMe(String username, String password);
     boolean addRole(String role, String username);
+    String createOtpCode(String username);
+    void deleteOtpCode(String username);
+    boolean checkOtpCode(String otpCode);
+    AuthResponse generateTokenWithOtpCode(String otpCode);
 }
