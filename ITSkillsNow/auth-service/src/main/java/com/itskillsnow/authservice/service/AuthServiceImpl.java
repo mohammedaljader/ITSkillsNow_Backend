@@ -172,7 +172,7 @@ public class AuthServiceImpl implements AuthService {
         OTPCode code = otpCodeRepository.findByOtpCode(otpCode)
                 .orElseThrow(() -> new OtpCodeNotFoundException("Code was not found!"));
 
-        otpCodeRepository.delete(code);
+        otpCodeRepository.deleteAllByUsername(code.getUsername());
         return this.generateToken(code.getUsername());
     }
 

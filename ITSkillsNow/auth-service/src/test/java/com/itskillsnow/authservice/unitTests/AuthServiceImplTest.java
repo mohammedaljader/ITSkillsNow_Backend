@@ -412,7 +412,7 @@ class AuthServiceImplTest {
 
 
         verify(otpCodeRepository, times(1)).findByOtpCode("231234");
-        verify(otpCodeRepository, times(1)).delete(any(OTPCode.class));
+        verify(otpCodeRepository, times(1)).deleteAllByUsername("testUser");
         verify(userRepository, times(1)).findByUsername("testUser");
         verify(jwtService, times(1)).generateTokens(any(User.class), anyString());
     }
@@ -430,7 +430,7 @@ class AuthServiceImplTest {
         Assertions.assertEquals(expected ,actual.getMessage());
 
         verify(otpCodeRepository, times(1)).findByOtpCode("123456");
-        verify(otpCodeRepository, times(0)).delete(any(OTPCode.class));
+        verify(otpCodeRepository, times(0)).deleteAllByUsername(anyString());
         verify(userRepository, times(0)).findByUsername("testUser");
         verify(jwtService, times(0)).generateTokens(any(User.class), anyString());
     }

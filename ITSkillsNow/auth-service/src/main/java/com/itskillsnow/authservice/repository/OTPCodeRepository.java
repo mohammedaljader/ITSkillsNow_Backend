@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface OTPCodeRepository extends JpaRepository<OTPCode, String> {
     Optional<OTPCode> findByOtpCode(String otpCode);
+    void deleteAllByUsername(String username);
 }
