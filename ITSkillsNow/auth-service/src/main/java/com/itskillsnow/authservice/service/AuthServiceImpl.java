@@ -162,6 +162,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public void deleteOtpCode(String username) {
+        otpCodeRepository.deleteAllByUsername(username);
+    }
+
+    @Override
     public boolean checkOtpCode(String otpCode) {
         Optional<OTPCode> code = otpCodeRepository.findByOtpCode(otpCode);
         return code.isPresent();

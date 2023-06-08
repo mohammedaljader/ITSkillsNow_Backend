@@ -88,6 +88,7 @@ public class AuthController {
         } else {
             loginAttemptService.loginFailed(dto.getUsername());
             if (loginAttemptService.isBlocked(dto.getUsername())) {
+                authService.deleteOtpCode(dto.getUsername());
                 return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                         .body("Too many login attempts. Please try again later.");
             }
