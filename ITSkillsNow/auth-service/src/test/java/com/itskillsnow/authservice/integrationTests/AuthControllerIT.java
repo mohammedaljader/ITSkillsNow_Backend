@@ -5,6 +5,7 @@ import com.itskillsnow.authservice.dto.AuthRequest;
 import com.itskillsnow.authservice.dto.AuthResponse;
 import com.itskillsnow.authservice.dto.request.AddRoleDto;
 import com.itskillsnow.authservice.dto.request.DeleteUserDto;
+import com.itskillsnow.authservice.dto.request.LoginWithMultiFactorDto;
 import com.itskillsnow.authservice.repository.OTPCodeRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -474,10 +475,11 @@ class AuthControllerIT {
 
         String code = otpCodeRepository.findAll().get(0).getOtpCode();
 
+        LoginWithMultiFactorDto request = new LoginWithMultiFactorDto("johnDoe3", code);
+
         //check the code
-        ResponseEntity<AuthResponse> responseEntity = restTemplate.postForEntity(baseUrl + "/login-multiFactor/"
-                        .concat(code),
-                authRequest, AuthResponse.class);
+        ResponseEntity<AuthResponse> responseEntity = restTemplate.postForEntity(baseUrl + "/check-multiFactor",
+                request, AuthResponse.class);
 
         // assert that the response status code is 200 OK
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -511,16 +513,67 @@ class AuthControllerIT {
                 authRequest, String.class);
 
 
+        LoginWithMultiFactorDto request = new LoginWithMultiFactorDto("johnDoe3", "123456");
+
         //check the code
-        HttpClientErrorException.Forbidden response = Assertions.assertThrows(
-                HttpClientErrorException.Forbidden.class, () ->
-                        restTemplate.postForEntity(baseUrl + "/login-multiFactor/"
-                                        .concat("123456"),
-                                authRequest, AuthResponse.class)
+        HttpClientErrorException.BadRequest response = Assertions.assertThrows(
+                HttpClientErrorException.BadRequest.class, () ->
+                        restTemplate.postForEntity(baseUrl + "/check-multiFactor",
+                                request, AuthResponse.class)
         );
 
         // Verify
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Invalid code.", response.getResponseBodyAsString());
+    }
+
+
+    @Test
+    void testCheckMultiFactor_withWrongCode_tryThreeTimes_returnBadRequest() {
+        // create a new user to test the login endpoint
+        AddUserDto user = new AddUserDto();
+        user.setFullName("John Doe3");
+        user.setUsername("johnDoe3");
+        user.setEmail("johndoe3@example.com");
+        user.setPassword("password3");
+
+        // register the user
+        restTemplate.postForObject(baseUrl + "/register", user, String.class);
+
+        // create the authentication request
+        AuthRequest authRequest = new AuthRequest();
+        authRequest.setUsername("johnDoe3");
+        authRequest.setPassword("password3");
+
+        // make the login with multi_factor request
+        restTemplate.postForEntity(baseUrl + "/login-multiFactor",
+                authRequest, String.class);
+
+
+        LoginWithMultiFactorDto request = new LoginWithMultiFactorDto("johnDoe3", "123456");
+
+        //request 3 times
+        Assertions.assertThrows(
+                HttpClientErrorException.BadRequest.class, () ->
+                        restTemplate.postForEntity(baseUrl + "/check-multiFactor",
+                                request, AuthResponse.class)
+        );
+        Assertions.assertThrows(
+                HttpClientErrorException.BadRequest.class, () ->
+                        restTemplate.postForEntity(baseUrl + "/check-multiFactor",
+                                request, AuthResponse.class)
+        );
+
+        // the last attempt
+        HttpClientErrorException.TooManyRequests response = Assertions.assertThrows(
+                HttpClientErrorException.TooManyRequests.class, () ->
+                        restTemplate.postForEntity(baseUrl + "/check-multiFactor",
+                                request, AuthResponse.class)
+        );
+
+        // Verify
+        assertEquals(HttpStatus.TOO_MANY_REQUESTS, response.getStatusCode());
+        assertEquals("Too many login attempts. Please try again later.", response.getResponseBodyAsString());
     }
 
 }
