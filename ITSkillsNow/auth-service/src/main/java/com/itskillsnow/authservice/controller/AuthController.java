@@ -82,10 +82,6 @@ public class AuthController {
 
     @PostMapping("/check-multiFactor")
     public ResponseEntity<?> checkMultiFactor(@RequestBody LoginWithMultiFactorDto dto) {
-        if (loginAttemptService.isBlocked(dto.getUsername())) {
-            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                    .body("Too many login attempts. Please try again later.");
-        }
         if (authService.checkOtpCode(dto.getCode())) {
             loginAttemptService.resetAttempts(dto.getUsername());
             return ResponseEntity.ok(authService.generateTokenWithOtpCode(dto.getCode()));
