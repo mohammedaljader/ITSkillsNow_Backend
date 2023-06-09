@@ -12,8 +12,9 @@ spring:
     addresses: rabbitmq:5672
   datasource:
     password: M0618678213@
-    url: jdbc:postgresql://itskillsnow.postgres.database.azure.com:5432/courseDB
+    url: jdbc:postgresql://itskillsnow.postgres.database.azure.com:5432/courseDB?user=itskillsnow&password=M0618678213@&sslmode=require
     username: itskillsnow
+
   jpa:
     hibernate:
       ddl-auto: create-drop
