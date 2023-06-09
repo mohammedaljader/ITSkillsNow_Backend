@@ -12,7 +12,7 @@ spring:
     addresses: rabbitmq:5672
   datasource:
     password: M0618678213@
-    url: jdbc:postgresql://itskillsnow.postgres.database.azure.com:5432/authDB?user=itskillsnow&password=M0618678213@&sslmode=require
+    url: jdbc:postgresql://itskillsnow.postgres.database.azure.com:5432/authDB
     username: itskillsnow
   jpa:
     hibernate:
