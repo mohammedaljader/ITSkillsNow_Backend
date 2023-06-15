@@ -80,6 +80,8 @@ public class UserServiceImpl implements UserService {
             //delete the old profile image from blob storage
             String blobFileName = FileNamingUtils.getBlobFilename(user.getProfileImage());
             blobService.deleteFile(blobFileName);
+            User newUser = mapUpdateProfileImageToModel(user, null);
+            userRepository.save(newUser);
             return true;
         }else {
             return false;
