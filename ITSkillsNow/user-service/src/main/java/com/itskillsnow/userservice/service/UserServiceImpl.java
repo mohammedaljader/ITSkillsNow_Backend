@@ -1,13 +1,14 @@
 package com.itskillsnow.userservice.service;
 
+import com.itskillsnow.userservice.dto.UpdateProfileDto;
 import com.itskillsnow.userservice.dto.UserDto;
-import com.itskillsnow.userservice.event.UserEvent;
+import com.itskillsnow.userservice.exception.UserNotFoundException;
 import com.itskillsnow.userservice.model.User;
 import com.itskillsnow.userservice.repository.UserRepository;
 import com.itskillsnow.userservice.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,35 +20,45 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    private final RabbitTemplate rabbitTemplate;
-
     @Override
     public List<UserDto> getAllUsers() {
         List<User> users = userRepository.findAll();
-        return users.stream().map(user -> new UserDto(user.getUsername(),
+        return users.stream().map(user -> new UserDto(
+                        user.getUsername(),
                         user.getFullName(),
                         user.getEmail(),
-                        user.getAddress()))
+                        user.getAddress(),
+                        user.getProfileImage(),
+                        user.getPhoneNumber(),
+                        user.getProfession()))
                 .collect(Collectors.toList());
     }
 
     @Override
     public UserDto getUserByUsername(String username) {
         Optional<User> user = userRepository.findByUsername(username);
-        return user.map(x -> new UserDto(x.getUsername(), x.getFullName(), x.getEmail(), x.getAddress()))
-                .orElse(null);
+        return user.map(x -> new UserDto(x.getUsername(),
+                        x.getFullName(),
+                        x.getEmail(),
+                        x.getAddress(),
+                        x.getProfileImage(),
+                        x.getPhoneNumber(),
+                        x.getProfession()))
+                .orElseThrow(() -> new UserNotFoundException("User was not found!"));
     }
 
     @Override
-    public boolean deleteUser(String username) {
-        Optional<User> user = userRepository.findByUsername(username);
-        if(user.isEmpty()){
-            return false;
-        }
-        userRepository.delete(user.get());
-        //Delete User from all services database
-        UserEvent event = new UserEvent(user.get().getUserId().toString(), "delete");
-        rabbitTemplate.convertAndSend("user.exchange", "user.delete", event);
-        return true;
+    public Boolean addProfileImage(MultipartFile file) {
+        return null;
+    }
+
+    @Override
+    public Boolean updateProfileImage(MultipartFile file) {
+        return null;
+    }
+
+    @Override
+    public Boolean updateProfile(UpdateProfileDto updateProfileDto) {
+        return null;
     }
 }

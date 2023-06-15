@@ -27,11 +27,4 @@ public class UserController {
     public UserDto getUserByUsername(@PathVariable String username){
         return userService.getUserByUsername(username);
     }
-
-
-    @DeleteMapping("/{username}")
-    @ResponseStatus(HttpStatus.OK)
-    public boolean deleteUser(@PathVariable String username){
-        return userService.deleteUser(username);
-    }
 }
