@@ -34,7 +34,7 @@ public class UserController {
 
     @PostMapping("/profile")
     @ResponseStatus(HttpStatus.OK)
-    public Boolean addProfileImage(@RequestParam String username,
+    public String addProfileImage(@RequestParam String username,
                                          @RequestParam("profileImage") MultipartFile profileImage) throws IOException {
 
         UpdateProfileImageDto profileImageDto = new UpdateProfileImageDto(username, profileImage);
@@ -43,7 +43,7 @@ public class UserController {
 
     @DeleteMapping("/profile/{username}")
     @ResponseStatus(HttpStatus.OK)
-    public Boolean deleteUser(@PathVariable String username){
+    public Boolean deleteProfileImage(@PathVariable String username){
         return userService.deleteProfileImage(username);
     }
 

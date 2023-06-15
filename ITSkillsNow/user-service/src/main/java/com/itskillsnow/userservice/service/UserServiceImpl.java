@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean addProfileImage(UpdateProfileImageDto profileImageDto) throws IOException {
+    public String addProfileImage(UpdateProfileImageDto profileImageDto) throws IOException {
         User user = userRepository.findByUsername(profileImageDto.getUsername())
                 .orElseThrow(() -> new UserNotFoundException("User was not found!"));
 
@@ -61,12 +61,14 @@ public class UserServiceImpl implements UserService {
                 profileImageDto.getProfileImage().getSize());
 
         //delete the old profile image from blob storage
-        String blobFileName = FileNamingUtils.getBlobFilename(user.getProfileImage());
-        blobService.deleteFile(blobFileName);
+        if(user.getProfileImage() != null){
+            String blobFileName = FileNamingUtils.getBlobFilename(user.getProfileImage());
+            blobService.deleteFile(blobFileName);
+        }
 
         User newUser = mapUpdateProfileImageToModel(user, profileImage);
         userRepository.save(newUser);
-        return true;
+        return profileImage;
     }
 
     @Override
@@ -74,10 +76,14 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User was not found!"));
 
-        //delete the old profile image from blob storage
-        String blobFileName = FileNamingUtils.getBlobFilename(user.getProfileImage());
-        blobService.deleteFile(blobFileName);
-        return true;
+        if(user.getProfileImage() != null){
+            //delete the old profile image from blob storage
+            String blobFileName = FileNamingUtils.getBlobFilename(user.getProfileImage());
+            blobService.deleteFile(blobFileName);
+            return true;
+        }else {
+            return false;
+        }
     }
 
     @Override

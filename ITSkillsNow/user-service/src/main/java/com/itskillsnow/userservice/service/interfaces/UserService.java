@@ -11,7 +11,7 @@ public interface UserService {
     List<UserDto> getAllUsers();
     UserDto getUserByUsername(String username);
 
-    Boolean addProfileImage(UpdateProfileImageDto profileImageDto) throws IOException;
+    String addProfileImage(UpdateProfileImageDto profileImageDto) throws IOException;
 
     Boolean deleteProfileImage(String username);
 
