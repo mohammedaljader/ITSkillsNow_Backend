@@ -19,14 +19,14 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping
+    @GetMapping("/profile")
     @ResponseStatus(HttpStatus.OK)
     public List<UserDto> getAllUsers(){
         return userService.getAllUsers();
     }
 
 
-    @GetMapping("/{username}")
+    @GetMapping("/profile/{username}")
     @ResponseStatus(HttpStatus.OK)
     public UserDto getUserByUsername(@PathVariable String username){
         return userService.getUserByUsername(username);
@@ -47,7 +47,7 @@ public class UserController {
         return userService.deleteProfileImage(username);
     }
 
-    @PutMapping
+    @PutMapping("/profile")
     @ResponseStatus(HttpStatus.OK)
     public UserDto updateCourseWithImage(@RequestBody UpdateProfileDto updateProfileDto){
         return userService.updateProfile(updateProfileDto);
