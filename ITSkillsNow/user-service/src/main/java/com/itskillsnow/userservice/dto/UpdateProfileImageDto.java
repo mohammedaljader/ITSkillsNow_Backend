@@ -3,13 +3,12 @@ package com.itskillsnow.userservice.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateProfileDto {
+public class UpdateProfileImageDto {
     private String username;
-    private String address;
-    private String phoneNumber;
-    private String profession;
+    private MultipartFile profileImage;
 }

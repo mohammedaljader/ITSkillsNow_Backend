@@ -1,18 +1,20 @@
 package com.itskillsnow.userservice.service.interfaces;
 
 import com.itskillsnow.userservice.dto.UpdateProfileDto;
+import com.itskillsnow.userservice.dto.UpdateProfileImageDto;
 import com.itskillsnow.userservice.dto.UserDto;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface UserService {
     List<UserDto> getAllUsers();
     UserDto getUserByUsername(String username);
 
-    Boolean addProfileImage(MultipartFile file);
+    Boolean addProfileImage(UpdateProfileImageDto profileImageDto) throws IOException;
 
-    Boolean updateProfileImage(MultipartFile file);
+    Boolean deleteProfileImage(String username);
 
-    Boolean updateProfile(UpdateProfileDto updateProfileDto);
+    UserDto updateProfile(UpdateProfileDto updateProfileDto);
 }

@@ -1,15 +1,18 @@
 package com.itskillsnow.userservice.service;
 
 import com.itskillsnow.userservice.dto.UpdateProfileDto;
+import com.itskillsnow.userservice.dto.UpdateProfileImageDto;
 import com.itskillsnow.userservice.dto.UserDto;
 import com.itskillsnow.userservice.exception.UserNotFoundException;
 import com.itskillsnow.userservice.model.User;
 import com.itskillsnow.userservice.repository.UserRepository;
+import com.itskillsnow.userservice.service.interfaces.BlobService;
 import com.itskillsnow.userservice.service.interfaces.UserService;
+import com.itskillsnow.userservice.util.FileNamingUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,6 +22,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final BlobService blobService;
 
     @Override
     public List<UserDto> getAllUsers() {
@@ -48,17 +52,59 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean addProfileImage(MultipartFile file) {
-        return null;
+    public Boolean addProfileImage(UpdateProfileImageDto profileImageDto) throws IOException {
+        User user = userRepository.findByUsername(profileImageDto.getUsername())
+                .orElseThrow(() -> new UserNotFoundException("User was not found!"));
+
+        String profileImage = blobService.storeFile(profileImageDto.getProfileImage().getOriginalFilename(),
+                profileImageDto.getProfileImage().getInputStream(),
+                profileImageDto.getProfileImage().getSize());
+
+        //delete the old profile image from blob storage
+        String blobFileName = FileNamingUtils.getBlobFilename(user.getProfileImage());
+        blobService.deleteFile(blobFileName);
+
+        User newUser = mapUpdateProfileImageToModel(user, profileImage);
+        userRepository.save(newUser);
+        return true;
     }
 
     @Override
-    public Boolean updateProfileImage(MultipartFile file) {
-        return null;
+    public Boolean deleteProfileImage(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User was not found!"));
+
+        //delete the old profile image from blob storage
+        String blobFileName = FileNamingUtils.getBlobFilename(user.getProfileImage());
+        blobService.deleteFile(blobFileName);
+        return true;
     }
 
     @Override
-    public Boolean updateProfile(UpdateProfileDto updateProfileDto) {
-        return null;
+    public UserDto updateProfile(UpdateProfileDto updateProfileDto) {
+        User user = userRepository.findByUsername(updateProfileDto.getUsername())
+                .orElseThrow(() -> new UserNotFoundException("User was not found!"));
+
+        User updatedUser = mapUpdateProfileToModel(user, updateProfileDto);
+        User savedUser = userRepository.save(updatedUser);
+        return mapModelToDto(savedUser);
+    }
+
+    private User mapUpdateProfileImageToModel(User user, String profileImage){
+        return new User(user.getUserId(), user.getUsername(),user.getFullName(),
+                user.getEmail(), user.getAddress(), profileImage, user.getPhoneNumber(),
+                user.getProfession());
+    }
+
+    private User mapUpdateProfileToModel(User user, UpdateProfileDto profileDto){
+        return new User(user.getUserId(), user.getUsername(),user.getFullName(),
+                user.getEmail(), profileDto.getAddress(), user.getProfileImage(), profileDto.getPhoneNumber(),
+                profileDto.getProfession());
+    }
+
+    private UserDto mapModelToDto(User user){
+        return new UserDto(user.getUsername(), user.getFullName(), user.getEmail(),
+                user.getAddress(), user.getProfileImage(), user.getPhoneNumber(),
+                user.getProfession());
     }
 }
