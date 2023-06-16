@@ -15,25 +15,29 @@ public class RouteValidator {
             "/auth/validate",
             "/api/course",
             "/api/job",
+            "/api/user",
             "/eureka"
     );
 
     public static final List<String> adminEndpoints = List.of(
             "/api/course",
             "/api/job",
-            "/auth/addRole"
+            "/auth/addRole",
+            "/api/user"
     );
 
     public static final List<String> companyEndpoints = List.of(
             "/api/course",
-            "/api/job"
+            "/api/job",
+            "/api/user"
     );
 
 
     public static final List<String> userEndpoints = List.of(
             "/api/job",
             "/api/course",
-            "/auth/deleteMe"
+            "/auth/deleteMe",
+            "/api/user"
     );
 
 

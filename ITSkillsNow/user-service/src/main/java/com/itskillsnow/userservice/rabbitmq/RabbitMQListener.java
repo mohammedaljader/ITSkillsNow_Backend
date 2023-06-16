@@ -27,7 +27,11 @@ public class RabbitMQListener {
 
         if(event.getEventType().equals("create")){
             User user = new User(UUID.fromString(payload.getUserId()), payload.getUsername(),
-                    payload.getFullName(), payload.getEmail(), null);
+                    payload.getFullName(), payload.getEmail(),
+                    null,
+                    null,
+                    null,
+                    null);
             createUserEvent(user);
         }
 

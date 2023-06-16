@@ -7,18 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
+public class UpdateProfileDto {
     private String username;
-
-    private String fullName;
-
-    private String email;
-
     private String address;
-
-    private String profileImage;
-
     private String phoneNumber;
-
     private String profession;
 }
